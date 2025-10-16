@@ -1,0 +1,48 @@
+/* Layout helpers */
+.container{width:100%;max-width:1320px;margin:0 auto;padding:0 1.5rem;}
+.container-narrow{max-width:1180px;margin:0 auto;padding:0 1.25rem;}
+.section{padding:var(--space-7) 0;}
+.section-tight{padding:var(--space-5) 0;}
+.flex{display:flex;}
+.flex-col{display:flex;flex-direction:column;}
+.gap-sm{gap:var(--space-2);} .gap{gap:var(--space-3);} .gap-lg{gap:var(--space-5);} .gap-xl{gap:var(--space-6);} 
+.grid-auto{display:grid;gap:var(--space-4);grid-template-columns:repeat(auto-fill,minmax(var(--col-min,200px),1fr));}
+.full-bleed{width:100vw;position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;}
+.center{margin-left:auto;margin-right:auto;}
+.stack{display:flex;flex-direction:column;gap:var(--stack-gap, var(--space-4));}
+
+/********* UI *********/
+.btn{--btn-bg:var(--color-surface);--btn-bd:var(--color-border);--btn-color:var(--color-text);background:var(--btn-bg);border:1px solid var(--btn-bd);color:var(--btn-color);padding:.65rem .95rem;font-size:var(--fs-sm);font-weight:600;letter-spacing:.5px;border-radius:12px;display:inline-flex;align-items:center;gap:.5rem;cursor:pointer;transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease),color var(--dur) var(--ease);position:relative;}
+.btn:hover{background:var(--color-accent);border-color:var(--color-accent);color:#fff;}
+.btn:focus-visible{outline:none;box-shadow:var(--focus-ring);} 
+.btn.primary{--btn-bg:var(--color-accent);--btn-bd:var(--color-accent);--btn-color:#fff;}
+.btn.primary:hover{background:var(--color-accent-hover);}
+.btn.ghost{--btn-bg:rgba(255,255,255,.04);--btn-bd:var(--color-border);}
+.btn.outline{--btn-bg:transparent;--btn-bd:var(--color-border);} 
+.btn.danger{--btn-bg:var(--color-danger);--btn-bd:var(--color-danger);} 
+.btn.sm{padding:.45rem .7rem;font-size:var(--fs-xs);border-radius:10px;}
+.btn.lg{padding:.85rem 1.25rem;font-size:var(--fs-base);border-radius:16px;}
+.icon-btn{background:var(--color-surface-soft);border:1px solid var(--color-border);width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--color-text-dim);cursor:pointer;font-size:.8rem;transition:var(--dur) var(--ease);} 
+.icon-btn:hover{background:var(--color-accent);border-color:var(--color-accent);color:#fff;}
+.icon-btn.sm{width:30px;height:30px;border-radius:8px;font-size:.65rem;}
+
+.badge{display:inline-flex;align-items:center;font-size:var(--fs-xxs);font-weight:700;letter-spacing:.5px;padding:.3rem .55rem;border-radius:999px;background:var(--color-surface-soft);border:1px solid var(--color-border);color:var(--color-text-dim);} 
+.badge.accent{background:var(--color-accent);border-color:var(--color-accent);color:#fff;} 
+.badge.green{background:var(--color-positive);border-color:var(--color-positive);color:#fff;} 
+
+.surface{background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:18px;position:relative;}
+.surface-soft{background:var(--color-surface);border:1px solid var(--color-border);border-radius:18px;}
+.surface-glow{background:var(--gradient-soft);border:1px solid var(--color-border);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:var(--shadow-md);} 
+
+.link-fx{position:relative;display:inline-block;text-decoration:none;color:var(--color-text-dim);}
+.link-fx:after{content:"";position:absolute;left:0;bottom:-3px;height:2px;width:100%;background:var(--color-accent);transform:scaleX(0);transform-origin:left;transition:transform var(--dur) var(--ease);} 
+.link-fx:hover{color:#fff;} .link-fx:hover:after{transform:scaleX(1);} 
+
+.skeleton{position:relative;overflow:hidden;background:var(--color-surface-soft);} 
+.skeleton:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,rgba(255,255,255,.05),rgba(255,255,255,.18) 45%,rgba(255,255,255,.05));background-size:200% 100%;animation:sk-shimmer 1.25s linear infinite;} 
+@keyframes sk-shimmer{0%{background-position:0 0;}100%{background-position:200% 0;}}
+
+.text-dim{color:var(--color-text-dim);} .text-faint{color:var(--color-text-faint);} .truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* Focus */
+:focus-visible{outline:none;box-shadow:var(--focus-ring);} 
