@@ -1,0 +1,168 @@
+/* Clean CodePen-style login mascot + form */
+
+.cp-login {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  background: linear-gradient(180deg,#f0fbf7 0%, #e6f7f1 100%);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+}
+
+.cp-card {
+  width: 380px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 72px 30px 40px;
+  box-shadow: 0 18px 40px -4px rgba(0,0,0,0.08), 0 4px 12px -2px rgba(0,0,0,0.05);
+  position: relative;
+  overflow: visible;
+  border: 1px solid #e6f1ef;
+}
+
+/* Head */
+.cp-head {
+  position: absolute;
+  top: -86px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160px;
+  height: 160px;
+  background: #fff;
+  border-radius: 50%;
+  border: 5px solid #3a5e77;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 22px rgba(58,94,119,0.15);
+}
+
+.cp-ear {
+  width: 30px;
+  height: 30px;
+  background: #fff;
+  border: 4px solid #3a5e77;
+  border-radius: 50%;
+  position: absolute;
+  top: 14px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+}
+.cp-ear--left { left: 14px; }
+.cp-ear--right { right: 14px; }
+
+.cp-face { text-align:center; }
+.cp-eyes { display:flex; gap:26px; justify-content:center; }
+.cp-eye { width:18px; height:18px; background:#3a5e77; border-radius:50%; box-shadow:0 0 0 3px #fff inset; }
+.cp-mouth { width:54px; height:22px; background:#617e92; border-radius:0 0 28px 28px; margin:10px auto 0; position:relative; }
+.cp-mouth:before { content:""; position:absolute; top:4px; left:50%; transform:translateX(-50%); width:24px; height:6px; background:#fff; border-radius:3px; opacity:.35; }
+
+/* Paws */
+.cp-paws { position:absolute; top:54px; left:50%; transform:translateX(-50%); display:flex; gap:46px; }
+.cp-paw { width:60px; height:60px; background:#fff; border:5px solid #3a5e77; border-radius:50%; box-shadow:0 6px 14px rgba(0,0,0,0.1); position:relative; }
+.cp-paw:before, .cp-paw:after { content:""; position:absolute; width:14px; height:14px; background:#3a5e77; border-radius:50%; top:16px; }
+.cp-paw:before { left:14px; }
+.cp-paw:after { right:14px; }
+
+.cp-form { margin-top: 0; }
+.cp-body { display:grid; gap:14px; }
+.cp-label { font-weight:700; color:#217093; font-size:14px; letter-spacing:.5px; }
+.cp-input { padding:12px 14px; border-radius:10px; border:1.5px solid #d9e8ec; background:#f5fbfc; font-size:14px; transition: all .25s ease; }
+.cp-input:focus { outline:none; border-color:#4eb8dd; box-shadow:0 0 0 4px rgba(78,184,221,0.18); background:#fff; }
+.cp-row { display:flex; justify-content:space-between; align-items:center; }
+.cp-checkbox { display:inline-flex; gap:8px; align-items:center; color:#217093; font-size:13px; }
+.cp-checkbox input { width:18px; height:18px; cursor:pointer; accent-color:#4eb8dd; }
+.cp-link { background:transparent; border:none; color:#217093; text-decoration:underline; cursor:pointer; font-size:13px; padding:2px 4px; border-radius:4px; transition:background .2s; }
+.cp-link:hover { background:rgba(33,112,147,0.08); }
+
+.cp-btn { position:relative; margin:22px auto 6px; display:inline-block; padding:14px 46px; border-radius:40px; background:linear-gradient(90deg,#8fcaa1,#6cb787); color:#fff; font-weight:800; letter-spacing:1px; border:none; cursor:pointer; box-shadow:0 18px 34px -8px rgba(108,183,135,0.45),0 6px 14px -4px rgba(0,0,0,0.18); transition:transform .25s cubic-bezier(.19,1,.22,1), box-shadow .25s; }
+.cp-btn:hover:not(:disabled) { transform:translateY(-4px); box-shadow:0 26px 42px -10px rgba(108,183,135,0.55),0 10px 18px -6px rgba(0,0,0,0.22); }
+.cp-btn:active:not(:disabled) { transform:translateY(-1px); }
+.cp-btn:disabled { opacity:.6; cursor:progress; }
+
+.cp-footer { display:flex; justify-content:center; margin-top:10px; }
+.cp-error { color:#c94a4a; text-align:center; font-size:13px; }
+.cp-info { color:#217093; text-align:center; font-size:13px; }
+
+@media (max-width: 460px) {
+  .cp-card { width:92%; padding:68px 20px 34px; }
+  .cp-head { width:132px; height:132px; top:-74px; }
+  .cp-paws { top:50px; gap:36px; }
+  .cp-paw { width:54px; height:54px; }
+  .cp-btn { width:100%; }
+}
+
+/* === New Yeti React Port === */
+.yetiLoginContainer { display:grid; place-items:center; min-height:100vh; background:linear-gradient(180deg,#f3fafc,#e6f5fa); padding:24px; }
+.yetiCard { position:relative; width:380px; max-width:100%; background:#fff; border:1px solid #d5e6ed; border-radius:20px; padding:140px 32px 40px; box-shadow:0 18px 38px -10px rgba(0,40,70,.18),0 4px 14px -4px rgba(0,40,70,.12); }
+.yetiHead { position:absolute; top:-110px; left:50%; transform:translateX(-50%); width:220px; height:220px; }
+.yetiHead .svgContainer { width:220px; height:220px; border:5px solid #2f5672; background:#bfe4f5; }
+.yetiHead .svgContainer.noBorder { border-radius:50%; overflow:hidden; }
+.yetiForm { display:grid; gap:18px; }
+.yetiForm .inputGroup { display:grid; gap:6px; }
+.yetiForm label { font-size:14px; font-weight:600; letter-spacing:.5px; color:#1d4e63; }
+.yetiForm input { padding:12px 14px; border-radius:12px; border:1.5px solid #cfe3ea; background:#f5fafc; font-size:14px; transition:.25s; }
+.yetiForm input:focus { outline:none; border-color:#4eb8dd; box-shadow:0 0 0 4px rgba(78,184,221,.25); background:#fff; }
+.yetiForm .helper { margin:0; font-size:12px; color:#4a7385; opacity:.8; }
+.primaryBtn { padding:14px 40px; background:linear-gradient(90deg,#4eb8dd,#2a90b3); color:#fff; font-weight:700; border:none; border-radius:40px; cursor:pointer; letter-spacing:.5px; box-shadow:0 14px 30px -8px rgba(42,144,179,.45),0 4px 12px -4px rgba(0,0,0,.18); transition:.25s cubic-bezier(.19,1,.22,1); }
+.primaryBtn:hover { transform:translateY(-4px); box-shadow:0 22px 36px -10px rgba(42,144,179,.55),0 8px 16px -6px rgba(0,0,0,.22); }
+.primaryBtn:active { transform:translateY(-1px); }
+.actions { display:flex; justify-content:center; margin-top:8px; }
+
+/* === Refactored structured form layout === */
+.yetiForm { display:grid; gap:26px; }
+.yetiForm .formHeader { text-align:left; display:grid; gap:8px; margin-bottom:4px; }
+.yetiForm .formTitle { margin:0; font-size:28px; line-height:1.15; font-weight:800; letter-spacing:.5px; background:linear-gradient(90deg,#163e51,#2a90b3); -webkit-background-clip:text; background-clip:text; color:#163e51; }
+.yetiForm .formSubtitle { margin:0; font-size:15px; line-height:1.5; color:#315d72; font-weight:500; opacity:.9; }
+
+.yetiForm .formBody { display:grid; gap:22px; }
+.yetiForm .fieldGroup { display:grid; gap:8px; }
+.yetiForm .fieldLabel { font-size:13px; font-weight:700; letter-spacing:.6px; text-transform:none; color:#1d4e63; }
+
+/* Inputs reuse earlier base but refine radius & shadow on focus */
+.yetiForm input { padding:13px 16px; border-radius:14px; border:1.5px solid #cfe3ea; background:#f3f9fb; font-size:14px; font-weight:500; color:#173b49; box-shadow:0 0 0 0 rgba(78,184,221,0); }
+.yetiForm input::placeholder { color:#6e93a3; font-weight:400; }
+.yetiForm input:focus { outline:none; border-color:#4eb8dd; background:#fff; box-shadow:0 0 0 4px rgba(78,184,221,.22); }
+
+/* Password block & show password button */
+.yetiForm .passwordBlock { display:grid; gap:8px; }
+.yetiForm .showPwRow { display:flex; }
+.yetiForm .showPwBtn { font-size:13px; padding:6px 14px; background:#e7f4f9; border:1px solid #c6e4ef; color:#1c5d76; border-radius:8px; cursor:pointer; font-weight:600; letter-spacing:.3px; transition:.25s; box-shadow:0 2px 4px -2px rgba(0,60,90,.18); }
+.yetiForm .showPwBtn:hover { background:#d9edf5; }
+.yetiForm .showPwBtn:active { background:#cfe7f0; transform:translateY(1px); }
+.yetiForm .showPwBtn:focus-visible { outline:3px solid rgba(78,184,221,.55); outline-offset:2px; }
+
+/* Support row (remember + forgot) */
+.yetiForm .supportRow { display:flex; flex-wrap:wrap; align-items:center; gap:18px; margin-top:6px; }
+.yetiForm .rememberMe { display:inline-flex; gap:6px; align-items:center; font-size:13px; font-weight:600; color:#1c5d76; }
+.yetiForm .rememberMe input { width:18px; height:18px; accent-color:#2a90b3; cursor:pointer; box-shadow:none; }
+.yetiForm .forgotPasswordLink { font-size:13px; font-weight:600; color:#1c5d76; text-decoration:none; position:relative; padding:2px 0; }
+.yetiForm .forgotPasswordLink:after { content:""; position:absolute; left:0; right:0; bottom:0; height:2px; background:linear-gradient(90deg,#4eb8dd,#2a90b3); transform:scaleX(0); transform-origin:left; transition:.35s cubic-bezier(.19,1,.22,1); border-radius:2px; }
+.yetiForm .forgotPasswordLink:hover:after { transform:scaleX(1); }
+
+/* Actions row and secondary actions */
+.yetiForm .actions { margin-top:4px; display:flex; flex-direction:row; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+.yetiForm .primaryBtn { margin:0; }
+.yetiForm .secondaryActions { font-size:14px; font-weight:500; color:#33596c; display:flex; align-items:center; gap:4px; }
+.yetiForm .registerLink { font-weight:700; color:#2a90b3; text-decoration:none; position:relative; padding:2px 0; }
+.yetiForm .registerLink:after { content:""; position:absolute; left:0; right:0; bottom:0; height:2px; background:linear-gradient(90deg,#4eb8dd,#2a90b3); transform:scaleX(0); transform-origin:left; transition:.35s cubic-bezier(.19,1,.22,1); border-radius:2px; }
+.yetiForm .registerLink:hover:after { transform:scaleX(1); }
+
+/* Primary button refine */
+.primaryBtn { position:relative; font-size:15px; }
+.primaryBtn:focus-visible { outline:3px solid rgba(78,184,221,.55); outline-offset:3px; }
+
+/* Reduce top padding on card because header changed visual balance */
+.yetiCard { padding-top:132px; }
+
+@media (max-width: 480px){
+  .yetiForm .actions { flex-direction:column; align-items:stretch; }
+  .yetiForm .primaryBtn { width:100%; }
+  .yetiForm .secondaryActions { justify-content:center; }
+}
+
+@media (max-width: 480px){
+  .yetiCard { width:100%; padding:130px 20px 34px; }
+  .yetiHead { width:180px; height:180px; top:-90px; }
+  .yetiHead .svgContainer { width:180px; height:180px; }
+}
+
+
