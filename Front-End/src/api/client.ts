@@ -12,6 +12,7 @@ export type Game = {
   name: string;
   price: number;
   quantity: number;
+  imageUrl?: string;
   salePercent?: number;
   categories?: { name: string; description?: string }[];
 };
