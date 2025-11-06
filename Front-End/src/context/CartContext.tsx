@@ -35,12 +35,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cart]);
 
   const add = useCallback((game: Game, { redirect = false } = {}) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return false;
-    }
-    
+    // Cho phép thêm vào giỏ hàng mà không cần đăng nhập
+    // Sẽ yêu cầu đăng nhập khi checkout
     setCart((prev) => {
       const existing = prev.find((g) => g.id === game.id);
       if (existing) {

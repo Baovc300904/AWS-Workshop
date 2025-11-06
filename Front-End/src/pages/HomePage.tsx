@@ -23,9 +23,12 @@ const GAME_PLACEHOLDERS = [
 ];
 
 function getGameImage(game: Game): string {
-  // Prioritize imageUrl from API if available
-  if (game.imageUrl) {
-    return game.imageUrl;
+  // Prioritize image/cover from API if available
+  if (game.image) {
+    return game.image;
+  }
+  if (game.cover) {
+    return game.cover;
   }
   // Fallback to placeholder based on game name hash
   const hash = game.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -69,7 +72,16 @@ export function HomePage(){
         if (!cancelled) setGames(data);
       })
       .catch((err) => {
-        if (!cancelled) setError(err?.response?.data?.message ?? 'Failed to load games');
+        if (!cancelled) {
+          // Check if it's a network/connection error
+          if (!err.response) {
+            setError('Không thể kết nối tới server. Vui lòng kiểm tra backend đang chạy.');
+          } else if (err.response.status >= 500) {
+            setError('Server đang gặp sự cố. Vui lòng thử lại sau.');
+          } else {
+            setError(err?.response?.data?.message ?? 'Không thể tải danh sách games. Vui lòng thử lại.');
+          }
+        }
       })
       .finally(() => !cancelled && setLoading(false));
     return () => { cancelled = true; };
@@ -199,6 +211,43 @@ export function HomePage(){
     );
   }
 
+  if (error && games.length === 0) {
+    return (
+      <div className="home-model">
+        <div className="hm-container">
+          <div className="error-state-page">
+            <div className="error-icon">⚠️</div>
+            <h2>Không thể tải dữ liệu</h2>
+            <p className="error-message">{error}</p>
+            <div className="error-actions">
+              <button 
+                className="btn-retry primary"
+                onClick={() => window.location.reload()}
+              >
+                🔄 Thử lại
+              </button>
+              <button 
+                className="btn-retry secondary"
+                onClick={() => navigate('/store')}
+              >
+                Xem cửa hàng
+              </button>
+            </div>
+            <div className="error-help">
+              <p className="help-title">Gợi ý khắc phục:</p>
+              <ul className="help-list">
+                <li>Kiểm tra backend đang chạy tại <code>http://localhost:8080</code></li>
+                <li>Chạy lệnh: <code>cd Back-End && mvn spring-boot:run</code></li>
+                <li>Đảm bảo MySQL database đang hoạt động</li>
+                <li>Xóa cache trình duyệt và thử lại</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main className="home-model">
       <div className="hm-container">
@@ -208,7 +257,7 @@ export function HomePage(){
             <div className="cat-head">Danh mục sản phẩm</div>
             <ul className="cat-nav">
               {visibleCats.map(c => (
-                <li key={c.id}>
+                <li key={c.id || c.name}>
                   <button 
                     type="button" 
                     onClick={() => navigate(`/store?category=${encodeURIComponent(c.name)}`)}
@@ -273,9 +322,9 @@ export function HomePage(){
                       ›
                     </button>
                     <div className="hero-dots">
-                      {heroSlides.map((_, i) => (
+                      {heroSlides.map((slide, i) => (
                         <button 
-                          key={i} 
+                          key={slide.id} 
                           className={i === heroIndex ? 'dot active' : 'dot'} 
                           aria-label={`Slide ${i+1}`} 
                           onClick={() => setHeroIndex(i)} 

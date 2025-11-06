@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { forgotPhoneRequest, forgotPhoneConfirm } from '../api/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import './ForgotPasswordPage.css';
 
 export function ForgotPasswordPage() {
   const [step, setStep] = useState<'username' | 'otp'>('username');
@@ -48,34 +49,87 @@ export function ForgotPasswordPage() {
   };
 
   return (
-    <div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh' }}>
-      {step === 'username' && (
-        <form onSubmit={onRequest} style={{ width: 420, padding: 24, border: '1px solid #e5e7eb', borderRadius: 12 }}>
-          <h2 style={{ marginTop: 0, marginBottom: 16 }}>Quên mật khẩu</h2>
-          <div style={{ display: 'grid', gap: 12 }}>
-            <input placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-            <button type="submit" disabled={loading}>Gửi OTP</button>
-            {error && <div style={{ color: 'red' }}>{error}</div>}
-            {info && <div style={{ color: '#2563eb' }}>{info}</div>}
-            <button type="button" onClick={() => navigate('/login')} style={{ background: 'transparent', border: 'none', color: '#2563eb', textDecoration: 'underline', cursor: 'pointer' }}>Back to sign in</button>
-          </div>
-        </form>
-      )}
+    <div className="forgotPasswordContainer">
+      <div className="forgotPasswordCard">
+        {step === 'username' && (
+          <form onSubmit={onRequest} className="forgotPasswordForm">
+            <div className="forgotPasswordHeader">
+              <h2 className="forgotPasswordTitle">🔒 Quên mật khẩu</h2>
+              <p className="forgotPasswordSubtitle">Nhập username để nhận mã OTP qua điện thoại</p>
+            </div>
+            <div className="forgotPasswordBody">
+              <div className="forgotPasswordField">
+                <label htmlFor="username" className="forgotPasswordLabel">Username</label>
+                <input
+                  id="username"
+                  className="forgotPasswordInput"
+                  placeholder="Nhập username của bạn"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+              </div>
+              {error && <div className="forgotPasswordError">⚠️ {error}</div>}
+              {info && <div className="forgotPasswordInfo">✅ {info}</div>}
+            </div>
+            <div className="forgotPasswordActions">
+              <button type="submit" className="forgotPasswordButton" disabled={loading}>
+                {loading ? '⏳ Đang gửi...' : '📧 Gửi mã OTP'}
+              </button>
+              <Link to="/login" className="forgotPasswordBackLink">
+                ← Quay lại đăng nhập
+              </Link>
+            </div>
+          </form>
+        )}
 
-      {step === 'otp' && (
-        <form onSubmit={onConfirm} style={{ width: 420, padding: 24, border: '1px solid #e5e7eb', borderRadius: 12 }}>
-          <h2 style={{ marginTop: 0, marginBottom: 16 }}>Xác nhận OTP</h2>
-          <div style={{ display: 'grid', gap: 12 }}>
-            {maskedPhone && <div style={{ color: '#475569', fontSize: 14 }}>{maskedPhone}</div>}
-            <input placeholder="Mã OTP" value={otp} onChange={(e) => setOtp(e.target.value)} required />
-            <input placeholder="Mật khẩu mới" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-            <button type="submit" disabled={loading}>Đổi mật khẩu</button>
-            {error && <div style={{ color: 'red' }}>{error}</div>}
-            {info && <div style={{ color: '#2563eb' }}>{info}</div>}
-            <button type="button" onClick={() => navigate('/login')} style={{ background: 'transparent', border: 'none', color: '#2563eb', textDecoration: 'underline', cursor: 'pointer' }}>Back to sign in</button>
-          </div>
-        </form>
-      )}
+        {step === 'otp' && (
+          <form onSubmit={onConfirm} className="forgotPasswordForm">
+            <div className="forgotPasswordHeader">
+              <h2 className="forgotPasswordTitle">🔐 Xác nhận OTP</h2>
+              <p className="forgotPasswordSubtitle">Nhập mã OTP và mật khẩu mới</p>
+            </div>
+            <div className="forgotPasswordBody">
+              {maskedPhone && <div className="forgotPasswordInfo">📱 {maskedPhone}</div>}
+              <div className="forgotPasswordField">
+                <label htmlFor="otp" className="forgotPasswordLabel">Mã OTP</label>
+                <input
+                  id="otp"
+                  className="forgotPasswordInput"
+                  placeholder="Nhập mã OTP 6 chữ số"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  maxLength={6}
+                  required
+                />
+              </div>
+              <div className="forgotPasswordField">
+                <label htmlFor="newPassword" className="forgotPasswordLabel">Mật khẩu mới</label>
+                <input
+                  id="newPassword"
+                  className="forgotPasswordInput"
+                  placeholder="Nhập mật khẩu mới (tối thiểu 8 ký tự)"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  minLength={8}
+                  required
+                />
+              </div>
+              {error && <div className="forgotPasswordError">⚠️ {error}</div>}
+              {info && <div className="forgotPasswordInfo">✅ {info}</div>}
+            </div>
+            <div className="forgotPasswordActions">
+              <button type="submit" className="forgotPasswordButton" disabled={loading}>
+                {loading ? '⏳ Đang xác nhận...' : '🔑 Đổi mật khẩu'}
+              </button>
+              <Link to="/login" className="forgotPasswordBackLink">
+                ← Quay lại đăng nhập
+              </Link>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

@@ -351,38 +351,89 @@ const [submitError, setSubmitError] = useState<string | null>(null);
                   try {
                     const username = emailRef.current?.value?.trim() || '';
                     const password = passwordRef.current?.value || '';
+                    
+                    if (!username || !password) {
+                      setSubmitError('Vui lòng nhập đầy đủ username và mật khẩu');
+                      setSubmitting(false);
+                      return;
+                    }
+                    
+                    console.log('[Login] Attempting login for:', username);
                     const token = await login(username, password);
-                    if (!token) throw new Error('Đăng nhập thất bại');
-                    localStorage.setItem('token', token);
+                    console.log('[Login] Received token:', token ? 'YES' : 'NO');
+                    
+                    if (!token) throw new Error('Đăng nhập thất bại - không nhận được token');
+                    
+                    localStorage.setItem('wgs_token', token);
+                    localStorage.setItem('token', token); // Backward compatibility
                     localStorage.setItem('username', username);
                     setAuthToken(token);
+                    
+                    console.log('[Login] Token saved to localStorage');
+                    
                     // decode jwt to get roles/authorities (scope)
                     try {
 										const payloadPart = token.split('.')[1];
 										const json = JSON.parse(decodeURIComponent(escape(window.atob(payloadPart.replace(/-/g, '+').replace(/_/g, '/')))));
+										console.log('[Login] JWT payload:', json);
+										
 										const scope = json.scope || json.scp || json.roles || '';
 										const roles = Array.isArray(scope)
 											? scope
 											: (typeof scope === 'string' ? scope.split(/[\s,;,:|]+/) : []);
 										// Normalize role strings (some backends use 'ADMIN' or 'ROLE_ADMIN')
 										const normalized = roles.map((r: any) => ('' + (r?.authority || r)).toUpperCase());
+										console.log('[Login] User roles:', normalized);
+										
 										localStorage.setItem('user', JSON.stringify({ username, authorities: normalized }));
+										
+										// Kiểm tra redirect URL trước khi navigate theo role
+										const redirectUrl = localStorage.getItem('redirect_after_login');
+										if (redirectUrl) {
+											console.log('[Login] Redirecting to:', redirectUrl);
+											localStorage.removeItem('redirect_after_login');
+											navigate(redirectUrl);
+											return;
+										}
+										
 										if (normalized.includes('ROLE_ADMIN') || normalized.includes('ADMIN')) {
+											console.log('[Login] Redirecting to admin page');
 											navigate('/admin');
 											return;
 										}
 										if (normalized.includes('ROLE_MOD') || normalized.includes('MOD') || normalized.includes('ROLE_MODERATOR') || normalized.includes('MODERATOR')) {
+											console.log('[Login] Redirecting to moderator page');
 											navigate('/moderator');
 											return;
 										}
 										if (normalized.includes('ROLE_USER') || normalized.includes('USER')) {
+											console.log('[Login] Redirecting to home page');
 											navigate('/');
 											return;
 										}
-                    } catch {}
-                    navigate('/');
+                    } catch (jwtErr) {
+                      console.error('[Login] Error parsing JWT:', jwtErr);
+                    }
+                    
+                    // Fallback: check redirect URL nếu không parse được token
+                    const redirectUrl = localStorage.getItem('redirect_after_login');
+                    if (redirectUrl) {
+                    	console.log('[Login] Fallback redirect to:', redirectUrl);
+                    	localStorage.removeItem('redirect_after_login');
+                    	navigate(redirectUrl);
+                    } else {
+                    	console.log('[Login] Fallback redirect to home');
+                    	navigate('/');
+                    }
                   } catch (err: any) {
-                    setSubmitError(err?.response?.data?.message ?? err?.message ?? 'Đăng nhập thất bại');
+                    console.error('[Login] Error:', err);
+                    const errorMessage = err?.response?.data?.message || err?.message || 'Đăng nhập thất bại';
+                    console.error('[Login] Error details:', {
+                      status: err?.response?.status,
+                      statusText: err?.response?.statusText,
+                      data: err?.response?.data
+                    });
+                    setSubmitError(errorMessage);
                   } finally {
                     setSubmitting(false);
                   }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 type LineItem = { id: string; name: string; price: number; qty: number; salePercent?: number };
 
@@ -13,7 +14,19 @@ function getSalePctByStorage(id: string, name: string): number {
 }
 
 export default function CheckoutPage() {
+  const navigate = useNavigate();
   const [tick, setTick] = useState(0);
+  
+  // Kiểm tra đăng nhập khi vào trang checkout
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Lưu URL hiện tại để redirect về sau khi đăng nhập
+      localStorage.setItem('redirect_after_login', '/checkout');
+      navigate('/login');
+    }
+  }, [navigate]);
+  
   const items: (LineItem & { stock?: number })[] = useMemo(() => {
     try {
       const fromBuyNow = localStorage.getItem('checkout_items');
