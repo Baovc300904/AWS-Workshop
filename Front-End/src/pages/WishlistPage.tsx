@@ -24,12 +24,30 @@ const WishlistPage = () => {
 
             try {
                 setLoading(true);
-                // Fetch each game by ID
+                // Fetch each game by ID, silently skip 404s
                 const gamePromises = wishlist.map((id: string) => 
-                    fetchGame(id).catch(() => null)
+                    fetchGame(id).catch((err) => {
+                        // Silently handle 404 - game was deleted
+                        if (err?.response?.status === 404) {
+                            return null;
+                        }
+                        console.error(`Error fetching game ${id}:`, err);
+                        return null;
+                    })
                 );
                 const results = await Promise.all(gamePromises);
                 const validGames = results.filter((g: any): g is GameResponse => g !== null);
+                
+                // Auto-remove deleted games from wishlist
+                if (validGames.length < wishlist.length) {
+                    const validIds = validGames.map(g => g.id);
+                    wishlist.forEach((id: string) => {
+                        if (!validIds.includes(id)) {
+                            remove(id);
+                        }
+                    });
+                }
+                
                 setGames(validGames);
             } catch (error) {
                 console.error('Error fetching wishlist games:', error);
@@ -92,7 +110,6 @@ const WishlistPage = () => {
         <div className="wishlist-page">
             <div className="wishlist-container">
                 <div className="wishlist-header">
-<<<<<<< Updated upstream
                     <h1>Danh sách yêu thích</h1>
                     <p className="wishlist-subtitle">{games.length} game</p>
                 </div>
@@ -158,7 +175,6 @@ const WishlistPage = () => {
                                             title="Xóa khỏi yêu thích"
                                         >
                                             🗑️
-=======
                     <h1>❤️ Danh sách yêu thích</h1>
                     <p className="wishlist-subtitle">{games.length} game trong danh sách của bạn</p>
                 </div>
@@ -261,18 +277,14 @@ const WishlistPage = () => {
                                             title="Xóa khỏi yêu thích"
                                         >
                                             🗑️ Xóa
->>>>>>> Stashed changes
                                         </button>
                                     </div>
                                 </div>
                             </div>
-<<<<<<< Updated upstream
-                        </div>
-                    ))}
-=======
                         );
                     })}
->>>>>>> Stashed changes
+                        </div>
+                    ))}
                 </div>
 
                 <div className="wishlist-actions">
@@ -280,11 +292,8 @@ const WishlistPage = () => {
                         className="btn-secondary"
                         onClick={() => navigate('/store')}
                     >
-<<<<<<< Updated upstream
-                        Tiếp tục mua sắm
-=======
                         ← Tiếp tục mua sắm
->>>>>>> Stashed changes
+                        Tiếp tục mua sắm
                     </button>
                     <button 
                         className="btn-primary"
@@ -293,11 +302,8 @@ const WishlistPage = () => {
                             navigate('/checkout');
                         }}
                     >
-<<<<<<< Updated upstream
-                        Thêm tất cả vào giỏ hàng
-=======
                         🛒 Thêm tất cả vào giỏ hàng ({games.length})
->>>>>>> Stashed changes
+                        Thêm tất cả vào giỏ hàng
                     </button>
                 </div>
             </div>

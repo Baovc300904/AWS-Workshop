@@ -1,84 +1,48 @@
-/* Gaming Login Page - Cyberpunk Style */
+/* Clean CodePen-style login mascot + form */
 
-.yetiLoginContainer { 
+.cp-login {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  background: linear-gradient(180deg,#f0fbf7 0%, #e6f7f1 100%);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+}
+
+.cp-card {
+  width: 380px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 72px 30px 40px;
+  box-shadow: 0 18px 40px -4px rgba(0,0,0,0.08), 0 4px 12px -2px rgba(0,0,0,0.05);
+  position: relative;
+  overflow: visible;
+  border: 1px solid #e6f1ef;
+}
+
+/* Head */
+.cp-head {
+  position: absolute;
+  top: -86px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160px;
+  height: 160px;
+  background: #fff;
+  border-radius: 50%;
+  border: 5px solid #3a5e77;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh; 
-  background: linear-gradient(to bottom, #16202D 0%, #1B2838 50%, #16202D 100%);
-  padding: 140px 24px 40px;
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 10px 22px rgba(58,94,119,0.15);
 }
 
-.yetiCard { 
-  position: relative; 
-  width: 420px; 
-  max-width: 100%; 
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
-  border: 2px solid rgba(99, 102, 241, 0.3); 
-  border-radius: 24px; 
-  padding: 160px 40px 48px; 
-  box-shadow: 
-    0 0 60px rgba(99, 102, 241, 0.3),
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    inset 0 0 60px rgba(99, 102, 241, 0.05);
-  backdrop-filter: blur(20px);
-}
-
-.yetiHead { 
-  position: absolute; 
-  top: -120px; 
-  left: 50%; 
-  transform: translateX(-50%); 
-  width: 240px; 
-  height: 240px; 
-  animation: yetiFloat 6s ease-in-out infinite;
-}
-
-@keyframes yetiFloat {
-  0%, 100% { 
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-  50% { 
-    transform: translateX(-50%) translateY(-10px) scale(1.02);
-  }
-}
-
-.yetiHead .svgContainer { 
-  width: 240px; 
-  height: 240px; 
-  border: 3px solid rgba(99, 102, 241, 0.6);
-  background: linear-gradient(135deg, #a9ddf3 0%, #c8e9f7 50%, #a9ddf3 100%);
-  box-shadow: 
-    0 0 40px rgba(99, 102, 241, 0.5),
-    0 10px 30px rgba(0, 0, 0, 0.4),
-    inset 0 5px 15px rgba(255, 255, 255, 0.4),
-    inset 0 -5px 15px rgba(0, 0, 0, 0.1);
-  filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.4));
-  transition: all 0.3s ease;
-}
-
-.yetiHead .svgContainer:hover {
-  transform: scale(1.05) rotate(2deg);
-  box-shadow: 
-    0 0 60px rgba(99, 102, 241, 0.7),
-    0 15px 40px rgba(0, 0, 0, 0.5),
-    inset 0 5px 20px rgba(255, 255, 255, 0.5),
-    inset 0 -5px 15px rgba(0, 0, 0, 0.1);
-  border-color: rgba(129, 140, 248, 0.8);
-}
-
-.yetiHead .svgContainer.noBorder { 
-  border-radius: 50%; 
-  overflow: hidden; 
-  position: relative;
-}
-
-.yetiHead .svgContainer.noBorder::before {
-  content: '';
+.cp-ear {
+  width: 30px;
+  height: 30px;
+  background: #fff;
+  border: 4px solid #3a5e77;
+  border-radius: 50%;
   position: absolute;
-<<<<<<< Updated upstream
   top: 14px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.06);
 }
@@ -101,7 +65,7 @@
 .cp-form { margin-top: 0; }
 .cp-body { display:grid; gap:14px; }
 .cp-label { font-weight:700; color:#217093; font-size:14px; letter-spacing:.5px; }
-.cp-input { padding:12px 14px; border-radius:10px; border:1.5px solid #d9e8ec; background:#ffffff; font-size:14px; transition: all .25s ease; }
+.cp-input { padding:12px 14px; border-radius:10px; border:1.5px solid #d9e8ec; background:#f5fbfc; font-size:14px; transition: all .25s ease; }
 .cp-input:focus { outline:none; border-color:#4eb8dd; box-shadow:0 0 0 4px rgba(78,184,221,0.18); background:#fff; }
 .cp-row { display:flex; justify-content:space-between; align-items:center; }
 .cp-checkbox { display:inline-flex; gap:8px; align-items:center; color:#217093; font-size:13px; }
@@ -135,7 +99,7 @@
 .yetiForm { display:grid; gap:18px; }
 .yetiForm .inputGroup { display:grid; gap:6px; }
 .yetiForm label { font-size:14px; font-weight:600; letter-spacing:.5px; color:#1d4e63; }
-.yetiForm input { padding:12px 14px; border-radius:12px; border:1.5px solid #cfe3ea; background:#ffffff; font-size:14px; transition:.25s; }
+.yetiForm input { padding:12px 14px; border-radius:12px; border:1.5px solid #cfe3ea; background:#f5fafc; font-size:14px; transition:.25s; }
 .yetiForm input:focus { outline:none; border-color:#4eb8dd; box-shadow:0 0 0 4px rgba(78,184,221,.25); background:#fff; }
 .yetiForm .helper { margin:0; font-size:12px; color:#4a7385; opacity:.8; }
 .primaryBtn { padding:14px 40px; background:linear-gradient(90deg,#4eb8dd,#2a90b3); color:#fff; font-weight:700; border:none; border-radius:40px; cursor:pointer; letter-spacing:.5px; box-shadow:0 14px 30px -8px rgba(42,144,179,.45),0 4px 12px -4px rgba(0,0,0,.18); transition:.25s cubic-bezier(.19,1,.22,1); }
@@ -154,7 +118,7 @@
 .yetiForm .fieldLabel { font-size:13px; font-weight:700; letter-spacing:.6px; text-transform:none; color:#1d4e63; }
 
 /* Inputs reuse earlier base but refine radius & shadow on focus */
-.yetiForm input { padding:13px 16px; border-radius:14px; border:1.5px solid #cfe3ea; background:#ffffff; font-size:14px; font-weight:500; color:#173b49; box-shadow:0 0 0 0 rgba(78,184,221,0); }
+.yetiForm input { padding:13px 16px; border-radius:14px; border:1.5px solid #cfe3ea; background:#f3f9fb; font-size:14px; font-weight:500; color:#173b49; box-shadow:0 0 0 0 rgba(78,184,221,0); }
 .yetiForm input::placeholder { color:#6e93a3; font-weight:400; }
 .yetiForm input:focus { outline:none; border-color:#4eb8dd; background:#fff; box-shadow:0 0 0 4px rgba(78,184,221,.22); }
 
@@ -193,28 +157,15 @@
   .yetiForm .actions { flex-direction:column; align-items:stretch; }
   .yetiForm .primaryBtn { width:100%; }
   .yetiForm .secondaryActions { justify-content:center; }
-=======
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.3) 50%,
-    transparent 70%
-  );
-  animation: shimmer 3s linear infinite;
 }
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%) translateY(-100%) rotate(45deg);
-  }
-  100% {
-    transform: translateX(100%) translateY(100%) rotate(45deg);
-  }
->>>>>>> Stashed changes
+@media (max-width: 480px){
+  .yetiCard { width:100%; padding:130px 20px 34px; }
+  .yetiHead { width:180px; height:180px; top:-90px; }
+  .yetiHead .svgContainer { width:180px; height:180px; }
+}
+
+
 }
 
 .yetiForm { 
@@ -615,3 +566,4 @@
     width: 100%;
   }
 }
+

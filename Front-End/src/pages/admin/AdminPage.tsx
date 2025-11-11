@@ -126,15 +126,7 @@ export default function AdminPage() {
             </div>
             <div className="topbarActions">
               {activeTab==='dashboard' && <button className="btn">Add Video</button>}
-              <button className="btn" onClick={()=>{ 
-                try { 
-                  localStorage.removeItem('wgs_token'); 
-                  localStorage.removeItem('token'); 
-                  setAuthToken(null); 
-                } catch {} finally { 
-                  window.location.href = '/login'; 
-                } 
-              }}>Logout</button>
+              <button className="btn" onClick={()=>{ try { localStorage.removeItem('token'); setAuthToken(null as any); } catch {} finally { window.location.href = '/login'; } }}>Logout</button>
             </div>
           </div>
           <div className="adminContent">

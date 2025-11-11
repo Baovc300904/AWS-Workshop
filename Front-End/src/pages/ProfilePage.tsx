@@ -24,13 +24,13 @@ export function ProfilePage() {
   const [formData, setFormData] = useState<UpdateProfilePayload>({
     firstName: '',
     lastName: '',
-    email: '',
     phone: '',
     dob: '',
   });
 
   useEffect(() => {
     const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+    
     if (!token) {
       navigate('/login');
       return;
@@ -38,33 +38,8 @@ export function ProfilePage() {
 
     const checkAuth = async () => {
       try {
-        // TEMPORARY: Mock data if backend not available
-        const USE_MOCK = true; // Set to false when backend is ready
-        
-        if (USE_MOCK) {
-          console.warn('[ProfilePage] Using MOCK data - Backend not available');
-          const mockData = {
-            id: 'mock-user-123',
-            username: localStorage.getItem('username') || 'baovc',
-            firstName: 'Bảo',
-            lastName: 'Võ Cao',
-            email: 'baovc@devteria.com',
-            phone: '0987654321',
-            dob: '2000-01-15'
-          };
-          setProfile(mockData);
-          setFormData({
-            firstName: mockData.firstName || '',
-            lastName: mockData.lastName || '',
-            email: mockData.email || '',
-            phone: mockData.phone || '',
-            dob: mockData.dob || '',
-          });
-          setLoading(false);
-          return;
-        }
-
         const valid = await introspect(token);
+        
         if (!valid) {
           localStorage.removeItem('token');
           localStorage.removeItem('wgs_token');
@@ -73,17 +48,24 @@ export function ProfilePage() {
         }
 
         const data = await getMyInfo();
-        console.log('[ProfilePage] User data loaded:', data);
         setProfile(data);
         setFormData({
           firstName: data.firstName || '',
           lastName: data.lastName || '',
-          email: data.email || '',
           phone: data.phone || '',
           dob: data.dob || '',
         });
       } catch (err: any) {
         console.error('[ProfilePage] Error loading user info:', err);
+        
+        // If 401 Unauthenticated, redirect to login
+        if (err?.response?.status === 401 || err?.response?.status === 403) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('wgs_token');
+          navigate('/login');
+          return;
+        }
+        
         setError(err?.response?.data?.message || 'Không thể tải thông tin người dùng');
       } finally {
         setLoading(false);
@@ -107,7 +89,6 @@ export function ProfilePage() {
       setFormData({
         firstName: profile?.firstName || '',
         lastName: profile?.lastName || '',
-        email: profile?.email || '',
         phone: profile?.phone || '',
         dob: profile?.dob || '',
       });
@@ -121,7 +102,6 @@ export function ProfilePage() {
     setSaving(true);
     try {
       const updated = await updateMyInfo(formData);
-      console.log('[ProfilePage] Profile updated:', updated);
       setProfile(updated);
       setEditing(false);
       alert('✅ Cập nhật thông tin thành công!');
@@ -328,17 +308,9 @@ export function ProfilePage() {
                         <span className="labelText">Email</span>
                       </div>
                       <div className="infoValue">
-                        {editing ? (
-                          <input
-                            type="email"
-                            className="editInput"
-                            value={formData.email}
-                            onChange={(e) => handleChange('email', e.target.value)}
-                            placeholder="email@example.com"
-                          />
-                        ) : (
-                          profile.email || <span className="emptyValue">Chưa cập nhật</span>
-                        )}
+                        {/* Email cannot be edited - backend doesn't support it */}
+                        {profile.email || <span className="emptyValue">Chưa cập nhật</span>}
+                        {editing && <span className="emailNote">(không thể sửa)</span>}
                       </div>
                     </div>
                     
