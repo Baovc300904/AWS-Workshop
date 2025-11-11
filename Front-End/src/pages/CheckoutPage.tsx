@@ -6,16 +6,16 @@ import './CheckoutPage.css';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const { cart, remove, updateQuantity, clear } = useCart();
+  const { cart, updateQuantity, remove, totalRaw, clear } = useCart();
   const { currency } = useCurrency();
   const [isProcessing, setIsProcessing] = useState(false);
-
+  
+  // Kiểm tra đăng nhập khi vào trang checkout
   useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+    const token = localStorage.getItem('token') || localStorage.getItem('wgs_token');
     if (!token) {
-      alert('Vui lòng đăng nhập để thanh toán');
-      navigate('/login');
+      localStorage.setItem('redirect_after_login', '/checkout');
+      navigate('/login', { replace: true });
     }
   }, [navigate]);
 
@@ -190,7 +190,6 @@ export default function CheckoutPage() {
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );

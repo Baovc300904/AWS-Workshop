@@ -25,8 +25,6 @@ export class ErrorBoundary extends Component<Props, State> {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
-<<<<<<< Updated upstream
-=======
   handleReload = () => {
     window.location.reload();
   };
@@ -35,7 +33,6 @@ export class ErrorBoundary extends Component<Props, State> {
     window.location.href = '/';
   };
 
->>>>>>> Stashed changes
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
@@ -44,21 +41,6 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="error-boundary-container">
-<<<<<<< Updated upstream
-          <div className="error-boundary-icon">⚠️</div>
-          <h1 className="error-boundary-title">
-            Đã xảy ra lỗi
-          </h1>
-          <p className="error-boundary-message">
-            {this.state.error?.message || 'Có lỗi không xác định xảy ra'}
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="error-boundary-button"
-          >
-            🔄 Tải lại trang
-          </button>
-=======
           <div className="error-boundary-content">
             <div className="error-boundary-icon-wrapper">
               <div className="error-boundary-icon">
@@ -117,7 +99,6 @@ export class ErrorBoundary extends Component<Props, State> {
               <p>Nếu vấn đề vẫn tiếp diễn, vui lòng liên hệ hỗ trợ</p>
             </div>
           </div>
->>>>>>> Stashed changes
         </div>
       );
     }

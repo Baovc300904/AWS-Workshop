@@ -24,13 +24,14 @@ export function ProfilePage() {
   const [formData, setFormData] = useState<UpdateProfilePayload>({
     firstName: '',
     lastName: '',
+    email: '',
     phone: '',
     dob: '',
   });
+  const [passwordConfirm, setPasswordConfirm] = useState(''); // Password for confirmation
 
   useEffect(() => {
     const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
-    
     if (!token) {
       navigate('/login');
       return;
@@ -38,8 +39,8 @@ export function ProfilePage() {
 
     const checkAuth = async () => {
       try {
+        // Verify token first
         const valid = await introspect(token);
-        
         if (!valid) {
           localStorage.removeItem('token');
           localStorage.removeItem('wgs_token');
@@ -47,26 +48,26 @@ export function ProfilePage() {
           return;
         }
 
+        // Load user profile from API
         const data = await getMyInfo();
         setProfile(data);
         setFormData({
           firstName: data.firstName || '',
           lastName: data.lastName || '',
+          email: data.email || '',
           phone: data.phone || '',
           dob: data.dob || '',
         });
       } catch (err: any) {
-        console.error('[ProfilePage] Error loading user info:', err);
+        const errorMsg = err?.response?.data?.message || err?.message || 'Không thể tải thông tin người dùng';
+        setError(errorMsg);
         
-        // If 401 Unauthenticated, redirect to login
-        if (err?.response?.status === 401 || err?.response?.status === 403) {
+        // If 401, redirect to login
+        if (err?.response?.status === 401) {
           localStorage.removeItem('token');
           localStorage.removeItem('wgs_token');
           navigate('/login');
-          return;
         }
-        
-        setError(err?.response?.data?.message || 'Không thể tải thông tin người dùng');
       } finally {
         setLoading(false);
       }
@@ -85,13 +86,15 @@ export function ProfilePage() {
 
   const handleEdit = () => {
     if (editing) {
-      // Cancel edit - reset form data
+      // Cancel edit - reset form data and password
       setFormData({
         firstName: profile?.firstName || '',
         lastName: profile?.lastName || '',
+        email: profile?.email || '',
         phone: profile?.phone || '',
         dob: profile?.dob || '',
       });
+      setPasswordConfirm('');
     }
     setEditing(!editing);
   };
@@ -99,15 +102,50 @@ export function ProfilePage() {
   const handleSave = async () => {
     if (!profile) return;
     
+    // Validate password confirmation
+    if (!passwordConfirm || passwordConfirm.trim() === '') {
+      alert('⚠️ Vui lòng nhập mật khẩu hiện tại để xác nhận thay đổi!');
+      return;
+    }
+    
     setSaving(true);
+    setError(null);
     try {
-      const updated = await updateMyInfo(formData);
+      // Include username and password in the update request
+      const updatePayload = {
+        username: profile.username,
+        password: passwordConfirm, // Send current password to preserve it
+        ...formData
+      };
+      
+      const updated = await updateMyInfo(updatePayload as any);
       setProfile(updated);
       setEditing(false);
-      alert('✅ Cập nhật thông tin thành công!');
+      setPasswordConfirm(''); // Clear password field
+      
+      // Show success message
+      const successMsg = document.createElement('div');
+      successMsg.className = 'toast-success';
+      successMsg.textContent = '✅ Cập nhật thông tin thành công!';
+      document.body.appendChild(successMsg);
+      setTimeout(() => successMsg.remove(), 3000);
+      
     } catch (err: any) {
-      console.error('[ProfilePage] Update failed:', err);
-      alert('❌ Cập nhật thất bại: ' + (err?.response?.data?.message || err.message));
+      let errorMsg = err?.response?.data?.message || err?.message || 'Cập nhật thất bại';
+      
+      // Check if error is due to wrong password
+      if (err?.response?.status === 401 || errorMsg.toLowerCase().includes('password')) {
+        errorMsg = 'Mật khẩu không đúng! Vui lòng thử lại.';
+      }
+      
+      setError(errorMsg);
+      
+      // Show error message
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'toast-error';
+      errorDiv.textContent = `❌ ${errorMsg}`;
+      document.body.appendChild(errorDiv);
+      setTimeout(() => errorDiv.remove(), 3000);
     } finally {
       setSaving(false);
     }
@@ -308,9 +346,17 @@ export function ProfilePage() {
                         <span className="labelText">Email</span>
                       </div>
                       <div className="infoValue">
-                        {/* Email cannot be edited - backend doesn't support it */}
-                        {profile.email || <span className="emptyValue">Chưa cập nhật</span>}
-                        {editing && <span className="emailNote">(không thể sửa)</span>}
+                        {editing ? (
+                          <input
+                            type="email"
+                            className="editInput"
+                            value={formData.email}
+                            onChange={(e) => handleChange('email', e.target.value)}
+                            placeholder="email@example.com"
+                          />
+                        ) : (
+                          profile.email || <span className="emptyValue">Chưa cập nhật</span>
+                        )}
                       </div>
                     </div>
                     
@@ -371,24 +417,46 @@ export function ProfilePage() {
                   </div>
 
                   {editing && (
-                    <div className="editActions">
-                      <button 
-                        className="saveButton" 
-                        onClick={handleSave}
-                        disabled={saving}
-                      >
-                        <span className="saveIcon">💾</span>
-                        {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
-                      </button>
-                      <button 
-                        className="cancelButton" 
-                        onClick={handleEdit}
-                        disabled={saving}
-                      >
-                        <span className="cancelIcon">🚫</span>
-                        Hủy bỏ
-                      </button>
-                    </div>
+                    <>
+                      <div className="passwordConfirmSection">
+                        <div className="passwordConfirmHeader">
+                          <span className="warningIcon">🔐</span>
+                          <h3>Xác nhận mật khẩu</h3>
+                        </div>
+                        <p className="passwordConfirmNote">
+                          Để bảo mật tài khoản, vui lòng nhập mật khẩu hiện tại của bạn để xác nhận thay đổi.
+                        </p>
+                        <div className="passwordConfirmInput">
+                          <input
+                            type="password"
+                            className="editInput"
+                            placeholder="Nhập mật khẩu hiện tại..."
+                            value={passwordConfirm}
+                            onChange={(e) => setPasswordConfirm(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="editActions">
+                        <button 
+                          className="saveButton" 
+                          onClick={handleSave}
+                          disabled={saving}
+                        >
+                          <span className="saveIcon">💾</span>
+                          {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                        </button>
+                        <button 
+                          className="cancelButton" 
+                          onClick={handleEdit}
+                          disabled={saving}
+                        >
+                          <span className="cancelIcon">🚫</span>
+                          Hủy bỏ
+                        </button>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
