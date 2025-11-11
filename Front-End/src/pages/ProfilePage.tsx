@@ -346,6 +346,8 @@ export function ProfilePage() {
                             className="editInput"
                             value={formData.dob}
                             onChange={(e) => handleChange('dob', e.target.value)}
+                            placeholder="YYYY-MM-DD"
+                            aria-label="Ngày sinh"
                           />
                         ) : (
                           profile.dob 
