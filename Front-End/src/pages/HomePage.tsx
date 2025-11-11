@@ -23,9 +23,12 @@ const GAME_PLACEHOLDERS = [
 ];
 
 function getGameImage(game: Game): string {
-  // Prioritize imageUrl from API if available
-  if (game.imageUrl) {
-    return game.imageUrl;
+  // Prioritize image/cover from API if available
+  if (game.image) {
+    return game.image;
+  }
+  if (game.cover) {
+    return game.cover;
   }
   // Fallback to placeholder based on game name hash
   const hash = game.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -69,7 +72,16 @@ export function HomePage(){
         if (!cancelled) setGames(data);
       })
       .catch((err) => {
-        if (!cancelled) setError(err?.response?.data?.message ?? 'Failed to load games');
+        if (!cancelled) {
+          // Check if it's a network/connection error
+          if (!err.response) {
+            setError('Không thể kết nối tới server. Vui lòng kiểm tra backend đang chạy.');
+          } else if (err.response.status >= 500) {
+            setError('Server đang gặp sự cố. Vui lòng thử lại sau.');
+          } else {
+            setError(err?.response?.data?.message ?? 'Không thể tải danh sách games. Vui lòng thử lại.');
+          }
+        }
       })
       .finally(() => !cancelled && setLoading(false));
     return () => { cancelled = true; };
@@ -199,6 +211,54 @@ export function HomePage(){
     );
   }
 
+  if (error && games.length === 0) {
+    return (
+      <div className="home-model">
+        <div className="hm-container">
+          <div className="error-state-page">
+            <div className="error-icon-wrapper">
+              <svg className="error-icon-svg" width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+              </svg>
+              <div className="error-glow"></div>
+            </div>
+            
+            <h2>Không thể tải dữ liệu</h2>
+            <p className="error-description">
+              Rất tiếc, chúng tôi không thể kết nối đến máy chủ lúc này. 
+              Vui lòng thử lại sau hoặc liên hệ hỗ trợ nếu vấn đề vẫn tiếp diễn.
+            </p>
+            
+            <div className="error-actions">
+              <button 
+                className="btn-retry primary"
+                onClick={() => window.location.reload()}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
+                </svg>
+                Thử lại
+              </button>
+              <button 
+                className="btn-retry secondary"
+                onClick={() => navigate('/store')}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/>
+                </svg>
+                Xem cửa hàng
+              </button>
+            </div>
+            
+            <div className="error-footer">
+              <p>Nếu bạn cần hỗ trợ, vui lòng liên hệ với chúng tôi</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main className="home-model">
       <div className="hm-container">
@@ -208,7 +268,7 @@ export function HomePage(){
             <div className="cat-head">Danh mục sản phẩm</div>
             <ul className="cat-nav">
               {visibleCats.map(c => (
-                <li key={c.id}>
+                <li key={c.id || c.name}>
                   <button 
                     type="button" 
                     onClick={() => navigate(`/store?category=${encodeURIComponent(c.name)}`)}
@@ -273,9 +333,9 @@ export function HomePage(){
                       ›
                     </button>
                     <div className="hero-dots">
-                      {heroSlides.map((_, i) => (
+                      {heroSlides.map((slide, i) => (
                         <button 
-                          key={i} 
+                          key={slide.id} 
                           className={i === heroIndex ? 'dot active' : 'dot'} 
                           aria-label={`Slide ${i+1}`} 
                           onClick={() => setHeroIndex(i)} 

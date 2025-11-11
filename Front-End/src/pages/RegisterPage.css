@@ -1,138 +1,648 @@
-/* Register page is isolated from login styles */
+/* Gaming Register Page - Cyberpunk Style for Game Code Shop */
 
 .registerContainer {
   display: grid;
   place-items: center;
   min-height: 100vh;
-  background: linear-gradient(180deg,#f5fbff,#eaf6ff);
+  background: linear-gradient(to bottom, #16202D 0%, #1B2838 50%, #16202D 100%);
   padding: 24px;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* Horizontal rectangular card: split 2 columns */
+/* Gaming Card with glow effect */
 .registerCard {
   width: 980px;
   max-width: 96vw;
-  background: #fff;
-  border: 1px solid #d7e6ef;
-  border-radius: 18px;
+  max-height: 90vh;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  border-radius: 24px;
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 380px 1fr;
   gap: 0;
-  box-shadow: 0 18px 38px -12px rgba(0,40,70,.18), 0 6px 18px -8px rgba(0,40,70,.12);
+  box-shadow: 
+    0 0 60px rgba(99, 102, 241, 0.3),
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 0 60px rgba(99, 102, 241, 0.05);
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(20px);
+}
+
+/* Left side: Gaming visual + branding */
+.registerLeft {
+  background: 
+    linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%),
+    rgba(15, 23, 42, 0.8);
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  border-right: 2px solid rgba(99, 102, 241, 0.2);
+  position: relative;
   overflow: hidden;
 }
 
-/* Left side: friendly face + intro */
-.registerLeft {
-  background: linear-gradient(180deg,#dff0fb,#cfe9fb);
-  padding: 28px 24px 28px 28px;
-  display: grid;
-  align-content: start;
-  gap: 18px;
-  border-right: 1px solid #d7e6ef;
-}
-.registerFace { display: grid; place-items: center; }
-.registerIntro h3 {
-  margin: 0 0 6px;
-  font-size: 22px;
-  font-weight: 800;
-  color: #18465b;
-}
-.registerIntro p {
-  margin: 0;
-  color: #2a6076;
-  font-size: 14px;
+/* Gaming controller/icon */
+.registerFace { 
+  display: grid; 
+  place-items: center;
+  position: relative;
+  margin-bottom: 20px;
 }
 
-/* Right side: form */
-.registerRight { padding: 28px; }
-.registerHeader { display: grid; gap: 6px; margin-bottom: 8px; }
+.registerFace svg {
+  filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.6));
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+/* Replace SVG with gaming controller */
+.registerFace::before {
+  content: '🎮';
+  font-size: 120px;
+  filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.8));
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+.registerFace svg {
+  display: none;
+}
+
+.registerIntro {
+  text-align: center;
+}
+
+.registerIntro h3 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 40px rgba(129, 140, 248, 0.5);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.registerIntro p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Decorative gaming elements */
+.registerLeft::after {
+  content: '< / >';
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  font-weight: 900;
+  color: rgba(99, 102, 241, 0.3);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 4px;
+}
+
+/* Right side: Gaming form */
+.registerRight { 
+  padding: 40px 36px;
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+/* Custom scrollbar for register right panel */
+.registerRight::-webkit-scrollbar {
+  width: 8px;
+}
+
+.registerRight::-webkit-scrollbar-track {
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 10px;
+}
+
+.registerRight::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 10px;
+}
+
+.registerRight::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+
+.registerHeader { 
+  display: grid; 
+  gap: 8px; 
+  margin-bottom: 24px; 
+}
+
 .registerTitle {
   margin: 0;
-  font-size: 28px;
+  font-size: 36px;
   line-height: 1.15;
   font-weight: 900;
-  letter-spacing: .4px;
-  color: #18465b;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 20px rgba(224, 231, 255, 0.3);
+  text-transform: uppercase;
 }
+
 .registerSubtitle {
   margin: 0;
   font-size: 14px;
-  color: #2a6076;
-  opacity: .95;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
 }
 
-.registerForm { display: grid; gap: 18px; }
+.registerForm { 
+  display: grid; 
+  gap: 20px; 
+}
+
 .registerGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px 16px;
+  gap: 18px 18px;
 }
-.fieldGroup { display: grid; gap: 8px; }
-.fieldGroup.fullRow { grid-column: span 2; }
-.fieldLabel { font-size: 13px; font-weight: 700; color: #1b4f64; letter-spacing: .4px; }
 
+.fieldGroup { 
+  display: grid; 
+  gap: 8px; 
+}
+
+.fieldGroup.fullRow { 
+  grid-column: span 2; 
+}
+
+.fieldLabel { 
+  font-size: 13px; 
+  font-weight: 700; 
+  color: #818cf8; 
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(129, 140, 248, 0.3);
+}
+
+/* Gaming inputs */
 .registerForm input {
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: 12px;
-  border: 1.5px solid #cfe3ea;
-  background: #f5fafc;
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  background: rgba(30, 41, 59, 0.6);
   font-size: 14px;
-  color: #173b49;
-  transition: .2s;
+  color: #e0e7ff;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
 }
-.registerForm input::placeholder { color: #6e93a3; }
-.registerForm input:focus { outline: none; border-color: #4eb8dd; background: #fff; box-shadow: 0 0 0 4px rgba(78,184,221,.18); }
 
-/* inline input + button */
+.registerForm input::placeholder { 
+  color: rgba(255, 255, 255, 0.4); 
+  font-style: italic;
+}
+
+.registerForm input:focus { 
+  outline: none; 
+  border-color: #818cf8; 
+  background: rgba(30, 41, 59, 0.8); 
+  box-shadow: 
+    0 0 0 4px rgba(129, 140, 248, 0.15),
+    0 0 20px rgba(129, 140, 248, 0.4),
+    inset 0 0 20px rgba(129, 140, 248, 0.1);
+  transform: translateY(-2px);
+}
+
+.registerForm input:hover {
+  border-color: rgba(129, 140, 248, 0.5);
+}
+
+/* Date input gaming style */
+.registerForm input[type="date"] {
+  position: relative;
+  padding-right: 40px;
+  cursor: pointer;
+  font-family: inherit;
+  color: #e0e7ff;
+}
+
+.registerForm input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23818cf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>') no-repeat center;
+  width: 28px;
+  height: 28px;
+  opacity: 0.7;
+  transition: all 0.3s;
+  border-radius: 8px;
+  margin-left: 8px;
+  filter: drop-shadow(0 0 8px rgba(129, 140, 248, 0.5));
+}
+
+.registerForm input[type="date"]:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  background-color: rgba(129, 140, 248, 0.15);
+  transform: scale(1.1);
+}
+
+.registerForm input[type="date"]:focus::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  background-color: rgba(129, 140, 248, 0.2);
+}
+
+.registerForm input[type="date"]::-webkit-datetime-edit-text,
+.registerForm input[type="date"]::-webkit-datetime-edit-month-field,
+.registerForm input[type="date"]::-webkit-datetime-edit-day-field,
+.registerForm input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #e0e7ff;
+  padding: 0 2px;
+  font-weight: 600;
+}
+
+.registerForm input[type="date"]:invalid::-webkit-datetime-edit {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Inline input + button for OTP */
 .inlineFieldRow {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
+
 .inlineBtn {
-  padding: 10px 14px;
-  background: #e7f4f9;
-  border: 1px solid #c6e4ef;
-  color: #1c5d76;
-  border-radius: 10px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%);
+  border: 2px solid rgba(129, 140, 248, 0.5);
+  color: #e0e7ff;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+  white-space: nowrap;
 }
-.inlineBtn:hover { background: #d9edf5; }
 
-/* messages */
-.regError { color: #c94a4a; font-size: 13px; }
-.regInfo { color: #1c5d76; font-size: 13px; }
+.inlineBtn:hover:not(:disabled) { 
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.5) 0%, rgba(168, 85, 247, 0.5) 100%);
+  border-color: #a78bfa;
+  box-shadow: 0 0 25px rgba(129, 140, 248, 0.6);
+  transform: translateY(-2px);
+}
 
-/* actions */
-.actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.inlineBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Gaming messages with cyberpunk glow */
+.regError { 
+  color: #fca5a5; 
+  font-size: 13px; 
+  font-weight: 600;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 2px solid rgba(239, 68, 68, 0.4);
+  border-left: 4px solid #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+  animation: errorPulse 2s ease-in-out infinite;
+}
+
+@keyframes errorPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.5); }
+}
+
+.regInfo { 
+  color: #a5f3fc; 
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(6, 182, 212, 0.15);
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 2px solid rgba(6, 182, 212, 0.4);
+  border-left: 4px solid #06b6d4;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+  animation: infoPulse 2s ease-in-out infinite;
+}
+
+@keyframes infoPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.5); }
+}
+
+/* Field-level errors with gaming style */
+.fieldError {
+  color: #fca5a5;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-shadow: 0 0 10px rgba(252, 165, 165, 0.5);
+  letter-spacing: 0.3px;
+}
+
+.fieldError::before {
+  content: "⚠";
+  font-size: 14px;
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8));
+}
+
+.registerForm input.error {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.registerForm input.error:focus {
+  border-color: #ef4444;
+  box-shadow: 
+    0 0 0 4px rgba(239, 68, 68, 0.2),
+    0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Field hints with cyberpunk style */
+.fieldHint {
+  font-size: 11px;
+  color: rgba(129, 140, 248, 0.6);
+  font-style: italic;
+  font-weight: 500;
+  text-shadow: 0 0 8px rgba(129, 140, 248, 0.3);
+}
+
+/* Required asterisk */
+.required {
+  color: #f87171;
+  font-weight: 900;
+  margin-left: 3px;
+  text-shadow: 0 0 10px rgba(248, 113, 113, 0.8);
+  animation: requiredGlow 2s ease-in-out infinite;
+}
+
+@keyframes requiredGlow {
+  0%, 100% { text-shadow: 0 0 10px rgba(248, 113, 113, 0.8); }
+  50% { text-shadow: 0 0 20px rgba(248, 113, 113, 1); }
+}
+
+/* Gaming action buttons */
+.actions { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 18px; 
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
 .primaryBtn {
-  padding: 12px 32px;
-  background: linear-gradient(90deg,#4eb8dd,#2a90b3);
-  color: #fff;
-  font-weight: 800;
-  border: none;
-  border-radius: 40px;
+  padding: 16px 40px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 15px;
+  border: 2px solid #a78bfa;
+  border-radius: 14px;
   cursor: pointer;
-  letter-spacing: .4px;
-  box-shadow: 0 14px 30px -8px rgba(42,144,179,.42), 0 4px 12px -4px rgba(0,0,0,.18);
-  transition: .25s cubic-bezier(.19,1,.22,1);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 
+    0 0 30px rgba(99, 102, 241, 0.6),
+    0 8px 20px rgba(0, 0, 0, 0.3),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 8px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  position: relative;
+  overflow: hidden;
 }
-.primaryBtn:hover { transform: translateY(-3px); }
-.secondaryActions { font-size: 14px; color: #33596c; display: flex; gap: 6px; align-items: center; }
-.registerLink { color: #2a90b3; font-weight: 800; text-decoration: none; position: relative; }
-.registerLink:after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: linear-gradient(90deg,#4eb8dd,#2a90b3); transform: scaleX(0); transform-origin: left; transition: .3s; border-radius: 2px; }
-.registerLink:hover:after { transform: scaleX(1); }
 
-/* Responsive */
-@media (max-width: 960px) {
-  .registerCard { grid-template-columns: 1fr; }
-  .registerLeft { border-right: none; border-bottom: 1px solid #d7e6ef; }
+.primaryBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
 }
+
+.primaryBtn:hover:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
+}
+
+.primaryBtn:hover:not(:disabled) { 
+  transform: translateY(-3px); 
+  box-shadow: 
+    0 0 50px rgba(129, 140, 248, 0.8),
+    0 12px 30px rgba(0, 0, 0, 0.4),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 8px rgba(255, 255, 255, 0.3);
+  border-color: #c7d2fe;
+}
+
+.primaryBtn:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  color: rgba(224, 231, 255, 0.5);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+}
+
+/* Google Button */
+.googleBtn {
+  width: 100%;
+  padding: 14px 32px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #3c4043;
+  font-weight: 600;
+  font-size: 14px;
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 0 20px rgba(99, 102, 241, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.googleBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.googleBtn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.googleBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.2),
+    0 0 40px rgba(99, 102, 241, 0.4);
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(255, 255, 255, 1);
+}
+
+.googleBtn:active {
+  transform: translateY(0);
+}
+
+.googleIcon {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.googleBtn span {
+  position: relative;
+  z-index: 1;
+}
+
+.secondaryActions { 
+  font-size: 14px; 
+  color: rgba(255, 255, 255, 0.7); 
+  display: flex; 
+  gap: 8px; 
+  align-items: center;
+  font-weight: 500;
+}
+
+.registerLink { 
+  color: #a78bfa; 
+  font-weight: 800; 
+  text-decoration: none; 
+  position: relative;
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+  transition: all 0.3s ease;
+}
+
+.registerLink::after { 
+  content: ""; 
+  position: absolute; 
+  left: 0; 
+  right: 0; 
+  bottom: -2px; 
+  height: 2px; 
+  background: linear-gradient(90deg, #818cf8 0%, #a78bfa 100%);
+  transform: scaleX(0); 
+  transform-origin: left; 
+  transition: transform 0.3s ease; 
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(129, 140, 248, 0.8);
+}
+
+.registerLink:hover {
+  color: #c7d2fe;
+  text-shadow: 0 0 20px rgba(199, 210, 254, 0.8);
+}
+
+.registerLink:hover::after { 
+  transform: scaleX(1); 
+}
+
+/* Responsive - Gaming style maintained */
+@media (max-width: 960px) {
+  .registerCard { 
+    grid-template-columns: 1fr; 
+    max-width: 600px;
+  }
+  .registerLeft { 
+    border-right: none; 
+    border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+    padding: 32px 24px;
+  }
+  .registerRight {
+    padding: 32px 24px;
+  }
+}
+
 @media (max-width: 560px) {
-  .registerGrid { grid-template-columns: 1fr; }
-  .fieldGroup.fullRow { grid-column: span 1; }
-  .actions { flex-direction: column; align-items: stretch; }
+  .registerGrid { 
+    grid-template-columns: 1fr; 
+  }
+  .fieldGroup.fullRow { 
+    grid-column: span 1; 
+  }
+  .actions { 
+    flex-direction: column; 
+    align-items: stretch; 
+  }
+  .primaryBtn {
+    width: 100%;
+  }
+  .registerTitle {
+    font-size: 28px;
+  }
+}
+
+/* Additional gaming effects */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
