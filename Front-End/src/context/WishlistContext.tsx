@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Game } from '../api/client';
 
 interface WishlistContextValue {
@@ -13,7 +12,6 @@ interface WishlistContextValue {
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const navigate = useNavigate();
   const [wishlist, setWishlist] = useState<string[]>(() => {
     try {
       const raw = localStorage.getItem('wishlist_ids');
@@ -30,19 +28,15 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   }, [wishlist]);
 
   const toggle = useCallback((game: Game) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return false;
-    }
-    
+    // Không yêu cầu đăng nhập để thêm vào wishlist
+    // Wishlist được lưu local, có thể sync sau khi đăng nhập
     setWishlist((list) => {
       return list.includes(game.id)
         ? list.filter((id) => id !== game.id)
         : [...list, game.id];
     });
     return true;
-  }, [navigate]);
+  }, []);
 
   const remove = useCallback((id: string) => {
     setWishlist((list) => list.filter((gid) => gid !== id));
