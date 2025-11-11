@@ -92,6 +92,7 @@ const WishlistPage = () => {
         <div className="wishlist-page">
             <div className="wishlist-container">
                 <div className="wishlist-header">
+<<<<<<< Updated upstream
                     <h1>Danh sách yêu thích</h1>
                     <p className="wishlist-subtitle">{games.length} game</p>
                 </div>
@@ -157,12 +158,121 @@ const WishlistPage = () => {
                                             title="Xóa khỏi yêu thích"
                                         >
                                             🗑️
+=======
+                    <h1>❤️ Danh sách yêu thích</h1>
+                    <p className="wishlist-subtitle">{games.length} game trong danh sách của bạn</p>
+                </div>
+
+                <div className="wishlist-list">
+                    {games.map((game) => {
+                        const finalPrice = game.salePercent > 0 
+                            ? game.price * (1 - game.salePercent / 100) 
+                            : game.price;
+                        const hasDiscount = game.salePercent > 0;
+                        const isFree = game.price === 0;
+
+                        return (
+                            <div key={game.id} className="wishlist-item">
+                                <div 
+                                    className="item-image-wrapper" 
+                                    onClick={() => navigate(`/game/${game.id}`)}
+                                >
+                                    <img 
+                                        src={getGameImage(game)} 
+                                        alt={game.name}
+                                        className="item-image"
+                                    />
+                                    {hasDiscount && (
+                                        <div className="item-discount-badge">
+                                            -{game.salePercent}%
+                                        </div>
+                                    )}
+                                    {game.video && (
+                                        <div className="video-indicator">
+                                            🎬 Video
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <div className="item-details">
+                                    <h3 
+                                        className="item-name" 
+                                        onClick={() => navigate(`/game/${game.id}`)}
+                                    >
+                                        {game.name}
+                                    </h3>
+                                    
+                                    {game.categories && game.categories.length > 0 && (
+                                        <div className="item-categories">
+                                            {game.categories.map((cat) => (
+                                                <span key={cat.name} className="item-category-tag">
+                                                    {cat.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="item-meta">
+                                        {game.releaseDate && (
+                                            <span className="item-meta-item">
+                                                📅 {new Date(game.releaseDate).toLocaleDateString('vi-VN')}
+                                            </span>
+                                        )}
+                                        {game.averageRating && (
+                                            <span className="item-rating">
+                                                ⭐ {game.averageRating.toFixed(1)}
+                                                {game.ratingCount && ` (${game.ratingCount})`}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="item-actions">
+                                    <div className="item-price-section">
+                                        {isFree ? (
+                                            <span className="item-price-free">Miễn phí</span>
+                                        ) : hasDiscount ? (
+                                            <>
+                                                <span className="item-price-original">
+                                                    {formatPrice(game.price, currency)}
+                                                </span>
+                                                <span className="item-price-current">
+                                                    {formatPrice(finalPrice, currency)}
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <span className="item-price-current">
+                                                {formatPrice(game.price, currency)}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="item-buttons">
+                                        <button
+                                            className="btn-add-cart"
+                                            onClick={() => handleAddToCart(game)}
+                                            title="Thêm vào giỏ hàng"
+                                        >
+                                            🛒 Thêm vào giỏ
+                                        </button>
+                                        <button
+                                            className="btn-remove-wishlist"
+                                            onClick={() => remove(game.id)}
+                                            title="Xóa khỏi yêu thích"
+                                        >
+                                            🗑️ Xóa
+>>>>>>> Stashed changes
                                         </button>
                                     </div>
                                 </div>
                             </div>
+<<<<<<< Updated upstream
                         </div>
                     ))}
+=======
+                        );
+                    })}
+>>>>>>> Stashed changes
                 </div>
 
                 <div className="wishlist-actions">
@@ -170,7 +280,11 @@ const WishlistPage = () => {
                         className="btn-secondary"
                         onClick={() => navigate('/store')}
                     >
+<<<<<<< Updated upstream
                         Tiếp tục mua sắm
+=======
+                        ← Tiếp tục mua sắm
+>>>>>>> Stashed changes
                     </button>
                     <button 
                         className="btn-primary"
@@ -179,7 +293,11 @@ const WishlistPage = () => {
                             navigate('/checkout');
                         }}
                     >
+<<<<<<< Updated upstream
                         Thêm tất cả vào giỏ hàng
+=======
+                        🛒 Thêm tất cả vào giỏ hàng ({games.length})
+>>>>>>> Stashed changes
                     </button>
                 </div>
             </div>

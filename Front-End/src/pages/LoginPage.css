@@ -1,48 +1,84 @@
-/* Clean CodePen-style login mascot + form */
+/* Gaming Login Page - Cyberpunk Style */
 
-.cp-login {
-  display: grid;
-  place-items: center;
-  min-height: 100vh;
-  background: linear-gradient(180deg,#f0fbf7 0%, #e6f7f1 100%);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
-}
-
-.cp-card {
-  width: 380px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 72px 30px 40px;
-  box-shadow: 0 18px 40px -4px rgba(0,0,0,0.08), 0 4px 12px -2px rgba(0,0,0,0.05);
-  position: relative;
-  overflow: visible;
-  border: 1px solid #e6f1ef;
-}
-
-/* Head */
-.cp-head {
-  position: absolute;
-  top: -86px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 160px;
-  height: 160px;
-  background: #fff;
-  border-radius: 50%;
-  border: 5px solid #3a5e77;
+.yetiLoginContainer { 
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 22px rgba(58,94,119,0.15);
+  min-height: 100vh; 
+  background: linear-gradient(to bottom, #16202D 0%, #1B2838 50%, #16202D 100%);
+  padding: 140px 24px 40px;
+  position: relative;
+  overflow: hidden;
 }
 
-.cp-ear {
-  width: 30px;
-  height: 30px;
-  background: #fff;
-  border: 4px solid #3a5e77;
-  border-radius: 50%;
+.yetiCard { 
+  position: relative; 
+  width: 420px; 
+  max-width: 100%; 
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 2px solid rgba(99, 102, 241, 0.3); 
+  border-radius: 24px; 
+  padding: 160px 40px 48px; 
+  box-shadow: 
+    0 0 60px rgba(99, 102, 241, 0.3),
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 0 60px rgba(99, 102, 241, 0.05);
+  backdrop-filter: blur(20px);
+}
+
+.yetiHead { 
+  position: absolute; 
+  top: -120px; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  width: 240px; 
+  height: 240px; 
+  animation: yetiFloat 6s ease-in-out infinite;
+}
+
+@keyframes yetiFloat {
+  0%, 100% { 
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  50% { 
+    transform: translateX(-50%) translateY(-10px) scale(1.02);
+  }
+}
+
+.yetiHead .svgContainer { 
+  width: 240px; 
+  height: 240px; 
+  border: 3px solid rgba(99, 102, 241, 0.6);
+  background: linear-gradient(135deg, #a9ddf3 0%, #c8e9f7 50%, #a9ddf3 100%);
+  box-shadow: 
+    0 0 40px rgba(99, 102, 241, 0.5),
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    inset 0 5px 15px rgba(255, 255, 255, 0.4),
+    inset 0 -5px 15px rgba(0, 0, 0, 0.1);
+  filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.4));
+  transition: all 0.3s ease;
+}
+
+.yetiHead .svgContainer:hover {
+  transform: scale(1.05) rotate(2deg);
+  box-shadow: 
+    0 0 60px rgba(99, 102, 241, 0.7),
+    0 15px 40px rgba(0, 0, 0, 0.5),
+    inset 0 5px 20px rgba(255, 255, 255, 0.5),
+    inset 0 -5px 15px rgba(0, 0, 0, 0.1);
+  border-color: rgba(129, 140, 248, 0.8);
+}
+
+.yetiHead .svgContainer.noBorder { 
+  border-radius: 50%; 
+  overflow: hidden; 
+  position: relative;
+}
+
+.yetiHead .svgContainer.noBorder::before {
+  content: '';
   position: absolute;
+<<<<<<< Updated upstream
   top: 14px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.06);
 }
@@ -157,12 +193,425 @@
   .yetiForm .actions { flex-direction:column; align-items:stretch; }
   .yetiForm .primaryBtn { width:100%; }
   .yetiForm .secondaryActions { justify-content:center; }
+=======
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 70%
+  );
+  animation: shimmer 3s linear infinite;
 }
 
-@media (max-width: 480px){
-  .yetiCard { width:100%; padding:130px 20px 34px; }
-  .yetiHead { width:180px; height:180px; top:-90px; }
-  .yetiHead .svgContainer { width:180px; height:180px; }
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+>>>>>>> Stashed changes
+}
+
+.yetiForm { 
+  display: grid; 
+  gap: 24px; 
+}
+
+.formHeader {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.formTitle {
+  margin: 0 0 8px;
+  font-size: 36px;
+  line-height: 1.15;
+  font-weight: 900;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 20px rgba(224, 231, 255, 0.3);
+  text-transform: uppercase;
+}
+
+.formSubtitle {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.formBody { 
+  display: grid; 
+  gap: 20px; 
+}
+
+.fieldGroup { 
+  display: grid; 
+  gap: 10px; 
+}
+
+.fieldLabel { 
+  font-size: 13px; 
+  font-weight: 700; 
+  color: #818cf8; 
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(129, 140, 248, 0.3);
+}
+
+.yetiForm input[type="text"],
+.yetiForm input[type="password"] {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  background: rgba(30, 41, 59, 0.6);
+  font-size: 14px;
+  color: #e0e7ff;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+.yetiForm input::placeholder { 
+  color: rgba(255, 255, 255, 0.4); 
+  font-style: italic;
+}
+
+.yetiForm input:focus { 
+  outline: none; 
+  border-color: #818cf8; 
+  background: rgba(30, 41, 59, 0.8); 
+  box-shadow: 
+    0 0 0 4px rgba(129, 140, 248, 0.15),
+    0 0 20px rgba(129, 140, 248, 0.4),
+    inset 0 0 20px rgba(129, 140, 248, 0.1);
+  transform: translateY(-2px);
+}
+
+.yetiForm input:hover {
+  border-color: rgba(129, 140, 248, 0.5);
+}
+
+.passwordBlock {
+  display: grid;
+  gap: 8px;
+}
+
+.showPwRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.showPwBtn {
+  background: transparent;
+  border: none;
+  color: #a78bfa;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px rgba(167, 139, 250, 0.5);
+}
+
+.showPwBtn:hover {
+  color: #c7d2fe;
+  background: rgba(129, 140, 248, 0.1);
+  text-shadow: 0 0 12px rgba(199, 210, 254, 0.8);
+}
+
+.supportRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.rememberMe {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.rememberMe input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #818cf8;
+}
+
+.forgotPasswordLink {
+  color: #a78bfa;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  text-shadow: 0 0 8px rgba(167, 139, 250, 0.5);
+}
+
+.forgotPasswordLink:hover {
+  color: #c7d2fe;
+  text-shadow: 0 0 12px rgba(199, 210, 254, 0.8);
+}
+
+.actions { 
+  display: flex; 
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px; 
+  margin-top: 8px;
+}
+
+.primaryBtn {
+  padding: 16px 40px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 15px;
+  border: 2px solid #a78bfa;
+  border-radius: 14px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 
+    0 0 30px rgba(99, 102, 241, 0.6),
+    0 8px 20px rgba(0, 0, 0, 0.3),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 8px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.primaryBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.primaryBtn:hover:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
+}
+
+.primaryBtn:hover:not(:disabled) { 
+  transform: translateY(-3px); 
+  box-shadow: 
+    0 0 50px rgba(129, 140, 248, 0.8),
+    0 12px 30px rgba(0, 0, 0, 0.4),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 8px rgba(255, 255, 255, 0.3);
+  border-color: #c7d2fe;
+}
+
+.primaryBtn:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  color: rgba(224, 231, 255, 0.5);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+}
+
+/* Google Button */
+.googleBtn {
+  width: 100%;
+  padding: 14px 32px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #3c4043;
+  font-weight: 600;
+  font-size: 14px;
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 0 20px rgba(99, 102, 241, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.googleBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.googleBtn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.googleBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.2),
+    0 0 40px rgba(99, 102, 241, 0.4);
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(255, 255, 255, 1);
+}
+
+.googleBtn:active {
+  transform: translateY(0);
+}
+
+.googleIcon {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.googleBtn span {
+  position: relative;
+  z-index: 1;
 }
 
 
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.7; }
+}
+
+.secondaryActions { 
+  font-size: 14px; 
+  color: rgba(255, 255, 255, 0.7); 
+  display: flex; 
+  gap: 8px; 
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.registerLink { 
+  color: #a78bfa; 
+  font-weight: 800; 
+  text-decoration: none; 
+  position: relative;
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+  transition: all 0.3s ease;
+}
+
+.registerLink::after { 
+  content: ""; 
+  position: absolute; 
+  left: 0; 
+  right: 0; 
+  bottom: -2px; 
+  height: 2px; 
+  background: linear-gradient(90deg, #818cf8 0%, #a78bfa 100%);
+  transform: scaleX(0); 
+  transform-origin: left; 
+  transition: transform 0.3s ease; 
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(129, 140, 248, 0.8);
+}
+
+.registerLink:hover {
+  color: #c7d2fe;
+  text-shadow: 0 0 20px rgba(199, 210, 254, 0.8);
+}
+
+.registerLink:hover::after { 
+  transform: scaleX(1); 
+}
+
+.cp-error { 
+  color: #fca5a5; 
+  text-align: center; 
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 2px solid rgba(239, 68, 68, 0.4);
+  border-left: 4px solid #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+  animation: errorPulse 2s ease-in-out infinite;
+}
+
+@keyframes errorPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.5); }
+}
+
+@media (max-width: 480px) {
+  .yetiCard { 
+    width: 100%;
+    padding: 150px 24px 36px; 
+  }
+  
+  .yetiHead { 
+    width: 200px; 
+    height: 200px; 
+    top: -100px;
+  }
+  
+  .yetiHead .svgContainer { 
+    width: 200px; 
+    height: 200px; 
+  }
+  
+  .formTitle {
+    font-size: 28px;
+  }
+  
+  .primaryBtn {
+    width: 100%;
+  }
+}
