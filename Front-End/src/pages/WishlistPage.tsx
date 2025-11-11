@@ -110,6 +110,71 @@ const WishlistPage = () => {
         <div className="wishlist-page">
             <div className="wishlist-container">
                 <div className="wishlist-header">
+                    <h1>Danh sách yêu thích</h1>
+                    <p className="wishlist-subtitle">{games.length} game</p>
+                </div>
+
+                <div className="wishlist-grid">
+                    {games.map((game) => (
+                        <div key={game.id} className="wishlist-card">
+                            <div className="card-image-wrapper" onClick={() => navigate(`/game/${game.id}`)}>
+                                <img 
+                                    src={getGameImage(game)} 
+                                    alt={game.name}
+                                    className="card-image"
+                                />
+                                {game.video && (
+                                    <div className="video-indicator">
+                                        <span>▶️ Video</span>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="card-content">
+                                <h3 
+                                    className="card-title" 
+                                    onClick={() => navigate(`/game/${game.id}`)}
+                                >
+                                    {game.name}
+                                </h3>
+                                
+                                {game.categories && game.categories.length > 0 && (
+                                    <div className="card-category">
+                                        {game.categories[0].name}
+                                    </div>
+                                )}
+
+                                <div className="card-footer">
+                                    <div className="card-price">
+                                        {game.salePercent > 0 ? (
+                                            <>
+                                                <span className="price-discount">-{game.salePercent}%</span>
+                                                <div className="price-group">
+                                                    <span className="price-original">{formatPrice(game.price, currency)}</span>
+                                                    <span className="price-final">
+                                                        {formatPrice(game.price * (1 - game.salePercent / 100), currency)}
+                                                    </span>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <span className="price-final">{formatPrice(game.price, currency)}</span>
+                                        )}
+                                    </div>
+
+                                    <div className="card-actions">
+                                        <button
+                                            className="btn-cart"
+                                            onClick={() => handleAddToCart(game)}
+                                            title="Thêm vào giỏ hàng"
+                                        >
+                                            🛒
+                                        </button>
+                                        <button
+                                            className="btn-remove"
+                                            onClick={() => remove(game.id)}
+                                            title="Xóa khỏi yêu thích"
+                                        >
+                                            🗑️
                     <h1>❤️ Danh sách yêu thích</h1>
                     <p className="wishlist-subtitle">{games.length} game trong danh sách của bạn</p>
                 </div>
@@ -218,6 +283,8 @@ const WishlistPage = () => {
                             </div>
                         );
                     })}
+                        </div>
+                    ))}
                 </div>
 
                 <div className="wishlist-actions">
@@ -226,6 +293,7 @@ const WishlistPage = () => {
                         onClick={() => navigate('/store')}
                     >
                         ← Tiếp tục mua sắm
+                        Tiếp tục mua sắm
                     </button>
                     <button 
                         className="btn-primary"
@@ -235,6 +303,7 @@ const WishlistPage = () => {
                         }}
                     >
                         🛒 Thêm tất cả vào giỏ hàng ({games.length})
+                        Thêm tất cả vào giỏ hàng
                     </button>
                 </div>
             </div>

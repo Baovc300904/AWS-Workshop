@@ -356,6 +356,18 @@ const [submitError, setSubmitError] = useState<string | null>(null);
                     localStorage.setItem('token', token);
                     localStorage.setItem('username', username);
                     setAuthToken(token);
+                    console.log('[Login] Received token:', token ? 'YES' : 'NO');
+                    
+                    if (!token) throw new Error('Đăng nhập thất bại - không nhận được token');
+                    
+                    localStorage.setItem('wgs_token', token);
+                    localStorage.setItem('token', token); // Backward compatibility
+                    localStorage.setItem('username', username);
+                    setAuthToken(token);
+                    
+                    console.log('[Login] Token saved to localStorage');
+                    
+
                     // decode jwt to get roles/authorities (scope)
                     try {
 										const payloadPart = token.split('.')[1];

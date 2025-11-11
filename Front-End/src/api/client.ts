@@ -200,16 +200,12 @@ export async function getMyInfo() {
   return res.data?.result as Me;
 }
 
-<<<<<<< Updated upstream
-=======
-export type UpdateProfilePayload = {
-  firstName?: string;
-  lastName?: string;
   phone?: string;
   dob?: string; // yyyy-MM-dd
 };
 
 export async function updateMyInfo(payload: UpdateProfilePayload) {
+
   // First get current user info to get the userId
   const currentUser = await getMyInfo();
   
@@ -224,7 +220,10 @@ export async function updateMyInfo(payload: UpdateProfilePayload) {
   return res.data?.result as Me;
 }
 
->>>>>>> Stashed changes
+  const res = await api.put('/users/myInfo', payload);
+  return res.data?.result as Me;
+}
+
 // Sales/Orders for dashboard (adjust endpoints to your backend)
 export type OrderSummary = {
   totalSold: number;
