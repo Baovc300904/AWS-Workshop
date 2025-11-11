@@ -186,7 +186,7 @@ export function HomePage() {
             <span className="cartText">Cart</span>
             <span className="cartBadge">{cartCount}</span>
           </button>
-          {(me || localStorage.getItem('username') || (()=>{ try { return JSON.parse(localStorage.getItem('user')||'{}')?.username; } catch { return null; } })()) && (
+          {(me || localStorage.getItem('username') || (()=>{ try { return JSON.parse(localStorage.getItem('user')||'{}')?.username; } catch { return null; } })()) ? (
             <div className="relativePos" ref={userRef}>
               <div className="userCompact" tabIndex={0} onClick={(e)=>{ e.stopPropagation(); setMenuOpen((v)=>!v); }} onKeyDown={(e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); e.stopPropagation(); setMenuOpen((v)=>!v); } }}>
                 <img className="avatar" src={localStorage.getItem('avatarUrl') || '/assets/avatar-default.png'} alt="avatar" />
@@ -201,6 +201,8 @@ export function HomePage() {
                 </div>
               )}
             </div>
+          ) : (
+            <button className="searchBtn loginBtn" onClick={() => { window.location.href = '/login'; }}>Login</button>
           )}
         </div>
         {/* user compact rendered after the search form below */}

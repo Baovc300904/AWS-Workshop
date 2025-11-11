@@ -193,6 +193,15 @@ export type Me = {
   username: string;
   firstName?: string;
   lastName?: string;
+  phone?: string;
+  dob?: string; // yyyy-MM-dd
+};
+
+export type UpdateProfilePayload = {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  dob?: string; // yyyy-MM-dd
 };
 
 export async function getMyInfo() {
@@ -200,12 +209,7 @@ export async function getMyInfo() {
   return res.data?.result as Me;
 }
 
-  phone?: string;
-  dob?: string; // yyyy-MM-dd
-};
-
 export async function updateMyInfo(payload: UpdateProfilePayload) {
-
   // First get current user info to get the userId
   const currentUser = await getMyInfo();
   
@@ -217,10 +221,6 @@ export async function updateMyInfo(payload: UpdateProfilePayload) {
   if (payload.dob) updateData.dob = payload.dob;
   
   const res = await api.put(`/users/${currentUser.id}`, updateData);
-  return res.data?.result as Me;
-}
-
-  const res = await api.put('/users/myInfo', payload);
   return res.data?.result as Me;
 }
 
