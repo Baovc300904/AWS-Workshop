@@ -101,5 +101,6 @@
 .wishBtn.small { width:30px; height:30px; font-size:16px; }
 .wishBtn[data-pressed="true"] { color:#ffd54f; border-color:#ffd54f; box-shadow:0 0 0 2px rgba(255,213,79,.18) inset; }
 .relativePos { position:relative; }
+.loginBtn { margin-left:8px; }
 
 
