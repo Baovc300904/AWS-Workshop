@@ -4,8 +4,73 @@ const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8080/identit
 
 export const api = axios.create({
   baseURL: API_BASE,
-  timeout: 10000
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
+
+// Public endpoints that don't need authentication
+const PUBLIC_ENDPOINTS = [
+  '/auth/log-in',
+  '/auth/introspect',
+  '/users/forgot-password',
+  '/users/request-phone-otp',
+  '/users/forgot-password/phone/request',
+  '/users/forgot-password/phone/confirm',
+  '/email/request-otp', // Email OTP endpoint
+  '/games',
+  '/games/by-price-asc',
+  '/games/by-price-desc',
+  '/games/search',
+  '/category',
+];
+
+// Request interceptor to conditionally add auth token
+api.interceptors.request.use(
+  (config) => {
+    const url = config.url || '';
+    const method = (config.method || 'get').toUpperCase();
+    
+    // Check if this is a public endpoint
+    const isPublicEndpoint = PUBLIC_ENDPOINTS.some(endpoint => {
+      if (endpoint === '/games' && method === 'GET') return url === '/games' || url.startsWith('/games/');
+      if (endpoint === '/category' && method === 'GET') return url.startsWith('/category');
+      return url.startsWith(endpoint);
+    });
+    
+    // Special check: POST /users (register) is public
+    const isRegisterEndpoint = method === 'POST' && (url === '/users' || url === '/users/');
+    const isFinallyPublic = isPublicEndpoint || isRegisterEndpoint;
+
+    // Only add Authorization header for protected endpoints
+    if (!isFinallyPublic) {
+      const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor to handle common errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear token if exists
+      const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+      if (token) {
+        localStorage.removeItem('wgs_token');
+        localStorage.removeItem('token');
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export type Game = {
   id: string;
@@ -135,6 +200,31 @@ export async function getMyInfo() {
   return res.data?.result as Me;
 }
 
+<<<<<<< Updated upstream
+=======
+export type UpdateProfilePayload = {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  dob?: string; // yyyy-MM-dd
+};
+
+export async function updateMyInfo(payload: UpdateProfilePayload) {
+  // First get current user info to get the userId
+  const currentUser = await getMyInfo();
+  
+  // Remove empty/null fields from payload
+  const updateData: any = {};
+  if (payload.firstName) updateData.firstName = payload.firstName;
+  if (payload.lastName) updateData.lastName = payload.lastName;
+  if (payload.phone) updateData.phone = payload.phone;
+  if (payload.dob) updateData.dob = payload.dob;
+  
+  const res = await api.put(`/users/${currentUser.id}`, updateData);
+  return res.data?.result as Me;
+}
+
+>>>>>>> Stashed changes
 // Sales/Orders for dashboard (adjust endpoints to your backend)
 export type OrderSummary = {
   totalSold: number;
