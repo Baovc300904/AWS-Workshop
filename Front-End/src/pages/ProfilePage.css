@@ -616,7 +616,7 @@
   .profileSidebar {
     position: relative;
     width: 100%;
-    min-height: auto;
+    min-height: 0;
     top: 0;
     border-right: none;
     border-bottom: 1px solid rgba(79, 165, 219, 0.15);
