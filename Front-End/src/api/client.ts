@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8080/identity';
+// Always use Vite proxy in development
+const API_BASE = '/identity';
 
 export const api = axios.create({
   baseURL: API_BASE,
@@ -14,6 +15,7 @@ export const api = axios.create({
 const PUBLIC_ENDPOINTS = [
   '/auth/log-in',
   '/auth/introspect',
+  // NOTE: /users is handled specially in interceptor (only POST /users for registration is public)
   '/users/forgot-password',
   '/users/request-phone-otp',
   '/users/forgot-password/phone/request',
@@ -33,18 +35,28 @@ api.interceptors.request.use(
     const method = (config.method || 'get').toUpperCase();
     
     // Check if this is a public endpoint
-    const isPublicEndpoint = PUBLIC_ENDPOINTS.some(endpoint => {
-      if (endpoint === '/games' && method === 'GET') return url === '/games' || url.startsWith('/games/');
-      if (endpoint === '/category' && method === 'GET') return url.startsWith('/category');
-      return url.startsWith(endpoint);
-    });
+    let isPublicEndpoint = false;
     
-    // Special check: POST /users (register) is public
-    const isRegisterEndpoint = method === 'POST' && (url === '/users' || url === '/users/');
-    const isFinallyPublic = isPublicEndpoint || isRegisterEndpoint;
+    // Special case: POST /users (registration) is public
+    if (url === '/users' && method === 'POST') {
+      isPublicEndpoint = true;
+    } else {
+      // Check other public endpoints
+      isPublicEndpoint = PUBLIC_ENDPOINTS.some(endpoint => {
+        // All GET requests to /games (including /games/{id}) are public
+        if (endpoint === '/games' && method === 'GET') {
+          return url === '/games' || url.startsWith('/games/');
+        }
+        // All GET requests to /category (including /category/{id}) are public
+        if (endpoint === '/category' && method === 'GET') {
+          return url === '/category' || url.startsWith('/category/');
+        }
+        return url.startsWith(endpoint);
+      });
+    }
 
     // Only add Authorization header for protected endpoints
-    if (!isFinallyPublic) {
+    if (!isPublicEndpoint) {
       const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -61,11 +73,15 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token if exists
-      const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
-      if (token) {
-        localStorage.removeItem('wgs_token');
-        localStorage.removeItem('token');
+      const endpoint = error.config?.url || '';
+      
+      // Only clear token if it's not a login endpoint (to preserve login error message)
+      if (!endpoint.includes('/auth/log-in')) {
+        const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+        if (token) {
+          localStorage.removeItem('wgs_token');
+          localStorage.removeItem('token');
+        }
       }
     }
     return Promise.reject(error);
@@ -77,6 +93,12 @@ export type Game = {
   name: string;
   price: number;
   quantity: number;
+  image?: string; // Main image URL
+  cover?: string; // Cover image URL
+  video?: string; // Video URL (YouTube, etc.)
+  releaseDate?: string; // ISO date string
+  averageRating?: number; // Average rating
+  ratingCount?: number; // Total ratings
   salePercent?: number;
   categories?: { name: string; description?: string }[];
 };
@@ -88,10 +110,12 @@ export type Category = {
 };
 
 export function setAuthToken(token: string | null) {
+  // Store token in localStorage - interceptor will handle adding it to requests
   if (token) {
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    localStorage.setItem('wgs_token', token);
   } else {
-    delete api.defaults.headers.common['Authorization'];
+    localStorage.removeItem('wgs_token');
+    localStorage.removeItem('token'); // Clean up old token key
   }
 }
 
@@ -104,6 +128,11 @@ export async function fetchGamesByPrice(order: 'asc' | 'desc') {
 export async function searchGames(keyword: string) {
   const res = await api.get('/games/search', { params: { keyword } });
   return res.data.result as Game[];
+}
+
+export async function fetchGame(id: string) {
+  const res = await api.get(`/games/${id}`);
+  return res.data.result as Game;
 }
 
 export async function fetchCategories() {
@@ -142,15 +171,18 @@ export async function deleteGame(id: string) {
 }
 
 export async function login(username: string, password: string) {
-  // Avoid sending stale Authorization header on public auth endpoint
-  const res = await api.post('/auth/log-in', { username, password }, { headers: { Authorization: undefined } });
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/auth/log-in', { username, password });
   const token = res.data?.result?.token as string;
+  if (!token) {
+    throw new Error('No token received from server');
+  }
   return token;
 }
 
 export async function introspect(token: string) {
-  // Introspect is also public; ensure no Bearer header interferes
-  const res = await api.post('/auth/introspect', { token }, { headers: { Authorization: undefined } });
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/auth/introspect', { token });
   return Boolean(res.data?.result?.valid);
 }
 
@@ -160,32 +192,44 @@ export type RegisterPayload = {
   firstName?: string;
   lastName?: string;
   dob?: string; // yyyy-MM-dd
+  email?: string;
+  emailOtp?: string;
   phone?: string;
-  phoneOtp?: string;
 };
 
 export async function register(payload: RegisterPayload) {
-  const res = await api.post('/users', payload, { headers: { Authorization: undefined } });
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/users', payload);
   return res.data?.result as { id: string; username: string };
 }
 
 export async function forgotPassword(username: string) {
-  const res = await api.post('/users/forgot-password', { username }, { headers: { Authorization: undefined } });
-  // backend returns token as result (per controller). We return it in case needed for demo/testing.
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/users/forgot-password', { username });
   return res.data?.result as string;
 }
 
 export async function requestPhoneOtp(phone: string) {
-  const res = await api.post('/users/request-phone-otp', { phone }, { headers: { Authorization: undefined } });
-  return res.data?.result as string; // demo returns code
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/users/request-phone-otp', { phone });
+  return res.data?.result as string;
+}
+
+// Request email OTP for registration
+export async function requestEmailOtp(email: string): Promise<string> {
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/email/request-otp', { email });
+  return res.data?.result as string; // Backend returns "OTP sent successfully" or the OTP code
 }
 
 export async function forgotPhoneRequest(username: string) {
-  await api.post('/users/forgot-password/phone/request', { username }, { headers: { Authorization: undefined } });
+  // Public endpoint - interceptor will not add token
+  await api.post('/users/forgot-password/phone/request', { username });
 }
 
 export async function forgotPhoneConfirm(username: string, otp: string, newPassword: string) {
-  await api.post('/users/forgot-password/phone/confirm', { username, otp, newPassword }, { headers: { Authorization: undefined } });
+  // Public endpoint - interceptor will not add token
+  await api.post('/users/forgot-password/phone/confirm', { username, otp, newPassword });
 }
 
 export type Me = {
@@ -193,15 +237,9 @@ export type Me = {
   username: string;
   firstName?: string;
   lastName?: string;
+  email?: string;
   phone?: string;
-  dob?: string; // yyyy-MM-dd
-};
-
-export type UpdateProfilePayload = {
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  dob?: string; // yyyy-MM-dd
+  dob?: string; // LocalDate from backend will be serialized as string
 };
 
 export async function getMyInfo() {
@@ -209,18 +247,21 @@ export async function getMyInfo() {
   return res.data?.result as Me;
 }
 
+export type UpdateProfilePayload = {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  dob?: string; // yyyy-MM-dd
+};
+
 export async function updateMyInfo(payload: UpdateProfilePayload) {
-  // First get current user info to get the userId
+  // First get user ID from myInfo
   const currentUser = await getMyInfo();
+  const userId = currentUser.id;
   
-  // Remove empty/null fields from payload
-  const updateData: any = {};
-  if (payload.firstName) updateData.firstName = payload.firstName;
-  if (payload.lastName) updateData.lastName = payload.lastName;
-  if (payload.phone) updateData.phone = payload.phone;
-  if (payload.dob) updateData.dob = payload.dob;
-  
-  const res = await api.put(`/users/${currentUser.id}`, updateData);
+  // Then update using /users/{userId} endpoint
+  const res = await api.put(`/users/${userId}`, payload);
   return res.data?.result as Me;
 }
 

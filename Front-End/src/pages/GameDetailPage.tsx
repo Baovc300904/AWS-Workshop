@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { api, Game } from '../api/client';
+import { fetchGame as apiFetchGame, fetchGamesByPrice, Game } from '../api/client';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency, formatPrice } from '../context/CurrencyContext';
@@ -26,31 +26,31 @@ export function GameDetailPage() {
       return;
     }
 
-    const fetchGame = async () => {
+    const loadGameDetail = async () => {
       try {
         setLoading(true);
+        setError(null);
         
-        // Workaround: Get all games and find by ID since /games/{id} returns 404
-        const response = await api.get('/games');
-        const allGames = response.data.result as Game[];
-        const foundGame = allGames.find(g => g.id === id);
+        // Use the proper API function to fetch game by ID
+        const gameData = await apiFetchGame(id);
+        setGame(gameData);
         
-        if (foundGame) {
-          setGame(foundGame);
-        } else {
-          setError('Game không tồn tại hoặc đã bị xóa');
-          // Set suggested games (exclude current game if found)
-          setSuggestedGames(allGames.filter(g => g.id !== id).slice(0, 4));
+        // Load suggested games
+        try {
+          const suggested = await fetchGamesByPrice('asc');
+          setSuggestedGames(suggested.filter(g => g.id !== id).slice(0, 4));
+        } catch (suggestErr) {
+          console.error('[GameDetailPage] Error fetching suggested games:', suggestErr);
         }
       } catch (err: any) {
         console.error('[GameDetailPage] Error fetching game:', err);
-        setError(err?.response?.data?.message || 'Không thể tải thông tin game');
+        const errorMessage = err?.response?.data?.message || 'Không thể tải thông tin game';
+        setError(errorMessage);
         
-        // Fetch suggested games when there's an error
+        // Load suggested games even when main game fails
         try {
-          const suggestedResponse = await api.get('/games');
-          const allGames = suggestedResponse.data.result as Game[];
-          setSuggestedGames(allGames.slice(0, 4));
+          const suggested = await fetchGamesByPrice('asc');
+          setSuggestedGames(suggested.slice(0, 4));
         } catch (suggestErr) {
           console.error('[GameDetailPage] Error fetching suggested games:', suggestErr);
         }
@@ -59,7 +59,7 @@ export function GameDetailPage() {
       }
     };
 
-    fetchGame();
+    loadGameDetail();
   }, [id]);
 
   const getDiscountedPrice = (game: Game) => {
