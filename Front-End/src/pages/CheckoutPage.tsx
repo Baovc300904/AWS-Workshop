@@ -198,6 +198,11 @@ export default function CheckoutPage() {
     return sum + Number(item.price) * item.quantity;
   }, 0);
 
+  const totalRaw = cart.reduce((sum, item) => {
+    const finalPrice = getDiscountedPrice(item);
+    return sum + finalPrice * item.quantity;
+  }, 0);
+
   const discount = subtotal - totalRaw;
 
   if (cart.length === 0) {
@@ -603,5 +608,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-
-
