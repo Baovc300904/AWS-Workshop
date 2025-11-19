@@ -31,8 +31,26 @@ export function GameDetailPage() {
         setLoading(true);
         setError(null);
         
-        // Use the proper API function to fetch game by ID
-        const gameData = await apiFetchGame(id);
+        // Try to fetch game by ID, fallback to list if 404
+        let gameData: Game | null = null;
+        
+        try {
+          gameData = await apiFetchGame(id);
+        } catch (fetchError: any) {
+          // If 404 (backend issue), fallback to fetching from list
+          if (fetchError?.response?.status === 404 || fetchError?.response?.data?.code === 1009) {
+            console.warn('[GameDetailPage] Game detail endpoint returned 404, falling back to list');
+            const allGames = await fetchGamesByPrice('asc');
+            gameData = allGames.find((g: Game) => g.id === id) || null;
+            
+            if (!gameData) {
+              throw new Error('Game không tồn tại');
+            }
+          } else {
+            throw fetchError;
+          }
+        }
+        
         setGame(gameData);
         
         // Load suggested games
@@ -44,7 +62,7 @@ export function GameDetailPage() {
         }
       } catch (err: any) {
         console.error('[GameDetailPage] Error fetching game:', err);
-        const errorMessage = err?.response?.data?.message || 'Không thể tải thông tin game';
+        const errorMessage = err?.message || err?.response?.data?.message || 'Không thể tải thông tin game';
         setError(errorMessage);
         
         // Load suggested games even when main game fails

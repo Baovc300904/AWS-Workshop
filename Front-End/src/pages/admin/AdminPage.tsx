@@ -13,7 +13,7 @@ export default function AdminPage() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState<{ id?: string; name: string; price: number | ''; quantity: number | ''; salePercent?: number | '' }>(()=>({ name:'', price:'', quantity:'' }));
+  const [form, setForm] = useState<{ id?: string; name: string; price: number | ''; quantity: number | ''; salePercent?: number | ''; image?: string; cover?: string; video?: string }>(()=>({ name:'', price:'', quantity:'' }));
   const [filter, setFilter] = useState('');
   const [cats, setCats] = useState<Category[]>([]);
   const [catsLoading, setCatsLoading] = useState(false);
@@ -71,24 +71,66 @@ export default function AdminPage() {
       return arr;
     })();
 
-    const w = 1000, h = 240, pad = { l:40, r:20, t:24, b:36 };
+    const w = 1000, h = 280, pad = { l:50, r:40, t:40, b:50 };
     const max = Math.max(1, ...values);
     const x = (i:number) => pad.l + (i*(w - pad.l - pad.r)/ (months.length-1));
     const y = (v:number) => pad.t + (h - pad.t - pad.b) - (v / max) * (h - pad.t - pad.b);
     const points = values.map((v,i)=> `${x(i)},${y(v)}`).join(' ');
+    const areaPoints = `${pad.l},${y(0)} ${points} ${w-pad.r},${y(0)}`;
+    
     return (
       <svg className="chartSvg" viewBox={`0 0 ${w} ${h}`}>
+        <defs>
+          <linearGradient id="chartGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#00d4ff" />
+            <stop offset="100%" stopColor="#7c3aed" />
+          </linearGradient>
+          <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="rgba(0, 212, 255, 0.3)" />
+            <stop offset="100%" stopColor="rgba(0, 212, 255, 0.05)" />
+          </linearGradient>
+        </defs>
+        
+        {/* Grid lines */}
+        {[0, 0.25, 0.5, 0.75, 1].map((factor, i) => (
+          <line
+            key={i}
+            className="chartGrid"
+            x1={pad.l}
+            y1={y(max * factor)}
+            x2={w - pad.r}
+            y2={y(max * factor)}
+            stroke="rgba(148, 163, 184, 0.1)"
+            strokeDasharray="4 4"
+          />
+        ))}
+        
+        {/* Area fill */}
+        <polygon fill="url(#areaGradient)" points={areaPoints} />
+        
+        {/* Main axis */}
         <line className="chartAxis" x1={pad.l} y1={y(0)} x2={w-pad.r} y2={y(0)} />
-        <polyline className="chartLine" fill="none" strokeWidth={4} points={points} />
+        
+        {/* Line */}
+        <polyline className="chartLine" fill="none" stroke="url(#chartGradient)" strokeWidth={3} points={points} />
+        
+        {/* Data points and labels */}
         {values.map((v,i)=> (
           <g key={i}>
-            <circle className="chartPoint" cx={x(i)} cy={y(v)} r={5} />
-            <text className="chartLabel" x={x(i)} y={y(v)-10} textAnchor="middle">{v.toLocaleString('en-US', { notation:'compact', compactDisplay:'short' })}</text>
-            <text className="chartLabel" x={x(i)} y={h-12} textAnchor="middle">{months[i]}</text>
+            <circle className="chartPoint" cx={x(i)} cy={y(v)} r={6} />
+            <text className="chartLabel" x={x(i)} y={y(v)-14} textAnchor="middle" fontWeight="700">
+              {v.toLocaleString('en-US', { notation:'compact', compactDisplay:'short' })}
+            </text>
+            <text className="chartLabel" x={x(i)} y={h-20} textAnchor="middle" fontSize="11">
+              {months[i]}
+            </text>
           </g>
         ))}
-        <text className="chartLabel" x={w/2} y={18} textAnchor="middle" fontWeight={800}>Sales Trend</text>
-        {monthlyErr && <text className="chartLabel" x={w-10} y={18} textAnchor="end">(fallback)</text>}
+        
+        <text className="chartTitle" x={w/2} y={24} textAnchor="middle" fontSize="16" fontWeight="800" fill="#f8fafc">
+          💰 Sales Trend {new Date().getFullYear()}
+        </text>
+        {monthlyErr && <text className="chartLabel" x={w-50} y={24} textAnchor="end" fontSize="10">(demo data)</text>}
       </svg>
     );
   };
@@ -96,15 +138,39 @@ export default function AdminPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const payload:any = { name: form.name, price: Number(form.price), quantity: Number(form.quantity) };
-      if (form.salePercent !== '' && typeof form.salePercent !== 'undefined') payload.salePercent = Number(form.salePercent);
-      if (form.id) { await updateGame(form.id, payload); } else { await createGame(payload); }
+      const payload: any = { 
+        name: form.name, 
+        price: Number(form.price), 
+        quantity: Number(form.quantity),
+        image: form.image || undefined,
+        cover: form.cover || undefined,
+        video: form.video || undefined
+      };
+      if (form.salePercent !== '' && typeof form.salePercent !== 'undefined') {
+        payload.salePercent = Number(form.salePercent);
+      }
+      if (form.id) { 
+        await updateGame(form.id, payload); 
+      } else { 
+        await createGame(payload); 
+      }
       setForm({ name:'', price:'', quantity:'' });
       await reload();
-    } catch (e:any) { alert(e?.response?.data?.message||'Failed'); }
+    } catch (e:any) { 
+      alert(e?.response?.data?.message || 'Failed to save game'); 
+    }
   };
 
-  const startEdit = (g:Game) => setForm({ id: g.id, name: g.name, price: g.price as any, quantity: g.quantity as any, salePercent: (g as any).salePercent as any });
+  const startEdit = (g:Game) => setForm({ 
+    id: g.id, 
+    name: g.name, 
+    price: g.price as any, 
+    quantity: g.quantity as any, 
+    salePercent: (g as any).salePercent as any,
+    image: g.image,
+    cover: g.cover,
+    video: g.video
+  });
   const doDelete = async (g:Game) => { if (!confirm(`Delete ${g.name}?`)) return; await deleteGame(g.id); await reload(); };
 
   const shown = games.filter(g => g.name.toLowerCase().includes(filter.toLowerCase()));

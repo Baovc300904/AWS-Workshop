@@ -151,6 +151,9 @@ export type GameCreatePayload = {
   quantity: number;
   price: number;
   salePercent?: number | null;
+  image?: string; // S3 URL or path
+  cover?: string; // S3 URL or path
+  video?: string; // YouTube URL or S3 URL
   categories?: string[]; // ids (optional)
 };
 
@@ -168,6 +171,24 @@ export async function updateGame(id: string, payload: GameUpdatePayload) {
 
 export async function deleteGame(id: string) {
   await api.delete(`/games/${id}`);
+}
+
+// S3 Upload functions
+export async function uploadImageToS3(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  try {
+    const res = await api.post('/s3/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data.result.url || res.data.result; // URL của file trên S3
+  } catch (error) {
+    console.error('S3 upload failed:', error);
+    throw error;
+  }
 }
 
 export async function login(username: string, password: string) {
@@ -295,6 +316,33 @@ export async function fetchRecentOrders(limit = 12) {
 export async function fetchMonthlySales() {
   const res = await api.get('/orders/monthly-sales');
   return res.data?.result as Array<{ month: string; amount: number }>;
+}
+
+// MoMo Payment API
+export type MoMoPaymentRequest = {
+  amount: number;
+  orderInfo: string;
+  returnUrl?: string;
+  notifyUrl?: string;
+  extraData?: string;
+};
+
+export type MoMoPaymentResponse = {
+  payUrl: string;
+  deeplink?: string;
+  qrCodeUrl?: string;
+  orderId: string;
+  requestId: string;
+};
+
+export async function createMoMoPayment(request: MoMoPaymentRequest): Promise<MoMoPaymentResponse> {
+  const res = await api.post('/payment/momo/create', request);
+  return res.data?.result as MoMoPaymentResponse;
+}
+
+export async function checkMoMoPaymentStatus(orderId: string) {
+  const res = await api.get(`/payment/momo/status/${orderId}`);
+  return res.data?.result;
 }
 
 

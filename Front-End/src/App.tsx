@@ -20,6 +20,7 @@ const StorePage = lazy(() => import('./pages/StorePage').then(m => ({ default: m
 const CategoriesPage = lazy(() => import('./pages/CategoriesPage').then(m => ({ default: m.default })));
 const TestCategories = lazy(() => import('./pages/TestCategories'));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
+const MoMoCallbackPage = lazy(() => import('./pages/MoMoCallbackPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
@@ -88,15 +89,16 @@ function AdminRoute({ children }: { children: React.ReactElement }) {
 function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const isAuthPage = ['/login', '/register', '/forgot'].includes(location.pathname);
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
     <div className="app-shell">
-      {!isAuthPage && <Navbar />}
+      {!isAuthPage && !isAdminPage && <Navbar />}
       <main className="app-main">
         {children}
       </main>
-      {!isAuthPage && <BackToTop />}
-      {!isAuthPage && <Footer />}
+      {!isAuthPage && !isAdminPage && <BackToTop />}
+      {!isAuthPage && !isAdminPage && <Footer />}
     </div>
   );
 }
@@ -131,6 +133,7 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/forgot" element={<ForgotPasswordPage />} />
+                    <Route path="/checkout/momo-callback" element={<MoMoCallbackPage />} />
                     <Route 
                       path="/profile" 
                       element={
