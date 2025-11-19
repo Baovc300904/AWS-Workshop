@@ -13,6 +13,27 @@
 
 .checkoutHeader {
   margin-bottom: 32px;
+  text-align: center;
+}
+
+.backBtn {
+  position: absolute;
+  left: 24px;
+  top: 100px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #4facfe;
+  border: 1px solid rgba(79, 172, 254, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background: rgba(79, 172, 254, 0.1);
+  border-color: #4facfe;
+  transform: translateX(-4px);
 }
 
 .checkoutHeader h1 {
@@ -22,6 +43,7 @@
   margin-bottom: 8px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
 }
 
@@ -350,6 +372,355 @@
   box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
 }
 
+.emptyBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+}
+
+/* Payment Section */
+.paymentSection {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(79, 172, 254, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.paymentMethods {
+  margin-bottom: 32px;
+}
+
+.paymentMethods h3 {
+  color: #4facfe;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.methodGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.methodCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(79, 172, 254, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.methodCard:hover {
+  background: rgba(79, 172, 254, 0.05);
+  border-color: rgba(79, 172, 254, 0.5);
+  transform: translateY(-4px);
+}
+
+.methodCard.active {
+  background: rgba(79, 172, 254, 0.1);
+  border-color: #4facfe;
+  box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+}
+
+.methodIcon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+/* MoMo Specific Styles */
+.momoIconWrapper {
+  background: linear-gradient(135deg, #a50064 0%, #d82d8b 100%);
+  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 32px;
+  font-weight: 900;
+  color: white;
+}
+
+.momoForm .momoHeader {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.momoLogo {
+  background: linear-gradient(135deg, #a50064 0%, #d82d8b 100%);
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: white;
+  margin: 0 auto 12px;
+}
+
+.momoHeader h3 {
+  color: #4facfe;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.momoHeader p {
+  color: #8b9bb4;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.momoQR {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.momoQRCode {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  background: #f0f0f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.momoQRCode .icon {
+  font-size: 80px;
+}
+
+.momoQRCode .label {
+  color: #666;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.momoQR p {
+  color: #666;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.momoDivider {
+  text-align: center;
+  color: #8b9bb4;
+  font-size: 14px;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.momoDivider::before,
+.momoDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.momoFeatures {
+  background: rgba(165, 0, 100, 0.1);
+  border: 1px solid rgba(165, 0, 100, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.momoFeatures .title {
+  color: #e6f7ff;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.momoFeatures ul {
+  color: #8b9bb4;
+  font-size: 13px;
+  padding-left: 20px;
+  margin: 0;
+  line-height: 1.8;
+}
+
+.methodName {
+  color: #e6f7ff;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.methodDesc {
+  color: #8b9bb4;
+  font-size: 13px;
+}
+
+/* Payment Form */
+.paymentForm,
+.contactForm {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(79, 172, 254, 0.15);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.paymentForm h3,
+.contactForm h3 {
+  color: #4facfe;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  color: #e6f7ff;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(79, 172, 254, 0.3);
+  border-radius: 8px;
+  color: #e6f7ff;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: #4facfe;
+  background: rgba(79, 172, 254, 0.05);
+  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+}
+
+.formGroup input.error {
+  border-color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.05);
+}
+
+.formGroup small {
+  display: block;
+  color: #8b9bb4;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.errorText {
+  display: block;
+  color: #ff6b6b;
+  font-size: 13px;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Payment Info */
+.paymentInfo {
+  margin-bottom: 24px;
+}
+
+.infoBox {
+  background: rgba(79, 172, 254, 0.05);
+  border: 1px solid rgba(79, 172, 254, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.infoBox h4 {
+  color: #4facfe;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.infoBox p {
+  color: #e6f7ff;
+  font-size: 14px;
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+/* Summary Items in Payment Step */
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summaryItemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.summaryItemName {
+  color: #e6f7ff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.summaryItemQty {
+  color: #8b9bb4;
+  font-size: 12px;
+}
+
+.summaryItemPrice {
+  color: #8be28b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.summaryDivider {
+  height: 2px;
+  background: rgba(79, 172, 254, 0.2);
+  margin: 16px 0;
+}
+
+.securityInfo {
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.securityInfo p {
+  color: #8b9bb4;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 /* Responsive */
 @media (max-width: 992px) {
   .checkoutContent {
@@ -358,6 +729,16 @@
   
   .orderSummary {
     position: static;
+  }
+
+  .methodGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .backBtn {
+    position: static;
+    margin-bottom: 16px;
+    display: inline-block;
   }
 }
 
@@ -379,5 +760,9 @@
   
   .checkoutHeader h1 {
     font-size: 28px;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
   }
 }

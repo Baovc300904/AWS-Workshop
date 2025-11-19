@@ -394,10 +394,7 @@ const RegisterPage: React.FC = () => {
       {/* Success Modal */}
       <ErrorModal 
         isOpen={showSuccessModal}
-        onClose={() => {
-          setShowSuccessModal(false);
-          navigate('/login');
-        }}
+        onClose={() => setShowSuccessModal(false)}
         title="Đăng ký thành công"
         message={modalMessage}
         type="success"

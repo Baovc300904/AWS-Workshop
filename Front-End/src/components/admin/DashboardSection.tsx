@@ -39,40 +39,40 @@ export function DashboardSection() {
       <section className="panel">
         <div className="metricsGrid">
           <div className="metricCard">
-            <div className="metricLabel">Total Keys Sold</div>
-            <div className="metricValue">{summary ? summary.totalSold.toLocaleString() : (loading ? '…' : '0')}</div>
+            <div className="metricLabel">🎮 Total Keys Sold</div>
+            <div className="metricValue">{summary ? summary.totalSold.toLocaleString() : (loading ? '⏳' : '0')}</div>
           </div>
           <div className="metricCard">
-            <div className="metricLabel">Revenue</div>
-            <div className="metricValue">{summary ? `$${summary.revenue.toLocaleString()}` : (loading ? '…' : '$0')}</div>
+            <div className="metricLabel">💰 Total Revenue</div>
+            <div className="metricValue">{summary ? `$${summary.revenue.toLocaleString()}` : (loading ? '⏳' : '$0')}</div>
           </div>
           <div className="metricCard">
-            <div className="metricLabel">Avg. Price</div>
+            <div className="metricLabel">📊 Average Price</div>
             <div className="metricValue">
-              {summary ? `$${Math.round(summary.avgPrice || 0).toLocaleString()}` : (loading ? '…' : '$0')}
+              {summary ? `$${Math.round(summary.avgPrice || 0).toLocaleString()}` : (loading ? '⏳' : '$0')}
             </div>
           </div>
           <div className="metricCard">
-            <div className="metricLabel">Top Game</div>
-            <div className="metricValue small">{summary?.topGameName ?? (loading ? '…' : '—')}</div>
+            <div className="metricLabel">🏆 Top Selling Game</div>
+            <div className="metricValue small">{summary?.topGameName ?? (loading ? '⏳' : '—')}</div>
           </div>
         </div>
       </section>
 
       <section className="panel">
         <div className="panelHeader">
-          <h3 className="panelTitle">Recent Sales</h3>
+          <h3 className="panelTitle">📈 Recent Sales</h3>
         </div>
         {recent && recent.length ? (
           <div className="tableWrap">
             <table className="salesTable">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Game</th>
-                  <th>Qty</th>
-                  <th>Amount</th>
-                  <th>Status</th>
+                  <th>📅 Date</th>
+                  <th>🎮 Game</th>
+                  <th>📦 Qty</th>
+                  <th>💵 Amount</th>
+                  <th>✅ Status</th>
                 </tr>
               </thead>
               <tbody>

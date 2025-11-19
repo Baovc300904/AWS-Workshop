@@ -12,17 +12,17 @@ export interface AdminNavbarProps {
   active: TabKey;
   onChange: (tab: TabKey) => void;
   className?: string;
-  items?: Array<{ key: TabKey; label: string }>;
+  items?: Array<{ key: TabKey; label: string; icon?: string }>;
 }
 
-const DEFAULT_ITEMS: Array<{ key: TabKey; label: string }> = [
-  { key: 'dashboard', label: 'Dashboard' },
-  { key: 'games', label: 'Games' },
-  { key: 'categories', label: 'Categories' },
-  { key: 'users', label: 'Users' },
-  { key: 'orders', label: 'Orders' },
-  { key: 'reports', label: 'Reports' },
-  { key: 'settings', label: 'Settings' },
+const DEFAULT_ITEMS: Array<{ key: TabKey; label: string; icon: string }> = [
+  { key: 'dashboard', label: 'Dashboard', icon: '📊' },
+  { key: 'games', label: 'Games', icon: '🎮' },
+  { key: 'categories', label: 'Categories', icon: '📁' },
+  { key: 'users', label: 'Users', icon: '👥' },
+  { key: 'orders', label: 'Orders', icon: '🛒' },
+  { key: 'reports', label: 'Reports', icon: '📈' },
+  { key: 'settings', label: 'Settings', icon: '⚙️' },
 ];
 
 export function AdminNavbar({ active, onChange, className, items = DEFAULT_ITEMS }: AdminNavbarProps) {
@@ -36,7 +36,8 @@ export function AdminNavbar({ active, onChange, className, items = DEFAULT_ITEMS
             aria-current={active === it.key ? 'page' : undefined}
             onClick={() => onChange(it.key)}
           >
-            {it.label}
+            {it.icon && <span className="navIcon">{it.icon}</span>}
+            <span>{it.label}</span>
           </button>
         ))}
       </div>
