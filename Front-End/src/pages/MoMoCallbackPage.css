@@ -150,6 +150,52 @@
   color: #4facfe;
 }
 
+/* Topup Details */
+.topupDetails {
+  background: rgba(79, 172, 254, 0.05);
+  border: 1px solid rgba(79, 172, 254, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 24px 0;
+}
+
+.topupRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(79, 172, 254, 0.1);
+}
+
+.topupRow:last-child {
+  border-bottom: none;
+}
+
+.topupLabel {
+  color: #8b9bb4;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.topupValue {
+  color: #e6f7ff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.topupValue.highlight {
+  color: #8be28b;
+  font-size: 20px;
+}
+
+.redirectNote {
+  color: #8b9bb4;
+  font-size: 13px;
+  font-style: italic;
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .momoCallbackCard {

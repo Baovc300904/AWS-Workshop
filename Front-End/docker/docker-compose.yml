@@ -5,7 +5,7 @@ services:
   frontend-prod:
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: Front-End/docker/Dockerfile
     container_name: game-store-frontend-prod
     ports:
       - "3000:80"  # Map port 3000 của host -> port 80 của container
@@ -19,12 +19,12 @@ services:
   frontend-dev:
     build:
       context: ..
-      dockerfile: docker/Dockerfile.dev
+      dockerfile: Front-End/docker/Dockerfile.dev
     container_name: game-store-frontend-dev
     ports:
       - "5173:5173"  # Map port 5173 của host -> port 5173 của container
     volumes:
-      - ..:/app
+      - ../Front-End:/app
       - /app/node_modules  # Prevent overwriting node_modules
     restart: unless-stopped
     networks:

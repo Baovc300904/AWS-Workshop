@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useCurrency, formatPrice } from '../context/CurrencyContext';
-import { createMoMoPayment } from '../api/client';
+import { getGameImage as getGameImageUtil } from '../utils/imageUtils';
+import { createMoMoPaymentWithItems } from '../api/client';
 import './CheckoutPage.css';
 
 type PaymentMethod = 'credit_card' | 'momo' | 'banking' | 'paypal';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const { cart, updateQuantity, remove, totalRaw, clear } = useCart();
+  const { cart, updateQuantity, remove, clear } = useCart();
   const { currency } = useCurrency();
   const [isProcessing, setIsProcessing] = useState(false);
   const [step, setStep] = useState<'cart' | 'payment'>('cart');
@@ -95,24 +96,24 @@ export default function CheckoutPage() {
     if (paymentMethod === 'momo') {
       try {
         const gameNames = cart.map(item => item.name).join(', ');
-        const orderInfo = `Thanh toan don hang: ${gameNames.slice(0, 50)}${gameNames.length > 50 ? '...' : ''}`;
+        const orderInfo = `Mua game: ${gameNames.slice(0, 100)}${gameNames.length > 100 ? '...' : ''}`;
+        const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         
         try {
-          // Try real API first
-          const momoResponse = await createMoMoPayment({
+          // Use new API with items
+          const momoResponse = await createMoMoPaymentWithItems({
+            orderId,
             amount: totalRaw,
             orderInfo,
-            returnUrl: `${window.location.origin}/checkout/momo-callback`,
-            extraData: JSON.stringify({
-              email,
-              phone,
-              cart: cart.map(item => ({
-                gameId: item.id,
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price,
-              })),
-            }),
+            returnUrl: `${window.location.origin}/AWS-Workshop/checkout/momo-callback`,
+            items: cart.map(item => ({
+              id: item.id,
+              name: item.name,
+              price: getDiscountedPrice(item),
+              currency: currency,
+              quantity: item.quantity,
+              totalPrice: getDiscountedPrice(item) * item.quantity,
+            })),
           });
 
           // Save order info to localStorage for callback
@@ -136,40 +137,18 @@ export default function CheckoutPage() {
             return;
           }
         } catch (apiError: any) {
-          console.warn('MoMo API not available, using mock flow:', apiError);
-          
-          // MOCK: Simulate MoMo payment flow
-          const mockOrderId = `MOCK_${Date.now()}`;
-          
-          // Save order info
-          localStorage.setItem('pending_order', JSON.stringify({
-            orderId: mockOrderId,
-            amount: totalRaw,
-            cart,
-            email,
-            phone,
-            timestamp: Date.now(),
-          }));
-
+          console.error('MoMo API error:', apiError);
           setIsProcessing(false);
-
-          // Show mock MoMo payment confirmation
-          const confirmPayment = window.confirm(
-            `🔔 DEMO: Thanh toán MoMo\n\n` +
-            `Tổng tiền: ${formatPrice(totalRaw, currency)}\n` +
-            `SĐT MoMo: ${momoPhone}\n` +
-            `Email: ${email}\n\n` +
-            `Trong môi trường thực tế, bạn sẽ được chuyển đến app MoMo để thanh toán.\n\n` +
-            `Nhấn OK để giả lập thanh toán thành công, Cancel để giả lập thất bại.`
+          
+          const errorDetail = apiError?.response?.data?.message || apiError?.message || 'Không rõ lỗi';
+          alert(
+            `❌ Lỗi kết nối MoMo API\n\n` +
+            `Chi tiết: ${errorDetail}\n\n` +
+            `Vui lòng kiểm tra:\n` +
+            `- Backend đã chạy chưa?\n` +
+            `- MoMo credentials đã đúng chưa?\n` +
+            `- Kết nối mạng ổn định không?`
           );
-
-          if (confirmPayment) {
-            // Simulate successful payment
-            navigate(`/checkout/momo-callback?resultCode=0&orderId=${mockOrderId}&message=Success`);
-          } else {
-            // Simulate failed payment
-            navigate(`/checkout/momo-callback?resultCode=1&orderId=${mockOrderId}&message=User cancelled`);
-          }
           return;
         }
         
@@ -194,6 +173,7 @@ export default function CheckoutPage() {
     }, 2000);
   };
 
+  // Calculate totals
   const subtotal = cart.reduce((sum, item) => {
     return sum + Number(item.price) * item.quantity;
   }, 0);

@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useCurrency, formatPrice } from '../context/CurrencyContext';
 import { useEffect, useState } from 'react';
 import { Game as GameResponse, fetchGame } from '../api/client';
+import { getGameImage } from '../utils/imageUtils';
 import './WishlistPage.css';
 
 const WishlistPage = () => {
@@ -13,6 +14,8 @@ const WishlistPage = () => {
     const { currency } = useCurrency();
     const [games, setGames] = useState<GameResponse[]>([]);
     const [loading, setLoading] = useState(true);
+    const [sortBy, setSortBy] = useState<'name' | 'price' | 'discount' | 'date'>('date');
+    const [showOnSaleOnly, setShowOnSaleOnly] = useState(false);
 
     useEffect(() => {
         const fetchWishlistGames = async () => {
@@ -45,9 +48,41 @@ const WishlistPage = () => {
         add(game as any);
     };
 
-    const getGameImage = (game: GameResponse) => {
-        return game.image || game.cover || 'https://placehold.co/300x400/1a2332/4facfe?text=No+Image';
+
+
+    // Filter and sort games
+    const getFilteredAndSortedGames = () => {
+        let result = [...games];
+
+        // Filter by sale
+        if (showOnSaleOnly) {
+            result = result.filter(g => (g.salePercent ?? 0) > 0);
+        }
+
+        // Sort
+        switch (sortBy) {
+            case 'name':
+                result.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'price':
+                result.sort((a, b) => {
+                    const priceA = a.salePercent ? a.price * (1 - a.salePercent / 100) : a.price;
+                    const priceB = b.salePercent ? b.price * (1 - b.salePercent / 100) : b.price;
+                    return priceA - priceB;
+                });
+                break;
+            case 'discount':
+                result.sort((a, b) => (b.salePercent ?? 0) - (a.salePercent ?? 0));
+                break;
+            case 'date':
+                // Already in chronological order (most recently added)
+                break;
+        }
+
+        return result;
     };
+
+    const displayGames = getFilteredAndSortedGames();
 
     if (loading) {
         return (
@@ -92,12 +127,65 @@ const WishlistPage = () => {
         <div className="wishlist-page">
             <div className="wishlist-container">
                 <div className="wishlist-header">
-                    <h1>❤️ Danh sách yêu thích</h1>
-                    <p className="wishlist-subtitle">{games.length} game trong danh sách của bạn</p>
+                    <div className="header-top">
+                        <div>
+                            <h1>❤️ Danh sách yêu thích</h1>
+                            <p className="wishlist-subtitle">
+                                {displayGames.length} {displayGames.length !== games.length ? `/ ${games.length}` : ''} game trong danh sách
+                            </p>
+                        </div>
+                        <button 
+                            className="btn-back"
+                            onClick={() => navigate('/store')}
+                        >
+                            ← Quay lại Store
+                        </button>
+                    </div>
+
+                    <div className="wishlist-controls">
+                        <div className="control-group">
+                            <label htmlFor="sortBy">Sắp xếp theo:</label>
+                            <select 
+                                id="sortBy"
+                                value={sortBy} 
+                                onChange={(e) => setSortBy(e.target.value as any)}
+                                className="control-select"
+                            >
+                                <option value="date">Mới nhất</option>
+                                <option value="name">Tên A-Z</option>
+                                <option value="price">Giá thấp đến cao</option>
+                                <option value="discount">Giảm giá nhiều nhất</option>
+                            </select>
+                        </div>
+
+                        <div className="control-group">
+                            <label className="checkbox-label">
+                                <input 
+                                    type="checkbox"
+                                    checked={showOnSaleOnly}
+                                    onChange={(e) => setShowOnSaleOnly(e.target.checked)}
+                                />
+                                <span>🏷️ Chỉ hiện game đang giảm giá</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="wishlist-list">
-                    {games.map((game) => {
+                {displayGames.length === 0 && games.length > 0 ? (
+                    <div className="empty-state">
+                        <div className="empty-icon">🔍</div>
+                        <h2>Không tìm thấy game</h2>
+                        <p>Không có game nào phù hợp với bộ lọc hiện tại</p>
+                        <button 
+                            className="btn-primary"
+                            onClick={() => setShowOnSaleOnly(false)}
+                        >
+                            Xóa bộ lọc
+                        </button>
+                    </div>
+                ) : (
+                    <div className="wishlist-list">
+                        {displayGames.map((game) => {
                         const salePercent = game.salePercent ?? 0;
                         const finalPrice = salePercent > 0 
                             ? game.price * (1 - salePercent / 100) 
@@ -201,25 +289,39 @@ const WishlistPage = () => {
                             </div>
                         );
                     })}
-                </div>
+                    </div>
+                )}
 
-                <div className="wishlist-actions">
-                    <button 
-                        className="btn-secondary"
-                        onClick={() => navigate('/store')}
-                    >
-                        ← Tiếp tục mua sắm
-                    </button>
-                    <button 
-                        className="btn-primary"
-                        onClick={() => {
-                            games.forEach((game) => add(game as any));
-                            navigate('/checkout');
-                        }}
-                    >
-                        🛒 Thêm tất cả vào giỏ hàng ({games.length})
-                    </button>
-                </div>
+                {displayGames.length > 0 && (
+                    <div className="wishlist-actions">
+                        <button 
+                            className="btn-secondary"
+                            onClick={() => navigate('/store')}
+                        >
+                            ← Tiếp tục mua sắm
+                        </button>
+                        <div className="actions-right">
+                            <span className="total-info">
+                                Tổng giá trị: {formatPrice(
+                                    displayGames.reduce((sum, g) => {
+                                        const price = g.salePercent ? g.price * (1 - g.salePercent / 100) : g.price;
+                                        return sum + price;
+                                    }, 0),
+                                    currency
+                                )}
+                            </span>
+                            <button 
+                                className="btn-primary"
+                                onClick={() => {
+                                    displayGames.forEach((game) => add(game as any));
+                                    navigate('/checkout');
+                                }}
+                            >
+                                🛒 Thêm tất cả vào giỏ hàng ({displayGames.length})
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

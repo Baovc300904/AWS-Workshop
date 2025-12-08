@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  base: '/AWS-Workshop/', // Tên repository của bạn
   server: {
     port: 5173,
     proxy: {
@@ -12,6 +13,10 @@ export default defineConfig({
         secure: false,
       },
     },
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
   }
 });
 
