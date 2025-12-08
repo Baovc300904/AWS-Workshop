@@ -312,6 +312,47 @@
   cursor: not-allowed;
 }
 
+/* Custom icon styles */
+.labelIcon {
+  display: inline-block;
+  font-size: 14px;
+  color: #818cf8;
+  margin-right: 6px;
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+.btnIcon {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 14px;
+  animation: iconSpin 2s linear infinite;
+}
+
+.primaryBtn:not(:disabled) .btnIcon {
+  animation: iconBounce 1s ease-in-out infinite;
+}
+
+.msgIcon {
+  display: inline-block;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+@keyframes iconPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes iconSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Gaming messages with cyberpunk glow */
 .regError { 
   color: #fca5a5; 

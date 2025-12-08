@@ -48,8 +48,8 @@ const RegisterPage: React.FC = () => {
       setSendingOtp(true);
       const code = await requestEmailOtp(email);
       // For demo: show code. In production, email would be sent by backend
-      setInfo(`📧 OTP đã gửi đến ${email}. Mã demo: ${code} (Kiểm tra console log)`);
-      setModalMessage(`📧 OTP đã được gửi đến ${email}.\n\nMã xác thực: ${code}\n\n(Trong môi trường production, mã này sẽ được gửi qua email)`);
+      setInfo(`► OTP đã gửi đến ${email}. Mã demo: ${code} (Kiểm tra console log)`);
+      setModalMessage(`▸ OTP đã được gửi đến ${email}.\n\nMã xác thực: ${code}\n\n(Trong môi trường production, mã này sẽ được gửi qua email)`);
       setShowSuccessModal(true);
     } catch (err: any) {
       const errorMsg = !err.response 
@@ -136,8 +136,8 @@ const RegisterPage: React.FC = () => {
     try {
       setSubmitting(true);
       const result = await apiRegister(payload);
-      setInfo(`✅ Đăng ký thành công! Chào mừng ${result.username}. Đang chuyển đến trang đăng nhập...`);
-      setModalMessage(`🎉 Đăng ký thành công!\n\nChào mừng ${result.username} đến với cộng đồng của chúng tôi.\n\nBạn sẽ được chuyển đến trang đăng nhập sau giây lát...`);
+      setInfo(`◆ Đăng ký thành công! Chào mừng ${result.username}. Đang chuyển đến trang đăng nhập...`);
+      setModalMessage(`◆ Đăng ký thành công!\n\nChào mừng ${result.username} đến với cộng đồng của chúng tôi.\n\nBạn sẽ được chuyển đến trang đăng nhập sau giây lát...`);
       setShowSuccessModal(true);
       setTimeout(() => navigate('/login'), 2000);
     } catch (err: any) {
@@ -227,7 +227,7 @@ const RegisterPage: React.FC = () => {
                     className={fieldErrors.password ? 'error' : ''}
                   />
                   <button type="button" className="inlineBtn" onClick={() => setShowPassword(v => !v)}>
-                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                    {showPassword ? 'HIDE' : 'SHOW'}
                   </button>
                 </div>
                 {fieldErrors.password && (
@@ -264,7 +264,7 @@ const RegisterPage: React.FC = () => {
 
               <div className="fieldGroup">
                 <label htmlFor="dob" className="fieldLabel">
-                  📅 Ngày sinh
+                  <span className="labelIcon">◆</span> Ngày sinh
                 </label>
                 <input 
                   id="dob" 
@@ -298,7 +298,7 @@ const RegisterPage: React.FC = () => {
                     onClick={onRequestEmailOtp} 
                     disabled={sendingOtp}
                   >
-                    {sendingOtp ? '⏳ Đang gửi' : '📧 Gửi OTP'}
+                    {sendingOtp ? '▶ Đang gửi' : '► Gửi OTP'}
                   </button>
                 </div>
                 {fieldErrors.email && (
@@ -336,18 +336,22 @@ const RegisterPage: React.FC = () => {
                 <span className="fieldHint">Tùy chọn - để liên hệ khi cần</span>
               </div>
 
-              {error && <div className="regError fullRow" role="alert">⚠️ {error}</div>}
-              {info && <div className="regInfo fullRow">{info}</div>}
+              {error && <div className="regError fullRow" role="alert"><span className="msgIcon">▲</span> {error}</div>}
+              {info && <div className="regInfo fullRow"><span className="msgIcon">▼</span> {info}</div>}
             </div>
 
             <div className="actions">
               <button className="primaryBtn" type="submit" disabled={submitting}>
                 {submitting ? (
                   <>
-                    <span>⏳ Đang đăng ký...</span>
+                    <span className="btnIcon">●</span>
+                    <span>Đang đăng ký...</span>
                   </>
                 ) : (
-                  <>🚀 Tạo tài khoản</>
+                  <>
+                    <span className="btnIcon">▸</span>
+                    <span>Tạo tài khoản</span>
+                  </>
                 )}
               </button>
 
@@ -358,10 +362,32 @@ const RegisterPage: React.FC = () => {
               <button 
                 type="button" 
                 className="googleBtn"
-                onClick={() => {
-                  // TODO: Implement Google OAuth registration
-                  console.log('Google register clicked');
-                  alert('Tính năng đăng ký Google sẽ được triển khai sớm!');
+                onClick={async () => {
+                  try {
+                    const { openGoogleAuthPopup, exchangeCodeForToken } = await import('../services/googleAuth');
+                    const { code } = await openGoogleAuthPopup();
+                    
+                    // Exchange code for token via backend
+                    const result = await exchangeCodeForToken(code);
+                    
+                    // Save token and redirect
+                    if (result?.token) {
+                      localStorage.setItem('wgs_token', result.token);
+                      localStorage.setItem('token', result.token);
+                      if (result.user) {
+                        localStorage.setItem('user', JSON.stringify(result.user));
+                      }
+                      setInfo('✅ Đăng ký Google thành công! Đang chuyển hướng...');
+                      setTimeout(() => navigate('/'), 1500);
+                    } else {
+                      throw new Error('No token received from server');
+                    }
+                  } catch (error: any) {
+                    console.error('Google register error:', error);
+                    setError(error.message || 'Đăng ký Google thất bại');
+                    setModalMessage(error.message || 'Đăng ký Google thất bại');
+                    setShowErrorModal(true);
+                  }
                 }}
               >
                 <svg className="googleIcon" viewBox="0 0 24 24" width="20" height="20">

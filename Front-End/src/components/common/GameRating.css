@@ -1,0 +1,468 @@
+/* GameRating.css */
+
+.gameRatingContainer {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ratingLoading {
+  text-align: center;
+  padding: 48px 0;
+  color: #67e8f9;
+}
+
+.ratingLoading .spinner {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  border: 4px solid rgba(103, 232, 249, 0.1);
+  border-left-color: #06b6d4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Rating Summary */
+.ratingSummary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 24px;
+  border-bottom: 2px solid rgba(103, 232, 249, 0.2);
+  margin-bottom: 24px;
+}
+
+.summaryLeft {
+  text-align: center;
+}
+
+.averageRating {
+  font-size: 72px;
+  font-weight: 800;
+  color: #06b6d4;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+.averageStars {
+  margin-bottom: 8px;
+}
+
+.ratingCount {
+  color: #94a3b8;
+  font-size: 16px;
+  margin: 0;
+}
+
+.summaryRight {
+  display: flex;
+  gap: 12px;
+}
+
+.btnWriteReview,
+.btnEditReview,
+.btnDeleteReview {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.btnWriteReview {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+}
+
+.btnWriteReview:hover {
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+}
+
+.btnEditReview {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btnEditReview:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+.btnDeleteReview {
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+}
+
+.btnDeleteReview:hover {
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(244, 63, 94, 0.4);
+}
+
+.myRatingActions {
+  display: flex;
+  gap: 12px;
+}
+
+.loginPrompt {
+  color: #94a3b8;
+  font-size: 16px;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Stars */
+.stars-container {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.star {
+  display: inline-block;
+  transition: all 0.2s;
+}
+
+.star.small {
+  font-size: 18px;
+}
+
+.star.medium {
+  font-size: 28px;
+}
+
+.star.large {
+  font-size: 42px;
+}
+
+.star.filled {
+  color: #fbbf24;
+  filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.5));
+}
+
+.star.empty {
+  color: #475569;
+}
+
+.star.interactive {
+  cursor: pointer;
+}
+
+.star.interactive:hover {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8));
+}
+
+/* Rating Form */
+.ratingForm {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 2px solid rgba(103, 232, 249, 0.2);
+}
+
+.formHeader h3 {
+  margin: 0 0 20px;
+  color: #67e8f9;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.formGroup textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid rgba(103, 232, 249, 0.2);
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 15px;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.3s;
+}
+
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+}
+
+.ratingText {
+  margin-left: 12px;
+  color: #fbbf24;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.charCount {
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.formActions {
+  display: flex;
+  gap: 12px;
+}
+
+.btnSubmit,
+.btnCancel {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.btnSubmit {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+  flex: 1;
+}
+
+.btnSubmit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+}
+
+.btnSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnCancel {
+  background: #475569;
+  color: white;
+  box-shadow: 0 4px 12px rgba(71, 85, 105, 0.3);
+}
+
+.btnCancel:hover:not(:disabled) {
+  background: #334155;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(71, 85, 105, 0.4);
+}
+
+.btnCancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Ratings List */
+.ratingsList {
+  margin-top: 24px;
+}
+
+.ratingError {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.noRatings {
+  text-align: center;
+  padding: 48px 0;
+  color: #94a3b8;
+}
+
+.noRatingsIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.noRatings p {
+  margin: 8px 0;
+  font-size: 18px;
+  color: #cbd5e1;
+}
+
+.noRatingsSubtext {
+  font-size: 14px !important;
+  color: #64748b !important;
+  font-style: italic;
+}
+
+.ratingItem {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 2px solid rgba(103, 232, 249, 0.1);
+  transition: all 0.3s;
+}
+
+.ratingItem:hover {
+  border-color: rgba(103, 232, 249, 0.3);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.ratingItem.myRating {
+  border-color: rgba(6, 182, 212, 0.5);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+}
+
+.ratingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.ratingUser {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.userAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.userInfo strong {
+  color: #e2e8f0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.myBadge {
+  display: inline-block;
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ratingMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.ratingDate {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.ratingComment {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 8px;
+  border-left: 3px solid #06b6d4;
+}
+
+.ratingComment p {
+  color: #cbd5e1;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .gameRatingContainer {
+    padding: 20px;
+  }
+
+  .ratingSummary {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .summaryRight {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btnWriteReview,
+  .btnEditReview,
+  .btnDeleteReview {
+    width: 100%;
+  }
+
+  .myRatingActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .averageRating {
+    font-size: 56px;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .btnSubmit,
+  .btnCancel {
+    width: 100%;
+  }
+
+  .ratingHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .ratingMeta {
+    align-items: flex-start;
+  }
+}

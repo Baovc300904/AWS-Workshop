@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchGamesByPrice, fetchCategories, Game, Category } from '../api/client';
 import { useCurrency } from '../context/CurrencyContext';
+import { getGameImage as getGameImageUtil } from '../utils/imageUtils';
 import './HomePage.css';
 
 // Category icons
@@ -23,16 +24,7 @@ const GAME_PLACEHOLDERS = [
 ];
 
 function getGameImage(game: Game): string {
-  // Prioritize image/cover from API if available
-  if (game.image) {
-    return game.image;
-  }
-  if (game.cover) {
-    return game.cover;
-  }
-  // Fallback to placeholder based on game name hash
-  const hash = game.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return GAME_PLACEHOLDERS[hash % GAME_PLACEHOLDERS.length];
+  return getGameImageUtil(game);
 }
 
 function formatPrice(price: number, currency: string = 'VND'): string {

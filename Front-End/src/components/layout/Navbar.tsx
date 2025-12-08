@@ -3,7 +3,7 @@ import './Navbar.css';
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { fetchCategories, Category, setAuthToken } from '../../api/client';
+import { fetchCategories, Category, setAuthToken, logout as apiLogout } from '../../api/client';
 
 export default function Navbar() {
     const { cart } = useCart();
@@ -118,8 +118,21 @@ export default function Navbar() {
         }
     }
 
-    function handleLogout() {
+    async function handleLogout() {
         try {
+            const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+            
+            // Call backend logout API if token exists
+            if (token) {
+                try {
+                    await apiLogout(token);
+                } catch (err) {
+                    console.error('[Navbar] Logout API error:', err);
+                    // Continue with local cleanup even if API fails
+                }
+            }
+            
+            // Clear local storage
             localStorage.removeItem('wgs_token');
             localStorage.removeItem('token');
             localStorage.removeItem('username');
@@ -127,7 +140,9 @@ export default function Navbar() {
             setAuthToken(null);
             setUser(null);
             navigate('/login');
-        } catch { }
+        } catch (err) {
+            console.error('[Navbar] Logout error:', err);
+        }
     }
 
     return (

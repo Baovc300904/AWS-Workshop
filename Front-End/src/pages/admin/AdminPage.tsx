@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Game, fetchGamesByPrice, createGame, updateGame, deleteGame, fetchCategories, Category, setAuthToken, fetchMonthlySales, createCategory } from '../../api/client';
 import './AdminPage.css';
 import { AdminNavbar } from '../../components/admin/AdminNavbar';
@@ -9,6 +10,7 @@ import { CategoriesSection } from '../../components/admin/CategoriesSection';
 import { SettingsSection } from './sections/SettingsSection';
 
 export default function AdminPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
@@ -223,14 +225,56 @@ export default function AdminPage() {
               />
             )}
             {activeTab==='categories' && (
-              <CategoriesSection cats={cats} loading={catsLoading} error={catsError} onCreate={handleCreateCategory} />
-            )}
-            {(activeTab==='users' || activeTab==='orders' || activeTab==='reports') && (
               <section className="panel">
                 <div className="panelHeader">
-                  <h3 className="panelTitle">{activeTab.charAt(0).toUpperCase()+activeTab.slice(1)}</h3>
+                  <h3 className="panelTitle">📂 Category Management</h3>
                 </div>
-                <div className="loading">This section is a placeholder. Implement {activeTab} management here.</div>
+                <div className="placeholderRedirect">
+                  <div className="redirectIcon">📂</div>
+                  <h4>Category Management</h4>
+                  <p>Manage all game categories with beautiful grid layout and CRUD operations</p>
+                  <button className="btnRedirect" onClick={() => navigate('/admin/categories')}>
+                    Go to Category Management →
+                  </button>
+                </div>
+              </section>
+            )}
+            {activeTab==='users' && (
+              <section className="panel">
+                <div className="panelHeader">
+                  <h3 className="panelTitle">👥 User Management</h3>
+                </div>
+                <div className="placeholderRedirect">
+                  <div className="redirectIcon">👥</div>
+                  <h4>User Management</h4>
+                  <p>Manage all users in a dedicated page with full CRUD operations</p>
+                  <button className="btnRedirect" onClick={() => navigate('/admin/users')}>
+                    Go to User Management →
+                  </button>
+                </div>
+              </section>
+            )}
+            {activeTab==='orders' && (
+              <section className="panel">
+                <div className="panelHeader">
+                  <h3 className="panelTitle">📦 Order Management</h3>
+                </div>
+                <div className="placeholderRedirect">
+                  <div className="redirectIcon">📦</div>
+                  <h4>Order Management</h4>
+                  <p>Track and manage all orders with detailed status information</p>
+                  <button className="btnRedirect" onClick={() => navigate('/admin/orders')}>
+                    Go to Order Management →
+                  </button>
+                </div>
+              </section>
+            )}
+            {activeTab==='reports' && (
+              <section className="panel">
+                <div className="panelHeader">
+                  <h3 className="panelTitle">📈 Reports</h3>
+                </div>
+                <div className="loading">This section is a placeholder. Implement reports management here.</div>
               </section>
             )}
             {activeTab==='settings' && (

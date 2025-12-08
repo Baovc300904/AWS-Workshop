@@ -4,6 +4,7 @@ import { fetchGamesByPrice, fetchCategories, searchGames, Game, Category } from 
 import { useCurrency, formatPrice } from '../context/CurrencyContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { getGameImage as getGameImageUtil } from '../utils/imageUtils';
 import './StorePage.css';
 
 // Platform list
@@ -19,10 +20,7 @@ const GAME_PLACEHOLDERS = [
 ];
 
 function getGameImage(game: Game): string {
-  if (game.image) return game.image;
-  if (game.cover) return game.cover;
-  const hash = game.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return GAME_PLACEHOLDERS[hash % GAME_PLACEHOLDERS.length];
+  return getGameImageUtil(game);
 }
 
 function getDiscountedPrice(game: Game): number {

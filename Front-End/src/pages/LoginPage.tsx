@@ -46,6 +46,9 @@ const LoginPage: React.FC = () => {
 const [submitting, setSubmitting] = useState(false);
 const [submitError, setSubmitError] = useState<string | null>(null);
 const [showErrorModal, setShowErrorModal] = useState(false);
+const [isBlinking, setIsBlinking] = useState(false);
+const [loginSuccess, setLoginSuccess] = useState(false);
+const [loginError, setLoginError] = useState(false);
   const navigate = useNavigate();
 
 	const getPosition = (el: Element | null) => {
@@ -251,12 +254,20 @@ const [showErrorModal, setShowErrorModal] = useState(false);
 		// Initialize to rest state
 		setArmState('rest');
 		setMouthStatus('small');
+		
+		// Eye blinking animation
+		const blinkInterval = setInterval(() => {
+			setIsBlinking(true);
+			setTimeout(() => setIsBlinking(false), 150);
+		}, 3000 + Math.random() * 2000); // Random blink between 3-5 seconds
+		
+		return () => clearInterval(blinkInterval);
 	}, [setArmState]);
 
   return (
 		<div className="yetiLoginContainer">
 			<div className="yetiCard">
-				<div className="yetiHead">
+				<div className={`yetiHead ${loginSuccess ? 'celebrate' : ''} ${loginError ? 'shake' : ''} ${submitting ? 'loading' : ''}`}>
 					<div className="svgContainer noBorder">
 						<svg ref={svgRef} className="mySVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
               <defs>
@@ -299,11 +310,11 @@ const [showErrorModal, setShowErrorModal] = useState(false);
                 <path fill="#FFFFFF" d="M138.142,55.064c-4.93,1.259-9.874,2.118-14.787,2.599c-0.336,3.341-0.776,6.689-1.322,10.037 c-4.569-1.465-8.909-3.222-12.996-5.226c-0.98,3.075-2.07,6.137-3.267,9.179c-5.514-3.067-10.559-6.545-15.097-10.329 c-1.806,2.889-3.745,5.73-5.816,8.515c-7.916-4.124-15.053-9.114-21.296-14.738l1.107-11.768h73.475V55.064z" />
 								<path fill="#FFFFFF" stroke="#3A5E77" strokeWidth={2.5} strokeLinecap="round" d="M63.56,55.102 c6.243,5.624,13.38,10.614,21.296,14.738c2.071-2.785,4.01-5.626,5.816-8.515c4.537,3.785,9.583,7.263,15.097,10.329 c1.197-3.043,2.287-6.104,3.267-9.179c4.087,2.004,8.427,3.761,12.996,5.226c0.545-3.348,0.986-6.696,1.322-10.037 c4.913-0.481,9.857-1.34,14.787-2.599" />
 							</g>
-							<g ref={eyeLRef} className="eyeL">
+							<g ref={eyeLRef} className={`eyeL ${isBlinking ? 'blink' : ''}`}>
 								<circle cx="85.5" cy="78.5" r="3.5" fill="#3a5e77" />
 								<circle cx="84" cy="76" r="1" fill="#fff" />
 							</g>
-							<g ref={eyeRRef} className="eyeR">
+							<g ref={eyeRRef} className={`eyeR ${isBlinking ? 'blink' : ''}`}>
 								<circle cx="114.5" cy="78.5" r="3.5" fill="#3a5e77" />
 								<circle cx="113" cy="76" r="1" fill="#fff" />
 							</g>
@@ -366,6 +377,10 @@ const [showErrorModal, setShowErrorModal] = useState(false);
                     localStorage.setItem('token', token); // Also save as 'token' for compatibility
                     localStorage.setItem('username', username);
                     
+                    // Trigger success animation
+                    setLoginSuccess(true);
+                    await new Promise(resolve => setTimeout(resolve, 800)); // Wait for animation
+                    
                     // Kiểm tra xem có redirect URL không
                     const redirectUrl = localStorage.getItem('redirect_after_login');
                     if (redirectUrl) {
@@ -385,12 +400,11 @@ const [showErrorModal, setShowErrorModal] = useState(false);
 										// Normalize role strings (some backends use 'ADMIN' or 'ROLE_ADMIN')
 										const normalized = roles.map((r: any) => ('' + (r?.authority || r)).toUpperCase());
 										localStorage.setItem('user', JSON.stringify({ username, authorities: normalized }));
-										if (normalized.includes('ROLE_ADMIN') || normalized.includes('ADMIN')) {
+										// Redirect ADMIN and MOD to admin dashboard
+										if (normalized.includes('ROLE_ADMIN') || normalized.includes('ADMIN') || 
+										    normalized.includes('ROLE_MOD') || normalized.includes('MOD') || 
+										    normalized.includes('ROLE_MODERATOR') || normalized.includes('MODERATOR')) {
 											navigate('/admin');
-											return;
-										}
-										if (normalized.includes('ROLE_MOD') || normalized.includes('MOD') || normalized.includes('ROLE_MODERATOR') || normalized.includes('MODERATOR')) {
-											navigate('/moderator');
 											return;
 										}
 										if (normalized.includes('ROLE_USER') || normalized.includes('USER')) {
@@ -402,16 +416,37 @@ const [showErrorModal, setShowErrorModal] = useState(false);
                   } catch (err: any) {
                     let errorMsg = 'Đăng nhập thất bại';
                     
-                    if (err?.response?.status === 401) {
-                      errorMsg = err?.response?.data?.message || 'Sai tên đăng nhập hoặc mật khẩu';
-                    } else if (err?.response?.data?.message) {
+                    // Case 1: Network error - Mất kết nối server
+                    if (err?.code === 'ECONNABORTED' || err?.code === 'ERR_NETWORK' || err?.message?.includes('Network Error') || !err?.response) {
+                      errorMsg = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.';
+                    }
+                    // Case 2: 401 - Sai username/password
+                    else if (err?.response?.status === 401) {
+                      errorMsg = 'Tên đăng nhập hoặc mật khẩu không chính xác. Vui lòng thử lại.';
+                    }
+                    // Case 3: 500 - Server error
+                    else if (err?.response?.status === 500) {
+                      errorMsg = 'Máy chủ đang gặp sự cố. Vui lòng thử lại sau.';
+                    }
+                    // Case 4: Timeout
+                    else if (err?.code === 'ECONNABORTED' || err?.message?.includes('timeout')) {
+                      errorMsg = 'Yêu cầu quá thời gian chờ. Vui lòng thử lại.';
+                    }
+                    // Case 5: Other HTTP errors
+                    else if (err?.response?.data?.message) {
                       errorMsg = err.response.data.message;
-                    } else if (err?.message) {
+                    }
+                    // Case 6: Generic error
+                    else if (err?.message && err.message !== 'Request failed with status code 500') {
                       errorMsg = err.message;
                     }
                     
                     setSubmitError(errorMsg);
                     setShowErrorModal(true);
+                    
+                    // Trigger shake animation on error
+                    setLoginError(true);
+                    setTimeout(() => setLoginError(false), 600);
                   } finally {
                     setSubmitting(false);
                   }
@@ -477,10 +512,30 @@ const [showErrorModal, setShowErrorModal] = useState(false);
 							<button 
 								type="button" 
 								className="googleBtn"
-								onClick={() => {
-									// TODO: Implement Google OAuth login
-									console.log('Google login clicked');
-									alert('Tính năng đăng nhập Google sẽ được triển khai sớm!');
+								onClick={async () => {
+									try {
+										const { openGoogleAuthPopup, exchangeCodeForToken } = await import('../services/googleAuth');
+										const { code } = await openGoogleAuthPopup();
+										
+										// Exchange code for token via backend
+										const result = await exchangeCodeForToken(code);
+										
+										// Save token and redirect
+										if (result?.token) {
+											localStorage.setItem('wgs_token', result.token);
+											localStorage.setItem('token', result.token);
+											if (result.user) {
+												localStorage.setItem('user', JSON.stringify(result.user));
+											}
+											navigate('/');
+										} else {
+											throw new Error('No token received from server');
+										}
+									} catch (error: any) {
+										console.error('Google login error:', error);
+										setSubmitError(error.message || 'Đăng nhập Google thất bại');
+										setShowErrorModal(true);
+									}
 								}}
 							>
 								<svg className="googleIcon" viewBox="0 0 24 24" width="20" height="20">

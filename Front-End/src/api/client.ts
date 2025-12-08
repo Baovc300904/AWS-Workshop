@@ -68,22 +68,89 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle common errors
+// Response interceptor to handle common errors and auto-refresh token
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      const endpoint = error.config?.url || '';
+  async (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      const endpoint = originalRequest?.url || '';
       
-      // Only clear token if it's not a login endpoint (to preserve login error message)
-      if (!endpoint.includes('/auth/log-in')) {
-        const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
-        if (token) {
-          localStorage.removeItem('wgs_token');
-          localStorage.removeItem('token');
+      // Don't try to refresh on login/register/public endpoints
+      if (endpoint.includes('/auth/log-in') || 
+          endpoint.includes('/auth/refresh') || 
+          endpoint.includes('/users') && originalRequest.method === 'post') {
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        // Queue this request while refresh is in progress
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+      
+      if (!token) {
+        localStorage.removeItem('wgs_token');
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
+
+      try {
+        // Try to refresh token
+        const res = await axios.post(`${API_BASE}/auth/refresh`, { token });
+        const newToken = res.data?.result?.token;
+        
+        if (newToken) {
+          setAuthToken(newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          processQueue(null, newToken);
+          return api(originalRequest);
+        } else {
+          throw new Error('No new token received');
         }
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        localStorage.removeItem('wgs_token');
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
+    
     return Promise.reject(error);
   }
 );
@@ -101,6 +168,24 @@ export type Game = {
   ratingCount?: number; // Total ratings
   salePercent?: number;
   categories?: { name: string; description?: string }[];
+  systemRequirements?: {
+    minimum?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+    recommended?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+  };
 };
 
 export type Category = {
@@ -155,6 +240,24 @@ export type GameCreatePayload = {
   cover?: string; // S3 URL or path
   video?: string; // YouTube URL or S3 URL
   categories?: string[]; // ids (optional)
+  systemRequirements?: {
+    minimum?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+    recommended?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+  };
 };
 
 export type GameUpdatePayload = Partial<GameCreatePayload>;
@@ -179,15 +282,13 @@ export async function uploadImageToS3(file: File): Promise<string> {
   formData.append('file', file);
   
   try {
-    const res = await api.post('/s3/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return res.data.result.url || res.data.result; // URL của file trên S3
-  } catch (error) {
+    // Don't set Content-Type header - let axios handle it for FormData
+    const res = await api.post('/s3/upload', formData);
+    return res.data?.result?.url || res.data?.result; // URL của file trên S3
+  } catch (error: any) {
     console.error('S3 upload failed:', error);
-    throw error;
+    const errorMessage = error?.response?.data?.message || error?.message || 'Upload failed';
+    throw new Error(errorMessage);
   }
 }
 
@@ -327,6 +428,24 @@ export type MoMoPaymentRequest = {
   extraData?: string;
 };
 
+export type MoMoPaymentItem = {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  quantity: number;
+  totalPrice: number;
+};
+
+export type MoMoPaymentWithItemsRequest = {
+  orderId: string;
+  amount: number;
+  orderInfo: string;
+  returnUrl?: string;
+  notifyUrl?: string;
+  items: MoMoPaymentItem[];
+};
+
 export type MoMoPaymentResponse = {
   payUrl: string;
   deeplink?: string;
@@ -340,9 +459,140 @@ export async function createMoMoPayment(request: MoMoPaymentRequest): Promise<Mo
   return res.data?.result as MoMoPaymentResponse;
 }
 
+export async function createMoMoPaymentWithItems(request: MoMoPaymentWithItemsRequest): Promise<MoMoPaymentResponse> {
+  const res = await api.post('/payment/momo/create-with-items', request);
+  return res.data?.result as MoMoPaymentResponse;
+}
+
 export async function checkMoMoPaymentStatus(orderId: string) {
   const res = await api.get(`/payment/momo/status/${orderId}`);
   return res.data?.result;
+}
+
+// Game Rating API
+export type GameRating = {
+  id: string;
+  gameId: string;
+  userId: string;
+  userName?: string;
+  rating: number; // 1-5
+  comment?: string;
+  createdAt?: string;
+};
+
+export type CreateRatingPayload = {
+  gameId: string;
+  rating: number; // 1-5
+  comment?: string;
+};
+
+export type UpdateRatingPayload = {
+  rating?: number;
+  comment?: string;
+};
+
+export async function createGameRating(payload: CreateRatingPayload): Promise<GameRating> {
+  const res = await api.post('/game-ratings', payload);
+  return res.data?.result as GameRating;
+}
+
+export async function updateGameRating(id: string, payload: UpdateRatingPayload): Promise<GameRating> {
+  const res = await api.put(`/game-ratings/${id}`, payload);
+  return res.data?.result as GameRating;
+}
+
+export async function deleteGameRating(id: string): Promise<void> {
+  await api.delete(`/game-ratings/${id}`);
+}
+
+export async function getGameRatings(gameId: string): Promise<GameRating[]> {
+  const res = await api.get(`/game-ratings/game/${gameId}`);
+  return res.data?.result as GameRating[];
+}
+
+export async function getMyRatingForGame(gameId: string): Promise<GameRating | null> {
+  try {
+    const res = await api.get(`/game-ratings/my-rating/${gameId}`);
+    return res.data?.result as GameRating;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+// Auth - Logout & Refresh Token
+export async function logout(token: string): Promise<void> {
+  await api.post('/auth/logout', { token });
+  localStorage.removeItem('wgs_token');
+  localStorage.removeItem('token');
+}
+
+export async function refreshToken(token: string): Promise<string> {
+  const res = await api.post('/auth/refresh', { token });
+  const newToken = res.data?.result?.token as string;
+  if (newToken) {
+    setAuthToken(newToken);
+  }
+  return newToken;
+}
+
+// Avatar Upload API
+export async function uploadAvatar(file: File): Promise<any> {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  try {
+    // Don't set Content-Type header - let axios handle it for FormData
+    const res = await api.post('/users/avatar', formData);
+    return res.data?.result;
+  } catch (error: any) {
+    console.error('Avatar upload failed:', error);
+    const errorMessage = error?.response?.data?.message || error?.message || 'Upload failed';
+    throw new Error(errorMessage);
+  }
+}
+
+export async function deleteAvatar(): Promise<any> {
+  const res = await api.delete('/users/avatar');
+  return res.data?.result;
+}
+
+// Topup API
+export type TopupPayload = {
+  amount: number;
+  description?: string;
+};
+
+export async function createMoMoTopup(payload: TopupPayload): Promise<any> {
+  const res = await api.post('/topup/momo', payload);
+  return res.data?.result;
+}
+
+export async function getTransactionHistory(): Promise<any[]> {
+  const res = await api.get('/topup/history');
+  return res.data?.result as any[];
+}
+
+export async function getBalance(): Promise<{ balance: number; username: string }> {
+  const res = await api.get('/topup/balance');
+  return res.data?.result;
+}
+
+export async function checkTopupStatus(orderId: string): Promise<any> {
+  const res = await api.get(`/topup/status/${orderId}`);
+  return res.data?.result;
+}
+
+// Cart API
+export type AddToCartPayload = {
+  gameId: string;
+  quantity: number;
+};
+
+export async function addToCart(payload: AddToCartPayload): Promise<void> {
+  await api.post('/cart/add', payload);
 }
 
 

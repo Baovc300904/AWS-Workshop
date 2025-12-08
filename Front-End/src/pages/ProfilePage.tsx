@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMyInfo, introspect, updateMyInfo, UpdateProfilePayload } from '../api/client';
+import { getMyInfo, introspect, updateMyInfo, UpdateProfilePayload, uploadAvatar, getBalance, createMoMoTopup, getTransactionHistory } from '../api/client';
 import './ProfilePage.css';
 
 interface UserProfile {
@@ -11,6 +11,8 @@ interface UserProfile {
   email?: string;
   phone?: string;
   dob?: string;
+  avatarUrl?: string;
+  balance?: number;
 }
 
 export function ProfilePage() {
@@ -20,7 +22,11 @@ export function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState('account'); // 'account', 'topup', 'inventory', 'points', 'history', 'voucher', 'wishlist'
+  
+  // Get section from URL params or default to 'account'
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialSection = urlParams.get('section') || 'account';
+  const [activeSection, setActiveSection] = useState(initialSection); // 'account', 'topup', 'inventory', 'points', 'history', 'voucher', 'wishlist'
   const [formData, setFormData] = useState<UpdateProfilePayload>({
     firstName: '',
     lastName: '',
@@ -29,6 +35,22 @@ export function ProfilePage() {
     dob: '',
   });
   const [passwordConfirm, setPasswordConfirm] = useState(''); // Password for confirmation
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [balance, setBalance] = useState<number>(0);
+  const [topupAmount, setTopupAmount] = useState<string>('');
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
+
+  // Function to load balance
+  const loadBalance = async () => {
+    try {
+      const balanceData = await getBalance();
+      setBalance(balanceData.balance || 0);
+    } catch (balanceErr) {
+      console.error('Failed to load balance:', balanceErr);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
@@ -58,6 +80,9 @@ export function ProfilePage() {
           phone: data.phone || '',
           dob: data.dob || '',
         });
+
+        // Load balance
+        await loadBalance();
       } catch (err: any) {
         const errorMsg = err?.response?.data?.message || err?.message || 'Không thể tải thông tin người dùng';
         setError(errorMsg);
@@ -75,6 +100,13 @@ export function ProfilePage() {
 
     checkAuth();
   }, [navigate]);
+
+  // Auto-refresh balance when coming back to topup section
+  useEffect(() => {
+    if (activeSection === 'topup' && !loading) {
+      loadBalance();
+    }
+  }, [activeSection, loading]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -155,6 +187,90 @@ export function ProfilePage() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('⚠️ Vui lòng chọn file ảnh!');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('⚠️ Kích thước ảnh không được vượt quá 5MB!');
+      return;
+    }
+
+    setAvatarUploading(true);
+    try {
+      const updatedUser = await uploadAvatar(file);
+      setProfile(prev => prev ? { ...prev, avatarUrl: updatedUser.avatarUrl } : null);
+      
+      const successMsg = document.createElement('div');
+      successMsg.className = 'toast-success';
+      successMsg.textContent = '✅ Upload avatar thành công!';
+      document.body.appendChild(successMsg);
+      setTimeout(() => successMsg.remove(), 3000);
+    } catch (err: any) {
+      console.error('Failed to upload avatar:', err);
+      alert('❌ Upload avatar thất bại: ' + (err.message || 'Unknown error'));
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  const handleTopup = async () => {
+    const amount = parseFloat(topupAmount);
+    if (!amount || amount <= 0) {
+      alert('⚠️ Vui lòng nhập số tiền hợp lệ!');
+      return;
+    }
+
+    if (amount < 10000) {
+      alert('⚠️ Số tiền nạp tối thiểu là 10,000 VNĐ!');
+      return;
+    }
+
+    try {
+      const result = await createMoMoTopup({ amount });
+      
+      if (result.payUrl) {
+        // Redirect to MoMo payment page
+        window.location.href = result.payUrl;
+      } else {
+        alert('❌ Không thể tạo link thanh toán');
+      }
+    } catch (err: any) {
+      console.error('Failed to create topup:', err);
+      alert('❌ Tạo yêu cầu nạp tiền thất bại');
+    }
+  };
+
+  const loadTransactions = async () => {
+    setLoadingTransactions(true);
+    try {
+      const data = await getTransactionHistory();
+      setTransactions(data);
+    } catch (err) {
+      console.error('Failed to load transactions:', err);
+    } finally {
+      setLoadingTransactions(false);
+    }
+  };
+
+  // Load transactions when switching to history section
+  useEffect(() => {
+    if (activeSection === 'history') {
+      loadTransactions();
+    }
+  }, [activeSection]);
+
   if (loading) {
     return (
       <div className="profileContainer">
@@ -185,9 +301,22 @@ export function ProfilePage() {
       {/* Left Sidebar */}
       <div className="profileSidebar">
         <div className="sidebarHeader">
-          <div className="sidebarAvatar">
-            <span className="sidebarAvatarText">{profile.username.charAt(0).toUpperCase()}</span>
+          <div className="sidebarAvatar sidebarAvatarClickable" onClick={handleAvatarClick}>
+            {profile.avatarUrl ? (
+              <img src={profile.avatarUrl} alt="Avatar" className="sidebarAvatarImage" />
+            ) : (
+              <span className="sidebarAvatarText">{profile.username.charAt(0).toUpperCase()}</span>
+            )}
+            {avatarUploading && <div className="avatarUploading">...</div>}
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="avatarFileInput"
+            onChange={handleAvatarChange}
+            aria-label="Upload avatar"
+          />
           <div className="sidebarUserInfo">
             <h3 className="sidebarUserName">
               {profile.firstName || profile.lastName
@@ -195,6 +324,10 @@ export function ProfilePage() {
                 : profile.username}
             </h3>
             <p className="sidebarUsername">@{profile.username}</p>
+            <div className="sidebarBalance">
+              <span className="balanceIcon">💰</span>
+              <span className="balanceAmount">{balance.toLocaleString('vi-VN')}đ</span>
+            </div>
           </div>
         </div>
 
@@ -562,12 +695,68 @@ export function ProfilePage() {
                 Nạp tiền
               </h1>
             </div>
+            
             <div className="contentCard">
+              <div className="cardHeader">
+                <h2 className="cardTitle">
+                  <span className="titleIcon">💳</span>
+                  Số dư hiện tại
+                </h2>
+              </div>
               <div className="cardBody">
-                <div className="emptyState">
-                  <div className="emptyStateIcon">💳</div>
-                  <h3>Chức năng nạp tiền</h3>
-                  <p>Tính năng này đang được phát triển</p>
+                <div className="balanceDisplay">
+                  <div className="balanceAmount">{balance.toLocaleString('vi-VN')} VNĐ</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="contentCard">
+              <div className="cardHeader">
+                <h2 className="cardTitle">
+                  <span className="titleIcon">💸</span>
+                  Nạp tiền qua MoMo
+                </h2>
+              </div>
+              <div className="cardBody">
+                <div className="topupForm">
+                  <div className="formGroup">
+                    <label htmlFor="topupAmount">Số tiền nạp (VNĐ)</label>
+                    <input
+                      id="topupAmount"
+                      type="number"
+                      className="editInput"
+                      value={topupAmount}
+                      onChange={(e) => setTopupAmount(e.target.value)}
+                      placeholder="Nhập số tiền (tối thiểu 10,000đ)"
+                      min="10000"
+                      step="10000"
+                    />
+                  </div>
+                  
+                  <div className="quickAmounts">
+                    <button className="quickAmountBtn" onClick={() => setTopupAmount('50000')}>
+                      50,000đ
+                    </button>
+                    <button className="quickAmountBtn" onClick={() => setTopupAmount('100000')}>
+                      100,000đ
+                    </button>
+                    <button className="quickAmountBtn" onClick={() => setTopupAmount('200000')}>
+                      200,000đ
+                    </button>
+                    <button className="quickAmountBtn" onClick={() => setTopupAmount('500000')}>
+                      500,000đ
+                    </button>
+                  </div>
+
+                  <button className="topupButton" onClick={handleTopup}>
+                    <span className="topupIcon">💳</span>
+                    Nạp tiền qua MoMo
+                  </button>
+
+                  <div className="topupNote">
+                    <p>💡 Bạn sẽ được chuyển đến trang thanh toán MoMo</p>
+                    <p>💡 Số tiền nạp tối thiểu: 10,000 VNĐ</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -627,14 +816,55 @@ export function ProfilePage() {
                 <span className="sectionIcon">📜</span>
                 Lịch sử giao dịch
               </h1>
+              <button className="refreshButton" onClick={loadTransactions}>
+                🔄 Làm mới
+              </button>
             </div>
+            
             <div className="contentCard">
               <div className="cardBody">
-                <div className="emptyState">
-                  <div className="emptyStateIcon">📋</div>
-                  <h3>Chưa có giao dịch</h3>
-                  <p>Lịch sử giao dịch của bạn sẽ hiển thị ở đây</p>
-                </div>
+                {loadingTransactions ? (
+                  <div className="loadingState">
+                    <div className="spinner"></div>
+                    <p>Đang tải...</p>
+                  </div>
+                ) : transactions.length === 0 ? (
+                  <div className="emptyState">
+                    <div className="emptyStateIcon">📋</div>
+                    <h3>Chưa có giao dịch</h3>
+                    <p>Lịch sử giao dịch của bạn sẽ hiển thị ở đây</p>
+                  </div>
+                ) : (
+                  <div className="transactionList">
+                    {transactions.map((tx) => (
+                      <div key={tx.id} className={`transactionItem ${tx.status.toLowerCase()}`}>
+                        <div className="transactionIcon">
+                          {tx.type === 'TOPUP' ? '💰' : tx.type === 'PURCHASE' ? '🎮' : '🔄'}
+                        </div>
+                        <div className="transactionDetails">
+                          <div className="transactionTitle">{tx.description}</div>
+                          <div className="transactionMeta">
+                            <span className="transactionDate">
+                              {new Date(tx.createdAt).toLocaleString('vi-VN')}
+                            </span>
+                            <span className="transactionMethod">{tx.paymentMethod}</span>
+                          </div>
+                        </div>
+                        <div className="transactionAmount">
+                          <span className={tx.type === 'TOPUP' ? 'positive' : 'negative'}>
+                            {tx.type === 'TOPUP' ? '+' : '-'}
+                            {tx.amount.toLocaleString('vi-VN')}đ
+                          </span>
+                          <span className={`transactionStatus ${tx.status.toLowerCase()}`}>
+                            {tx.status === 'SUCCESS' ? '✅ Thành công' : 
+                             tx.status === 'PENDING' ? '⏳ Đang xử lý' : 
+                             tx.status === 'FAILED' ? '❌ Thất bại' : '🚫 Đã hủy'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
