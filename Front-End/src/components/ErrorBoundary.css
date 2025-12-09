@@ -1,0 +1,334 @@
+.error-boundary-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: radial-gradient(circle at 50% 20%, rgba(220, 38, 38, 0.08), transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(37, 99, 235, 0.06), transparent 60%),
+              var(--color-bg, #0d1117);
+  color: var(--color-text, #e2e8f0);
+  position: relative;
+  overflow: hidden;
+}
+
+.error-boundary-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 60px,
+    rgba(255, 255, 255, 0.015) 60px,
+    rgba(255, 255, 255, 0.015) 120px
+  );
+  animation: drift 30s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(120px, 120px); }
+}
+
+.error-boundary-content {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-boundary-icon-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 2rem;
+}
+
+.error-boundary-icon {
+  position: relative;
+  z-index: 2;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc2626;
+  animation: iconPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(220, 38, 38, 0.3));
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.error-boundary-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.2), transparent 70%);
+  border-radius: 50%;
+  animation: glowPulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+.error-boundary-title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  margin-bottom: 1rem;
+  color: var(--color-text, #e2e8f0);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.error-boundary-description {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  color: var(--color-text-dim, #94a3b8);
+  line-height: 1.6;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.error-boundary-details {
+  background: var(--color-surface, #1b2532);
+  border: 1px solid var(--color-border, #273545);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  text-align: left;
+  animation: slideIn 0.4s ease-out 0.2s backwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-boundary-details-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-dim, #94a3b8);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.error-boundary-details-header svg {
+  color: var(--color-warning, #f59e0b);
+}
+
+.error-boundary-error-message {
+  font-family: var(--font-mono, 'Consolas', monospace);
+  font-size: 0.875rem;
+  color: #f87171;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.error-boundary-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  animation: slideIn 0.4s ease-out 0.3s backwards;
+}
+
+.error-boundary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.error-boundary-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.error-boundary-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.error-boundary-button:active {
+  transform: translateY(1px);
+}
+
+.error-boundary-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
+}
+
+.error-boundary-button > * {
+  position: relative;
+  z-index: 1;
+}
+
+.error-boundary-button.primary {
+  background: linear-gradient(135deg, var(--color-accent, #2563eb) 0%, var(--color-accent-hover, #1d4ed8) 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+.error-boundary-button.primary:hover {
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+  transform: translateY(-2px);
+}
+
+.error-boundary-button.secondary {
+  background: var(--color-surface, #1b2532);
+  color: var(--color-text, #e2e8f0);
+  border: 1px solid var(--color-border, #273545);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.error-boundary-button.secondary:hover {
+  background: var(--color-surface-soft, #222f3d);
+  border-color: var(--color-border-strong, #32485e);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.error-boundary-footer {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border, #273545);
+  animation: slideIn 0.4s ease-out 0.4s backwards;
+}
+
+.error-boundary-footer p {
+  font-size: 0.875rem;
+  color: var(--color-text-faint, #64748b);
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .error-boundary-container {
+    padding: 1.5rem;
+  }
+
+  .error-boundary-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .error-boundary-icon svg {
+    width: 64px;
+    height: 64px;
+  }
+
+  .error-boundary-glow {
+    width: 100px;
+    height: 100px;
+  }
+
+  .error-boundary-title {
+    font-size: 1.5rem;
+  }
+
+  .error-boundary-description {
+    font-size: 1rem;
+  }
+
+  .error-boundary-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .error-boundary-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Motion reduction */
+@media (prefers-reduced-motion: reduce) {
+  .error-boundary-container::before,
+  .error-boundary-icon,
+  .error-boundary-glow,
+  .error-boundary-content,
+  .error-boundary-details,
+  .error-boundary-actions,
+  .error-boundary-footer {
+    animation: none !important;
+  }
+
+  .error-boundary-button {
+    transition: none !important;
+  }
+
+  .error-boundary-button::before {
+    display: none;
+  }
+}
