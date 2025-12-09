@@ -11,7 +11,6 @@ import BackToTop from './components/ui/BackToTop';
 import { CartProvider } from './context/CartContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import { WishlistProvider } from './context/WishlistContext';
-import { ToastProvider } from './context/ToastContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { introspect } from './api/client';
 
@@ -19,21 +18,16 @@ import { introspect } from './api/client';
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
 const StorePage = lazy(() => import('./pages/StorePage').then(m => ({ default: m.StorePage })));
 const CategoriesPage = lazy(() => import('./pages/CategoriesPage').then(m => ({ default: m.default })));
+const TestCategories = lazy(() => import('./pages/TestCategories'));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
-const MoMoCallbackPage = lazy(() => import('./pages/MoMoCallbackPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
-const GoogleCallbackPage = lazy(() => import('./pages/GoogleCallbackPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const GameDetailPage = lazy(() => import('./pages/GameDetailPage').then(m => ({ default: m.GameDetailPage })));
 const WishlistPage = lazy(() => import('./pages/WishlistPage'));
 const AdminPage = lazy(() => import('./pages/admin/AdminPage'));
-const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
-const AdminUsersManagement = lazy(() => import('./pages/admin/AdminUsersManagement'));
 const ModeratorPage = lazy(() => import('./pages/ModeratorPage'));
-const MyOrdersPage = lazy(() => import('./pages/MyOrdersPage'));
-const PaymentCallbackPage = lazy(() => import('./pages/PaymentCallbackPage'));
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
   const [status, setStatus] = useState<'checking' | 'allowed' | 'redirect'>('checking');
@@ -71,17 +65,15 @@ function AdminRoute({ children }: { children: React.ReactElement }) {
           return;
         }
         const raw = localStorage.getItem('user');
-        let hasAccess = false;
+        let isAdmin = false;
         try {
           const u = raw ? JSON.parse(raw) : {};
           const roles = (u?.roles || u?.authorities || []).map((r: any) =>
             (r?.authority || r).toString().toUpperCase()
           );
-          // Allow both ADMIN and MOD to access admin pages
-          hasAccess = roles.includes('ROLE_ADMIN') || roles.includes('ADMIN') || 
-                      roles.includes('ROLE_MOD') || roles.includes('MOD');
+          isAdmin = roles.includes('ROLE_ADMIN') || roles.includes('ADMIN');
         } catch {}
-        setStatus(hasAccess ? 'allowed' : 'redirect');
+        setStatus(isAdmin ? 'allowed' : 'redirect');
       })
       .catch(() => setStatus('redirect'));
   }, []);
@@ -96,16 +88,15 @@ function AdminRoute({ children }: { children: React.ReactElement }) {
 function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const isAuthPage = ['/login', '/register', '/forgot'].includes(location.pathname);
-  const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
     <div className="app-shell">
-      {!isAuthPage && !isAdminPage && <Navbar />}
+      {!isAuthPage && <Navbar />}
       <main className="app-main">
         {children}
       </main>
-      {!isAuthPage && !isAdminPage && <BackToTop />}
-      {!isAuthPage && !isAdminPage && <Footer />}
+      {!isAuthPage && <BackToTop />}
+      {!isAuthPage && <Footer />}
     </div>
   );
 }
@@ -119,16 +110,16 @@ function App() {
           v7_relativeSplatPath: true 
         }}
       >
-        <ToastProvider>
-          <CurrencyProvider>
-            <CartProvider>
-              <WishlistProvider>
-                <Layout>
-                  <Suspense fallback={<div className="loading-screen">Đang tải...</div>}>
-                    <Routes>
+        <CurrencyProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <Layout>
+                <Suspense fallback={<div className="loading-screen">Đang tải...</div>}>
+                  <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/store" element={<StorePage />} />
                     <Route path="/categories" element={<CategoriesPage />} />
+                    <Route path="/test-nav" element={<TestCategories />} />
                     <Route
                       path="/checkout"
                       element={
@@ -140,10 +131,6 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/forgot" element={<ForgotPasswordPage />} />
-                    <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
-                    <Route path="/checkout/momo-callback" element={<MoMoCallbackPage />} />
-                    <Route path="/payment/callback" element={<MoMoCallbackPage />} />
-                    <Route path="/payment/momo/callback" element={<PaymentCallbackPage />} />
                     <Route 
                       path="/profile" 
                       element={
@@ -157,14 +144,6 @@ function App() {
                       element={
                         <ProtectedRoute>
                           <WishlistPage />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/orders" 
-                      element={
-                        <ProtectedRoute>
-                          <MyOrdersPage />
                         </ProtectedRoute>
                       } 
                     />
@@ -185,22 +164,6 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
-                    <Route
-                      path="/admin/users"
-                      element={
-                        <AdminRoute>
-                          <AdminUsersPage />
-                        </AdminRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin/users-management"
-                      element={
-                        <AdminRoute>
-                          <AdminUsersManagement />
-                        </AdminRoute>
-                      }
-                    />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </Suspense>
@@ -208,7 +171,6 @@ function App() {
             </WishlistProvider>
           </CartProvider>
         </CurrencyProvider>
-        </ToastProvider>
       </BrowserRouter>
     </ErrorBoundary>
   );
