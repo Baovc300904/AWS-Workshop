@@ -174,12 +174,16 @@ export function GamesSection({ form, loading, error, filter, shown, onSubmit, se
               </tr>
             </thead>
             <tbody>
-              {shown.map(g => (
-                <tr key={g.id}>
-                  <td>{g.name}</td>
-                  <td>{(g.price as any).toLocaleString('vi-VN', { style:'currency', currency:'VND' })}</td>
-                  <td>{g.quantity}</td>
-                  <td>{(g as any).salePercent ?? 0}</td>
+              {(shown || []).map(g => (
+                <tr key={g?.id || Math.random()}>
+                  <td>{g?.name || 'Unknown'}</td>
+                  <td>
+                    {typeof g?.price === 'number' 
+                      ? g.price.toLocaleString('vi-VN', { style:'currency', currency:'VND' })
+                      : '0₫'}
+                  </td>
+                  <td>{g?.quantity ?? 0}</td>
+                  <td>{(g as any)?.salePercent ?? 0}%</td>
                   <td>
                     <div className="tableActions">
                       <button className="btn" onClick={()=>startEdit(g)}>Edit</button>

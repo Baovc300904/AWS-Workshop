@@ -123,7 +123,7 @@ export function GameRating({ gameId, onRatingChange }: Props) {
     return <div className="stars-container">{stars}</div>;
   };
 
-  const averageRating = ratings.length > 0
+  const averageRating = ratings && ratings.length > 0
     ? (ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1)
     : 'N/A';
 

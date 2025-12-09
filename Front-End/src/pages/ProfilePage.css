@@ -868,28 +868,56 @@
   align-items: center;
   gap: 1rem;
   padding: 1.25rem;
-  background: rgba(30, 27, 46, 0.6);
+  background: linear-gradient(135deg, rgba(30, 27, 46, 0.6) 0%, rgba(22, 20, 31, 0.6) 100%);
   border: 1px solid rgba(79, 165, 219, 0.2);
   border-radius: 12px;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.transactionItem::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(79, 165, 219, 0.05) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.transactionItem:hover::before {
+  opacity: 1;
 }
 
 .transactionItem:hover {
-  transform: translateX(4px);
-  border-color: rgba(79, 165, 219, 0.4);
-  background: rgba(30, 27, 46, 0.8);
+  transform: translateY(-2px) translateX(4px);
+  border-color: rgba(79, 165, 219, 0.5);
+  background: linear-gradient(135deg, rgba(30, 27, 46, 0.9) 0%, rgba(22, 20, 31, 0.9) 100%);
+  box-shadow: 0 8px 24px rgba(79, 165, 219, 0.15),
+              0 0 0 1px rgba(79, 165, 219, 0.2);
 }
 
 .transactionIcon {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: rgba(79, 165, 219, 0.15);
+  background: linear-gradient(135deg, rgba(79, 165, 219, 0.2) 0%, rgba(79, 165, 219, 0.1) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
   flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 165, 219, 0.1);
+}
+
+.transactionItem:hover .transactionIcon {
+  transform: scale(1.1) rotate(5deg);
+  background: linear-gradient(135deg, rgba(79, 165, 219, 0.3) 0%, rgba(79, 165, 219, 0.15) 100%);
+  box-shadow: 0 6px 16px rgba(79, 165, 219, 0.2);
 }
 
 .transactionDetails {
@@ -928,22 +956,42 @@
 }
 
 .transactionStatus {
-  display: block;
+  display: inline-block;
   margin-top: 0.25rem;
   font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .transactionStatus.success {
   color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .transactionStatus.pending {
   color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .transactionStatus.failed,
 .transactionStatus.cancelled {
   color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .loadingState {

@@ -11,10 +11,24 @@ interface WishlistContextValue {
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
+// Get wishlist storage key based on logged-in user
+const getWishlistKey = () => {
+  const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+  if (!token) return 'wishlist_guest';
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const username = payload.sub || payload.username || 'unknown';
+    return `wishlist_${username}`;
+  } catch {
+    return 'wishlist_guest';
+  }
+};
+
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<string[]>(() => {
     try {
-      const raw = localStorage.getItem('wishlist_ids');
+      const raw = localStorage.getItem(getWishlistKey());
       return raw ? JSON.parse(raw) : [];
     } catch {
       return [];
@@ -23,7 +37,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem('wishlist_ids', JSON.stringify(wishlist));
+      localStorage.setItem(getWishlistKey(), JSON.stringify(wishlist));
     } catch {}
   }, [wishlist]);
 

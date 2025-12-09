@@ -44,19 +44,19 @@ export function AdminUsersPage() {
     }
   };
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = (users || []).filter(user => {
     const search = searchTerm.toLowerCase();
     return (
-      (user.username || '').toLowerCase().includes(search) ||
-      (user.email || '').toLowerCase().includes(search) ||
-      (user.firstName || '').toLowerCase().includes(search) ||
-      (user.lastName || '').toLowerCase().includes(search) ||
-      (user.phone || '').includes(search)
+      user.username.toLowerCase().includes(search) ||
+      user.email?.toLowerCase().includes(search) ||
+      user.firstName?.toLowerCase().includes(search) ||
+      user.lastName?.toLowerCase().includes(search) ||
+      user.phone?.includes(search)
     );
   });
 
   const getUserRoles = (user: User): string[] => {
-    if (!user.roles) return [];
+    if (!user || !user.roles || !Array.isArray(user.roles)) return [];
     return user.roles.map(r => r.name);
   };
 
@@ -75,7 +75,7 @@ export function AdminUsersPage() {
     <div className="adminUsersContainer">
       <div className="adminUsersHeader">
         <div className="headerTop">
-          <button className="btnBack" onClick={() => navigate('/admin')}>
+          <button className="btnBack" onClick={() => navigate('/moderator')}>
             ← Quay lại Dashboard
           </button>
           <h1>👥 Quản lý người dùng</h1>
@@ -110,28 +110,28 @@ export function AdminUsersPage() {
               <div className="statIcon">👥</div>
               <div className="statInfo">
                 <h3>Tổng người dùng</h3>
-                <p className="statValue">{users.length}</p>
+                <p className="statValue">{(users || []).length}</p>
               </div>
             </div>
             <div className="statCard">
               <div className="statIcon">🔐</div>
               <div className="statInfo">
                 <h3>Admin</h3>
-                <p className="statValue">{users.filter(u => getUserRoles(u).includes('ADMIN')).length}</p>
+                <p className="statValue">{(users || []).filter(u => getUserRoles(u).includes('ADMIN')).length}</p>
               </div>
             </div>
             <div className="statCard">
               <div className="statIcon">⚡</div>
               <div className="statInfo">
                 <h3>Moderator</h3>
-                <p className="statValue">{users.filter(u => getUserRoles(u).includes('MOD')).length}</p>
+                <p className="statValue">{(users || []).filter(u => getUserRoles(u).includes('MOD')).length}</p>
               </div>
             </div>
             <div className="statCard">
               <div className="statIcon">👤</div>
               <div className="statInfo">
                 <h3>User</h3>
-                <p className="statValue">{users.filter(u => getUserRoles(u).includes('USER')).length}</p>
+                <p className="statValue">{(users || []).filter(u => getUserRoles(u).includes('USER')).length}</p>
               </div>
             </div>
           </div>

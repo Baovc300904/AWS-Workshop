@@ -151,7 +151,7 @@ export function GameDetailPage() {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
                 gap: '16px' 
               }}>
-                {suggestedGames.map((suggestedGame) => (
+                {(suggestedGames || []).map((suggestedGame) => (
                   <div
                     key={suggestedGame.id}
                     onClick={() => navigate(`/game/${suggestedGame.id}`)}
@@ -232,7 +232,7 @@ export function GameDetailPage() {
               <h1>{game.name}</h1>
               {game.categories && game.categories.length > 0 && (
                 <div className="gameTags">
-                  {game.categories.map((cat) => (
+                  {(game.categories || []).map((cat) => (
                     <span key={cat.name} className="tag">
                       {cat.name}
                     </span>
@@ -303,7 +303,7 @@ export function GameDetailPage() {
                     <h2>📖 Thông tin chi tiết về {game.name}</h2>
                     <div className="gameMetaTags">
                       {game.categories && game.categories.length > 0 && (
-                        game.categories.map((cat) => (
+                        (game.categories || []).map((cat) => (
                           <span key={cat.name} className="metaTag">
                             {cat.name}
                           </span>
@@ -736,7 +736,7 @@ export function GameDetailPage() {
                 <p>Các game tương tự bạn có thể quan tâm</p>
               </div>
               <div className="suggestedGamesGrid">
-                {suggestedGames.map((suggestedGame) => {
+                {(suggestedGames || []).map((suggestedGame) => {
                   const suggestedHasDiscount = suggestedGame.salePercent && suggestedGame.salePercent > 0;
                   const suggestedFinalPrice = getDiscountedPrice(suggestedGame);
                   const suggestedIsFree = Number(suggestedGame.price) === 0;

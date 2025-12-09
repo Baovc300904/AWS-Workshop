@@ -1,320 +1,51 @@
-/* ========================================
-   ADMIN ORDERS PAGE - MODERN GAMING STYLE
-   ======================================== */
-
-.adminOrdersPage {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
-  padding: 32px;
-  color: #f8fafc;
+.adminOrdersContainer {
+  padding: 24px;
 }
-
-/* ========================================
-   HEADER
-   ======================================== */
 
 .ordersHeader {
-  margin-bottom: 32px;
-}
-
-.headerTop {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 24px;
   margin-bottom: 24px;
 }
 
-.backButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: rgba(148, 163, 184, 0.1);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 8px;
-  color: #94a3b8;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.backButton:hover {
-  background: rgba(148, 163, 184, 0.15);
-  border-color: rgba(148, 163, 184, 0.3);
-  color: #f8fafc;
-  transform: translateX(-2px);
-}
-
-.backIcon {
-  font-size: 18px;
-}
-
-.pageTitle {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 32px;
-  font-weight: 800;
+.ordersHeader h2 {
   margin: 0;
-  background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
 }
 
-.titleIcon {
-  font-size: 36px;
-}
-
-/* ========================================
-   STATS GRID
-   ======================================== */
-
-.statsGrid {
+.ordersStats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
+  margin-bottom: 24px;
 }
 
 .statCard {
-  background: linear-gradient(135deg, #1a1f2e 0%, #141824 100%);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.statCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, transparent 0%, rgba(0, 212, 255, 0.05) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.statCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(0, 212, 255, 0.2);
-  border-color: rgba(0, 212, 255, 0.3);
-}
-
-.statCard:hover::before {
-  opacity: 1;
-}
-
-.statIcon {
-  font-size: 32px;
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: 12px;
-  background: rgba(0, 212, 255, 0.1);
-}
-
-.statCard.pending .statIcon { background: rgba(245, 158, 11, 0.1); }
-.statCard.processing .statIcon { background: rgba(59, 130, 246, 0.1); }
-.statCard.completed .statIcon { background: rgba(16, 185, 129, 0.1); }
-.statCard.revenue .statIcon { background: rgba(124, 58, 237, 0.1); }
-
-.statContent {
-  flex: 1;
+  color: white;
 }
 
 .statLabel {
-  font-size: 13px;
-  color: #94a3b8;
-  margin-bottom: 4px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 8px;
 }
 
 .statValue {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
-  color: #f8fafc;
 }
-
-/* ========================================
-   CONTROLS
-   ======================================== */
-
-.ordersControls {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.searchBox {
-  flex: 1;
-  min-width: 300px;
-  position: relative;
-}
-
-.searchIcon {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-  color: #64748b;
-}
-
-.searchInput {
-  width: 100%;
-  padding: 14px 16px 14px 48px;
-  background: rgba(148, 163, 184, 0.08);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 12px;
-  color: #f8fafc;
-  font-size: 15px;
-  transition: all 0.2s ease;
-}
-
-.searchInput:focus {
-  outline: none;
-  background: rgba(148, 163, 184, 0.12);
-  border-color: #00d4ff;
-  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
-}
-
-.searchInput::placeholder {
-  color: #64748b;
-}
-
-.filterBox {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.filterLabel {
-  font-size: 14px;
-  font-weight: 600;
-  color: #94a3b8;
-}
-
-.filterSelect {
-  padding: 12px 16px;
-  background: rgba(148, 163, 184, 0.08);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 12px;
-  color: #f8fafc;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 150px;
-}
-
-.filterSelect:focus {
-  outline: none;
-  border-color: #00d4ff;
-  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
-}
-
-.filterSelect option {
-  background: #1a1f2e;
-  color: #f8fafc;
-}
-
-/* ========================================
-   CONTENT STATES
-   ======================================== */
-
-.ordersContent {
-  background: linear-gradient(135deg, #1a1f2e 0%, #141824 100%);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 16px;
-  overflow: hidden;
-  min-height: 400px;
-}
-
-.loadingState,
-.errorState,
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
-  text-align: center;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid rgba(0, 212, 255, 0.2);
-  border-top-color: #00d4ff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loadingState p {
-  color: #94a3b8;
-  font-size: 16px;
-}
-
-.errorIcon,
-.emptyIcon {
-  font-size: 64px;
-  margin-bottom: 16px;
-  opacity: 0.6;
-}
-
-.errorState h3,
-.emptyState h3 {
-  font-size: 24px;
-  margin-bottom: 8px;
-  color: #f8fafc;
-}
-
-.errorState p,
-.emptyState p {
-  color: #94a3b8;
-  font-size: 15px;
-  max-width: 400px;
-}
-
-.retryButton {
-  margin-top: 20px;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.retryButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
-}
-
-/* ========================================
-   ORDERS TABLE
-   ======================================== */
 
 .ordersTable {
-  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .ordersTable table {
@@ -323,199 +54,163 @@
 }
 
 .ordersTable thead {
-  background: rgba(0, 212, 255, 0.05);
-  border-bottom: 2px solid rgba(0, 212, 255, 0.2);
+  background: #f8fafc;
 }
 
 .ordersTable th {
   padding: 16px;
   text-align: left;
-  font-size: 13px;
-  font-weight: 700;
-  color: #00d4ff;
+  font-weight: 600;
+  color: #475569;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .ordersTable td {
-  padding: 20px 16px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-  font-size: 14px;
-  color: #e2e8f0;
+  padding: 16px;
+  border-top: 1px solid #e2e8f0;
+  color: #334155;
 }
 
-.orderRow {
-  transition: background 0.2s ease;
+.ordersTable tbody tr:hover {
+  background: #f8fafc;
 }
 
-.orderRow:hover {
-  background: rgba(0, 212, 255, 0.03);
-}
-
-.idBadge {
-  padding: 4px 12px;
-  background: rgba(124, 58, 237, 0.15);
-  border: 1px solid rgba(124, 58, 237, 0.3);
-  border-radius: 6px;
-  font-family: 'Courier New', monospace;
+.orderItem {
   font-size: 13px;
-  color: #a78bfa;
-  font-weight: 600;
+  color: #64748b;
+  margin: 4px 0;
 }
 
-.customerInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.customerName {
-  font-weight: 600;
-  color: #f8fafc;
-}
-
-.customerEmail {
+.completedText {
   font-size: 12px;
-  color: #94a3b8;
+  color: #059669;
+  font-weight: 500;
 }
 
-.itemsCount {
-  color: #94a3b8;
-}
-
-.priceValue {
-  font-weight: 700;
-  color: #10b981;
-  font-size: 15px;
-}
-
-/* Status Badges */
-.orderStatus {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+.btn {
+  padding: 8px 16px;
+  border: none;
   border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.statusIcon {
-  font-size: 14px;
-}
-
-.status-pending {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.status-processing {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-.status-completed {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.status-cancelled {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.orderDate {
-  color: #94a3b8;
-  font-size: 13px;
-}
-
-/* Action Buttons */
-.orderActions {
-  display: flex;
-  gap: 8px;
-}
-
-.actionBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: rgba(148, 163, 184, 0.08);
-  color: #f8fafc;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.btn:hover {
+  background: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modalContent h3 {
+  margin: 0 0 24px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.orderDetails {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.orderDetails p {
+  margin: 8px 0;
+  color: #475569;
+}
+
+.orderItems {
+  margin-top: 12px;
+}
+
+.formGroup {
+  margin-bottom: 24px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #334155;
+  font-size: 14px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.loading, .error, .emptyState {
+  text-align: center;
+  padding: 48px;
+  color: #64748b;
   font-size: 16px;
 }
 
-.actionBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
-}
-
-.actionBtn.view:hover {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.3);
-}
-
-.actionBtn.edit:hover {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.3);
-}
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-
-@media (max-width: 1024px) {
-  .statsGrid {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
-  
-  .ordersTable {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 768px) {
-  .adminOrdersPage {
-    padding: 20px;
-  }
-  
-  .headerTop {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .pageTitle {
-    font-size: 24px;
-  }
-  
-  .statsGrid {
-    grid-template-columns: 1fr;
-  }
-  
-  .ordersControls {
-    flex-direction: column;
-  }
-  
-  .searchBox {
-    min-width: 100%;
-  }
-  
-  .ordersTable {
-    overflow-x: scroll;
-  }
-  
-  .ordersTable table {
-    min-width: 800px;
-  }
+.error {
+  color: #dc2626;
 }

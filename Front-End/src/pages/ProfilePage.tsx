@@ -22,11 +22,7 @@ export function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  
-  // Get section from URL params or default to 'account'
-  const urlParams = new URLSearchParams(window.location.search);
-  const initialSection = urlParams.get('section') || 'account';
-  const [activeSection, setActiveSection] = useState(initialSection); // 'account', 'topup', 'inventory', 'points', 'history', 'voucher', 'wishlist'
+  const [activeSection, setActiveSection] = useState('account'); // 'account', 'topup', 'inventory', 'points', 'history', 'voucher', 'wishlist'
   const [formData, setFormData] = useState<UpdateProfilePayload>({
     firstName: '',
     lastName: '',
@@ -41,16 +37,6 @@ export function ProfilePage() {
   const [topupAmount, setTopupAmount] = useState<string>('');
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
-
-  // Function to load balance
-  const loadBalance = async () => {
-    try {
-      const balanceData = await getBalance();
-      setBalance(balanceData.balance || 0);
-    } catch (balanceErr) {
-      console.error('Failed to load balance:', balanceErr);
-    }
-  };
 
   useEffect(() => {
     const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
@@ -82,7 +68,12 @@ export function ProfilePage() {
         });
 
         // Load balance
-        await loadBalance();
+        try {
+          const balanceData = await getBalance();
+          setBalance(balanceData.balance || 0);
+        } catch (balanceErr) {
+          console.error('Failed to load balance:', balanceErr);
+        }
       } catch (err: any) {
         const errorMsg = err?.response?.data?.message || err?.message || 'Không thể tải thông tin người dùng';
         setError(errorMsg);
@@ -100,13 +91,6 @@ export function ProfilePage() {
 
     checkAuth();
   }, [navigate]);
-
-  // Auto-refresh balance when coming back to topup section
-  useEffect(() => {
-    if (activeSection === 'topup' && !loading) {
-      loadBalance();
-    }
-  }, [activeSection, loading]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -324,10 +308,12 @@ export function ProfilePage() {
                 : profile.username}
             </h3>
             <p className="sidebarUsername">@{profile.username}</p>
-            <div className="sidebarBalance">
-              <span className="balanceIcon">💰</span>
+          <div className="sidebarBalance">
+              <svg className="balanceIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
               <span className="balanceAmount">{balance.toLocaleString('vi-VN')}đ</span>
-            </div>
+          </div>
           </div>
         </div>
 
@@ -336,7 +322,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'account' ? 'active' : ''}`}
             onClick={() => setActiveSection('account')}
           >
-            <span className="navItemIcon">👤</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Tài khoản của tôi</span>
           </button>
           
@@ -344,7 +332,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'topup' ? 'active' : ''}`}
             onClick={() => setActiveSection('topup')}
           >
-            <span className="navItemIcon">💰</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Nạp tiền</span>
           </button>
           
@@ -352,7 +342,10 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'inventory' ? 'active' : ''}`}
             onClick={() => setActiveSection('inventory')}
           >
-            <span className="navItemIcon">📦</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Kho hàng</span>
           </button>
           
@@ -360,7 +353,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'points' ? 'active' : ''}`}
             onClick={() => setActiveSection('points')}
           >
-            <span className="navItemIcon">💎</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Đổi điểm</span>
           </button>
           
@@ -368,7 +363,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'history' ? 'active' : ''}`}
             onClick={() => setActiveSection('history')}
           >
-            <span className="navItemIcon">📜</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Lịch sử</span>
           </button>
           
@@ -376,7 +373,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'voucher' ? 'active' : ''}`}
             onClick={() => setActiveSection('voucher')}
           >
-            <span className="navItemIcon">🎟️</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Kho Voucher</span>
           </button>
           
@@ -384,7 +383,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'wishlist' ? 'active' : ''}`}
             onClick={() => navigate('/wishlist')}
           >
-            <span className="navItemIcon">❤️</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Yêu thích</span>
           </button>
           
@@ -392,7 +393,9 @@ export function ProfilePage() {
             className="sidebarNavItem danger"
             onClick={handleLogout}
           >
-            <span className="navItemIcon">🚪</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Đăng xuất</span>
           </button>
         </nav>
@@ -405,11 +408,21 @@ export function ProfilePage() {
           <div className="contentSection">
             <div className="sectionHeader">
               <h1 className="sectionTitle">
-                <span className="sectionIcon">👤</span>
+                <svg className="sectionIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
                 Tài khoản của tôi
               </h1>
               <button className="editToggleBtn" onClick={handleEdit}>
-                <span className="editIcon">{editing ? '❌' : '✏️'}</span>
+                {editing ? (
+                  <svg className="editIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg className="editIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
                 {editing ? 'Hủy' : 'Chỉnh sửa'}
               </button>
             </div>

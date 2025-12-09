@@ -117,12 +117,12 @@ export function HomePage(){
     return () => { cancelled = true; };
   }, []);
 
-  const visibleCats = categories.slice(0, catLimit);
-  const canMoreCat = categories.length > catLimit;
+  const visibleCats = (categories || []).slice(0, catLimit);
+  const canMoreCat = categories && categories.length > catLimit;
 
   // Hero carousel: top 8 games with highest discount
   const heroSlides = useMemo(() => (
-    [...games]
+    [...(games || [])]
       .filter(g => g.salePercent && g.salePercent > 0)
       .sort((a,b) => (b.salePercent || 0) - (a.salePercent || 0))
       .slice(0, 8)
@@ -134,17 +134,17 @@ export function HomePage(){
   const AUTO_MS = 5200;
 
   function nextHero(){ 
-    setHeroIndex(i => (i+1) % Math.max(1, heroSlides.length)); 
+    setHeroIndex(i => (i+1) % Math.max(1, (heroSlides || []).length)); 
   }
   
   function prevHero(){ 
-    setHeroIndex(i => (i-1 + heroSlides.length) % Math.max(1, heroSlides.length)); 
+    setHeroIndex(i => (i-1 + (heroSlides || []).length) % Math.max(1, (heroSlides || []).length)); 
   }
 
   // Autoplay with pause on hover
   const heroAreaRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    if (heroSlides.length === 0) return;
+    if (!heroSlides || heroSlides.length === 0) return;
     
     function clear(){ 
       if(heroTimer.current) { 
@@ -177,13 +177,13 @@ export function HomePage(){
       area?.removeEventListener('mouseenter', pause);
       area?.removeEventListener('mouseleave', resume);
     };
-  }, [heroIndex, heroSlides.length]);
+  }, [heroIndex, heroSlides?.length]);
 
   // Game sections
-  const featured = useMemo(() => heroSlides.slice(0, 4), [heroSlides]);
+  const featured = useMemo(() => (heroSlides || []).slice(0, 4), [heroSlides]);
   
   const bestSellers = useMemo(() => (
-    [...games]
+    [...(games || [])]
       .sort((a,b) => {
         const scoreA = (a.salePercent || 0) * 2 - (Number(a.price) || 0) / 1000;
         const scoreB = (b.salePercent || 0) * 2 - (Number(b.price) || 0) / 1000;
@@ -193,17 +193,17 @@ export function HomePage(){
   ), [games]);
 
   const deepDiscount = useMemo(() => (
-    games.filter(g => (g.salePercent || 0) >= 30)
+    (games || []).filter(g => (g.salePercent || 0) >= 30)
       .sort((a,b) => (b.salePercent || 0) - (a.salePercent || 0))
       .slice(0, 8)
   ), [games]);
 
   const freeToPlay = useMemo(() => (
-    games.filter(g => Number(g.price) === 0).slice(0, 8)
+    (games || []).filter(g => Number(g.price) === 0).slice(0, 8)
   ), [games]);
 
   const newArrivals = useMemo(() => (
-    [...games].slice(0, 8)
+    [...(games || [])].slice(0, 8)
   ), [games]);
 
   const sections = useMemo(() => {
@@ -217,7 +217,7 @@ export function HomePage(){
     return allSections.filter(s => s.items && s.items.length > 0);
   }, [bestSellers, deepDiscount, featured, freeToPlay, newArrivals]);
 
-  if (loading && games.length === 0) {
+  if (loading && (!games || games.length === 0)) {
     return (
       <div className="home-model">
         <div className="hm-container">
@@ -230,7 +230,7 @@ export function HomePage(){
     );
   }
 
-  if (error && games.length === 0) {
+  if (error && (!games || games.length === 0)) {
     return (
       <div className="home-model">
         <div className="hm-container">
@@ -286,7 +286,7 @@ export function HomePage(){
           <aside className="hm-side-left">
             <div className="cat-head">Danh mục sản phẩm</div>
             <ul className="cat-nav">
-              {visibleCats.map(c => (
+              {(visibleCats || []).map(c => (
                 <li key={c.id || c.name}>
                   <button 
                     type="button" 
@@ -298,7 +298,7 @@ export function HomePage(){
                 </li>
               ))}
             </ul>
-            {(canMoreCat || categories.length > 10) && (
+            {(canMoreCat || (categories && categories.length > 10)) && (
               <div className="cat-more">
                 {canMoreCat ? (
                   <button className="link-more" onClick={() => setCatLimit(l => l + 8)}>
@@ -343,7 +343,7 @@ export function HomePage(){
                     </div>
                   </div>
                 </Link>
-                {heroSlides.length > 1 && (
+                {heroSlides && heroSlides.length > 1 && (
                   <>
                     <button className="hero-nav prev" onClick={prevHero} aria-label="Trước">
                       ‹
@@ -352,7 +352,7 @@ export function HomePage(){
                       ›
                     </button>
                     <div className="hero-dots">
-                      {heroSlides.map((slide, i) => (
+                      {(heroSlides || []).map((slide, i) => (
                         <button 
                           key={slide.id} 
                           className={i === heroIndex ? 'dot active' : 'dot'} 
@@ -405,7 +405,7 @@ export function HomePage(){
         {sections.length > 0 && (
           <div className="section-nav">
             <ul>
-              {sections.map(s => (
+              {(sections || []).map(s => (
                 <li key={s.id}>
                   <a href={`#sec-${s.id}`}>{s.title}</a>
                 </li>
@@ -417,7 +417,7 @@ export function HomePage(){
         {/* Game Sections */}
         <div className="hm-sections">
           {error && <div className="error-state">{error}</div>}
-          {sections.map(s => (
+          {(sections || []).map(s => (
             <SectionShelf 
               key={s.id} 
               id={`sec-${s.id}`} 
@@ -448,7 +448,7 @@ function SectionShelf({ title, items, id, currency }: SectionShelfProps){
         <Link to="/store" className="link-more">Xem tất cả →</Link>
       </header>
       <div className="shelf-grid">
-        {items.map((g) => {
+        {(items || []).map((g) => {
           const hasDiscount = g.salePercent && g.salePercent > 0;
           const finalPrice = getDiscountedPrice(g);
           const percent = g.salePercent || 0;
@@ -482,7 +482,7 @@ function SectionShelf({ title, items, id, currency }: SectionShelfProps){
                 <div className="si-meta">
                   <span className="genres">
                     {g.categories && g.categories.length > 0 
-                      ? g.categories.slice(0, 2).map(c => c.name).join(', ')
+                      ? (g.categories || []).slice(0, 2).map(c => c.name).join(', ')
                       : 'Game'}
                   </span>
                   {g.releaseDate && (

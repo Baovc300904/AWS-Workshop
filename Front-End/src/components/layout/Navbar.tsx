@@ -3,14 +3,14 @@ import './Navbar.css';
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { fetchCategories, Category, setAuthToken, logout as apiLogout } from '../../api/client';
+import { fetchCategories, Category, setAuthToken, logout as apiLogout, getMyInfo } from '../../api/client';
 
 export default function Navbar() {
     const { cart } = useCart();
     const { wishlist } = useWishlist();
     const navigate = useNavigate();
     const [categories, setCategories] = useState<Category[]>([]);
-    const [user, setUser] = useState<{ username: string } | null>(() => {
+    const [user, setUser] = useState<{ username: string; avatarUrl?: string; roles?: string[] } | null>(() => {
         try {
             const username = localStorage.getItem('username');
             return username ? { username } : null;
@@ -60,6 +60,20 @@ export default function Navbar() {
             .then((cats) => setCategories(cats || []))
             .catch(() => { });
     }, []);
+
+    // Load user profile with avatar and roles
+    useEffect(() => {
+        if (user && user.username && !user.roles) {
+            getMyInfo()
+                .then((profile) => {
+                    if (profile) {
+                        const roles = profile.roles?.map((r: any) => r.name) || [];
+                        setUser({ username: profile.username, avatarUrl: profile.avatarUrl, roles });
+                    }
+                })
+                .catch(() => { });
+        }
+    }, [user]);
 
     const platforms = useMemo(() => [
         { name: 'PC', icon: '💻' },
@@ -132,9 +146,21 @@ export default function Navbar() {
                 }
             }
             
+            // Get current username before clearing
+            const username = user?.username || 'unknown';
+            
+            // Clear user-specific cart/wishlist
+            localStorage.removeItem(`cart_${username}`);
+            localStorage.removeItem(`wishlist_${username}`);
+            
+            // Clear old shared data
+            localStorage.removeItem('demo_cart');
+            localStorage.removeItem('wishlist_ids');
+            
             // Clear local storage
             localStorage.removeItem('wgs_token');
             localStorage.removeItem('token');
+            localStorage.removeItem('username');
             localStorage.removeItem('username');
             localStorage.removeItem('user');
             setAuthToken(null);
@@ -229,10 +255,10 @@ export default function Navbar() {
                                             </button>
                                         ))}
                                     </div>
-                                    {categories.length > 24 && (
+                                    {categories && categories.length > 24 && (
                                         <div className="dd-footer">
                                             <span className="dd-more">
-                                                và {categories.length - 24} thể loại khác...
+                                                và {(categories || []).length - 24} thể loại khác...
                                             </span>
                                         </div>
                                     )}
@@ -315,8 +341,16 @@ export default function Navbar() {
                                 aria-label="Menu người dùng"
                                 aria-expanded={openMenu === 'profile'}
                             >
-                                <span className="avatar-circle">👤</span>
-                                <span className="user-name-inline">{user.username}</span>
+                                {user.avatarUrl ? (
+                                    <img src={user.avatarUrl} alt="Avatar" className="avatar-circle" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                                ) : (
+                                    <span className="avatar-circle">👤</span>
+                                )}
+                                <span className="user-name-inline">
+                                    {user.username}
+                                    {user.roles?.includes('ADMIN') && <span style={{ marginLeft: '4px', padding: '2px 6px', background: '#ff4444', color: 'white', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold' }}>ADMIN</span>}
+                                    {user.roles?.includes('MOD') && !user.roles?.includes('ADMIN') && <span style={{ marginLeft: '4px', padding: '2px 6px', background: '#4CAF50', color: 'white', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold' }}>MOD</span>}
+                                </span>
                             </button>
                             {openMenu === 'profile' && (
                                 <div className="profile-dropdown">
@@ -381,13 +415,13 @@ export default function Navbar() {
                                             <button 
                                                 className="dropdown-grid-item"
                                                 onClick={() => {
-                                                    navigate('/checkout');
+                                                    navigate('/orders');
                                                     setOpenMenu(null);
                                                     setMobileOpen(false);
                                                 }}
                                             >
                                                 <span className="grid-item-icon">📝</span>
-                                                <span className="grid-item-text">Lịch sử giao dịch</span>
+                                                <span className="grid-item-text">Đơn hàng của tôi</span>
                                             </button>
                                             <button 
                                                 className="dropdown-grid-item"

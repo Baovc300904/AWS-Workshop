@@ -32,6 +32,21 @@ export function UserDropdown() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Listen for storage events (balance updates from MoMoCallbackPage)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+      if (token) {
+        getMyInfo()
+          .then(data => setUser(data))
+          .catch(err => console.error('[UserDropdown] Failed to refresh user info:', err));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -59,9 +74,30 @@ export function UserDropdown() {
   }, [isOpen]);
 
   const handleLogout = () => {
+    // Get current username before clearing
+    const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+    let username = 'unknown';
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        username = payload.sub || payload.username || 'unknown';
+      } catch {}
+    }
+    
+    // Clear user-specific cart/wishlist
+    localStorage.removeItem(`cart_${username}`);
+    localStorage.removeItem(`wishlist_${username}`);
+    
+    // Clear old shared data
+    localStorage.removeItem('demo_cart');
+    localStorage.removeItem('wishlist_ids');
+    
+    // Clear auth tokens
     localStorage.removeItem('wgs_token');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('username');
+    
     setIsOpen(false);
     navigate('/login');
   };

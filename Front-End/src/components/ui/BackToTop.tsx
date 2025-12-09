@@ -31,7 +31,7 @@ export default function BackToTop() {
 
   const handleZalo = () => {
     // Replace with your Zalo OA ID or phone number
-    const zaloNumber = '84123456789'; // Example: Vietnam number
+    const zaloNumber = '0937839123'; // Example: Vietnam number
     window.open(`https://zalo.me/${zaloNumber}`, '_blank');
   };
 

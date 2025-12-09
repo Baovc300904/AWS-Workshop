@@ -105,14 +105,12 @@ export default function CheckoutPage() {
             orderId,
             amount: totalRaw,
             orderInfo,
-            returnUrl: `${window.location.origin}/AWS-Workshop/checkout/momo-callback`,
             items: cart.map(item => ({
-              id: item.id,
-              name: item.name,
-              price: getDiscountedPrice(item),
-              currency: currency,
+              gameId: item.id,
+              gameName: item.name,
+              unitPrice: Number(item.price),
               quantity: item.quantity,
-              totalPrice: getDiscountedPrice(item) * item.quantity,
+              salePercent: item.salePercent || 0,
             })),
           });
 

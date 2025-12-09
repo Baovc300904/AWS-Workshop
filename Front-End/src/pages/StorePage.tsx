@@ -140,8 +140,8 @@ export function StorePage() {
   }, [games, category, platform, minPrice, maxPrice, onlyFree, onlySale]);
 
   // Stats
-  const totalGames = filteredGames.length;
-  const onSaleGames = filteredGames.filter(g => g.salePercent && g.salePercent > 0).length;
+  const totalGames = (filteredGames || []).length;
+  const onSaleGames = (filteredGames || []).filter(g => g.salePercent && g.salePercent > 0).length;
 
   const handleClearFilters = () => {
     setSearchParams({});
@@ -305,7 +305,7 @@ export function StorePage() {
             <div className="filterGroup">
               <h4>Thể loại</h4>
               <div className="filterList">
-                {categories.map(cat => (
+                {(categories || []).map(cat => (
                   <button
                     key={cat.id || cat.name}
                     className={`filterBtn ${category === cat.name ? 'active' : ''}`}
@@ -365,7 +365,7 @@ export function StorePage() {
 
           {!loading && !error && filteredGames.length > 0 && (
             <div className="gamesGrid">
-              {filteredGames.map(game => {
+              {(filteredGames || []).map(game => {
                 const finalPrice = getDiscountedPrice(game);
                 const isFree = Number(game.price) === 0;
                 const hasDiscount = game.salePercent && game.salePercent > 0;
@@ -389,7 +389,7 @@ export function StorePage() {
                         <h3 className="gameCardTitle">{game.name}</h3>
                         {game.categories && game.categories.length > 0 && (
                           <div className="gameCardTags">
-                            {game.categories.slice(0, 2).map(cat => (
+                            {(game.categories || []).slice(0, 2).map(cat => (
                               <span key={cat.name} className="tag">{cat.name}</span>
                             ))}
                           </div>
