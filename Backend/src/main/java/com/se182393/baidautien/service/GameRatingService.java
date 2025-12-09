@@ -1,0 +1,61 @@
+package com.se182393.baidautien.service;
+
+import com.se182393.baidautien.entity.Game;
+import com.se182393.baidautien.entity.GameRating;
+import com.se182393.baidautien.exception.AppException;
+import com.se182393.baidautien.exception.ErrorCode;
+import com.se182393.baidautien.repository.GameRatingRepository;
+import com.se182393.baidautien.repository.GameRepository;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+@Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
+public class GameRatingService {
+
+    GameRepository gameRepository;
+    GameRatingRepository ratingRepository;
+
+    @Transactional
+    public void submitRating(String gameId, int score, String clientId) {
+        if (score < 1 || score > 5) {
+            throw new AppException(ErrorCode.INVALID_KEY);
+        }
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
+
+        GameRating rating = ratingRepository.findByGameAndClientId(game, clientId)
+                .orElse(GameRating.builder()
+                        .game(game)
+                        .clientId(clientId)
+                        .createdAt(LocalDateTime.now())
+                        .build());
+        rating.setScore(score);
+        rating.setUpdatedAt(LocalDateTime.now());
+        ratingRepository.save(rating);
+        log.info("Rating saved: game={}, clientId={}, score={}", game.getName(), clientId, score);
+    }
+
+    public double getAverage(String gameId) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
+        Double avg = ratingRepository.averageForGame(game);
+        return avg == null ? 0.0 : avg;
+    }
+
+    public long getCount(String gameId) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
+        return ratingRepository.countByGame(game);
+    }
+}
+
+
