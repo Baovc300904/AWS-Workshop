@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8080/identity';
+// Use /api prefix in production, empty in dev (Vite proxy handles it)
+const API_BASE = import.meta.env.PROD ? '/api' : '';
 
 export const api = axios.create({
   baseURL: API_BASE,
@@ -14,7 +15,7 @@ export const api = axios.create({
 const PUBLIC_ENDPOINTS = [
   '/auth/log-in',
   '/auth/introspect',
-  '/users', // POST /users (register)
+  // NOTE: /users is handled specially in interceptor (only POST /users for registration is public)
   '/users/forgot-password',
   '/users/request-phone-otp',
   '/users/forgot-password/phone/request',
@@ -25,6 +26,9 @@ const PUBLIC_ENDPOINTS = [
   '/games/by-price-desc',
   '/games/search',
   '/category',
+  '/payment/momo/confirm', // MoMo payment confirmation (after redirect)
+  '/payment/momo/status', // Check payment status
+  '/topup/momo/confirm', // MoMo topup confirmation
 ];
 
 // Request interceptor to conditionally add auth token
@@ -34,12 +38,25 @@ api.interceptors.request.use(
     const method = (config.method || 'get').toUpperCase();
     
     // Check if this is a public endpoint
-    const isPublicEndpoint = PUBLIC_ENDPOINTS.some(endpoint => {
-      if (endpoint === '/users' && method === 'POST') return url.startsWith('/users') && !url.includes('/');
-      if (endpoint === '/games' && method === 'GET') return url === '/games' || url.startsWith('/games/');
-      if (endpoint === '/category' && method === 'GET') return url.startsWith('/category');
-      return url.startsWith(endpoint);
-    });
+    let isPublicEndpoint = false;
+    
+    // Special case: POST /users (registration) is public
+    if (url === '/users' && method === 'POST') {
+      isPublicEndpoint = true;
+    } else {
+      // Check other public endpoints
+      isPublicEndpoint = PUBLIC_ENDPOINTS.some(endpoint => {
+        // All GET requests to /games (including /games/{id}) are public
+        if (endpoint === '/games' && method === 'GET') {
+          return url === '/games' || url.startsWith('/games/');
+        }
+        // All GET requests to /category (including /category/{id}) are public
+        if (endpoint === '/category' && method === 'GET') {
+          return url === '/category' || url.startsWith('/category/');
+        }
+        return url.startsWith(endpoint);
+      });
+    }
 
     // Only add Authorization header for protected endpoints
     if (!isPublicEndpoint) {
@@ -54,24 +71,89 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle common errors
+// Response interceptor to handle common errors and auto-refresh token
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      const endpoint = error.config?.url || '';
-      const backendMessage = error.response?.data?.message || 'Unauthorized';
-      console.warn(`[API] 401 Unauthorized on ${endpoint}:`, backendMessage);
+  async (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      const endpoint = originalRequest?.url || '';
       
-      // Only clear token if it's not a login endpoint (to preserve login error message)
-      if (!endpoint.includes('/auth/log-in')) {
-        const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
-        if (token) {
-          localStorage.removeItem('wgs_token');
-          localStorage.removeItem('token');
+      // Don't try to refresh on login/register/public endpoints
+      if (endpoint.includes('/auth/log-in') || 
+          endpoint.includes('/auth/refresh') || 
+          endpoint.includes('/users') && originalRequest.method === 'post') {
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        // Queue this request while refresh is in progress
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+      
+      if (!token) {
+        localStorage.removeItem('wgs_token');
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
+
+      try {
+        // Try to refresh token
+        const res = await axios.post(`${API_BASE}/auth/refresh`, { token });
+        const newToken = res.data?.result?.token;
+        
+        if (newToken) {
+          setAuthToken(newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          processQueue(null, newToken);
+          return api(originalRequest);
+        } else {
+          throw new Error('No new token received');
         }
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        localStorage.removeItem('wgs_token');
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
+    
     return Promise.reject(error);
   }
 );
@@ -89,6 +171,24 @@ export type Game = {
   ratingCount?: number; // Total ratings
   salePercent?: number;
   categories?: { name: string; description?: string }[];
+  systemRequirements?: {
+    minimum?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+    recommended?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+  };
 };
 
 export type Category = {
@@ -108,17 +208,9 @@ export function setAuthToken(token: string | null) {
 }
 
 export async function fetchGamesByPrice(order: 'asc' | 'desc') {
-  try {
-    const url = order === 'asc' ? '/games/by-price-asc' : '/games/by-price-desc';
-    const res = await api.get(url);
-    return res.data.result as Game[];
-  } catch (error: any) {
-    console.error(`[fetchGamesByPrice] Error:`, error.response?.status, error.message);
-    if (error.response?.status === 401) {
-      console.warn('[fetchGamesByPrice] 401 on public endpoint /games - check backend');
-    }
-    throw error;
-  }
+  const url = order === 'asc' ? '/games/by-price-asc' : '/games/by-price-desc';
+  const res = await api.get(url);
+  return res.data.result as Game[];
 }
 
 export async function searchGames(keyword: string) {
@@ -127,22 +219,13 @@ export async function searchGames(keyword: string) {
 }
 
 export async function fetchGame(id: string) {
-  const res = await api.get(`/games/${id}`);
+  const res = await api.get(`/games/id/${id}`);
   return res.data.result as Game;
 }
 
 export async function fetchCategories() {
-  try {
-    const res = await api.get('/category');
-    return res.data.result as Category[];
-  } catch (error: any) {
-    console.error('[fetchCategories] Error:', error.response?.status, error.message);
-    // If 401 and it's a public endpoint, backend might not be running or misconfigured
-    if (error.response?.status === 401) {
-      console.warn('[fetchCategories] 401 on public endpoint - check backend SecurityConfig');
-    }
-    throw error;
-  }
+  const res = await api.get('/category');
+  return res.data.result as Category[];
 }
 
 export async function createCategory(payload: { name: string; description?: string }) {
@@ -156,7 +239,28 @@ export type GameCreatePayload = {
   quantity: number;
   price: number;
   salePercent?: number | null;
+  image?: string; // S3 URL or path
+  cover?: string; // S3 URL or path
+  video?: string; // YouTube URL or S3 URL
   categories?: string[]; // ids (optional)
+  systemRequirements?: {
+    minimum?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+    recommended?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+  };
 };
 
 export type GameUpdatePayload = Partial<GameCreatePayload>;
@@ -175,10 +279,31 @@ export async function deleteGame(id: string) {
   await api.delete(`/games/${id}`);
 }
 
+// S3 Upload functions
+export async function uploadImageToS3(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  try {
+    const res = await api.post('/s3/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data.result.url || res.data.result; // URL của file trên S3
+  } catch (error) {
+    console.error('S3 upload failed:', error);
+    throw error;
+  }
+}
+
 export async function login(username: string, password: string) {
   // Public endpoint - interceptor will not add token
   const res = await api.post('/auth/log-in', { username, password });
   const token = res.data?.result?.token as string;
+  if (!token) {
+    throw new Error('No token received from server');
+  }
   return token;
 }
 
@@ -219,16 +344,9 @@ export async function requestPhoneOtp(phone: string) {
 
 // Request email OTP for registration
 export async function requestEmailOtp(email: string): Promise<string> {
-  try {
-    // Public endpoint - interceptor will not add token
-    const res = await api.post('/email/request-otp', { email });
-    const result = res.data?.result as string;
-    console.log(`[Email OTP] Sent to ${email}. Result: ${result}`);
-    return result; // Backend returns "OTP sent successfully" or the OTP code
-  } catch (error: any) {
-    console.error('[requestEmailOtp] Error:', error.response?.data || error.message);
-    throw error;
-  }
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/email/request-otp', { email });
+  return res.data?.result as string; // Backend returns "OTP sent successfully" or the OTP code
 }
 
 export async function forgotPhoneRequest(username: string) {
@@ -265,7 +383,12 @@ export type UpdateProfilePayload = {
 };
 
 export async function updateMyInfo(payload: UpdateProfilePayload) {
-  const res = await api.put('/users/myInfo', payload);
+  // First get user ID from myInfo
+  const currentUser = await getMyInfo();
+  const userId = currentUser.id;
+  
+  // Then update using /users/{userId} endpoint
+  const res = await api.put(`/users/${userId}`, payload);
   return res.data?.result as Me;
 }
 
@@ -286,6 +409,32 @@ export type RecentOrder = {
   status: 'Completed' | 'Pending' | 'Cancelled';
 };
 
+// Full Order interface for order management
+export interface Order {
+  id: string;
+  userId: string;
+  username?: string;
+  items: OrderItem[];
+  totalAmount: number;
+  status: 'PROCESSING' | 'COMPLETED' | 'CANCELLED';
+  license_key: string | null;
+  delivery_content: string | null;
+  paymentMethod?: string;
+  createdAt: string;
+  updatedAt?: string;
+  completedAt?: string;
+}
+
+export interface OrderItem {
+  id?: string;
+  gameId: string;
+  gameName: string;
+  quantity: number;
+  unitPrice: number;
+  salePercent?: number;
+  finalPrice: number;
+}
+
 export async function fetchOrderSummary() {
   const res = await api.get('/orders/summary');
   return res.data?.result as OrderSummary;
@@ -299,6 +448,221 @@ export async function fetchRecentOrders(limit = 12) {
 export async function fetchMonthlySales() {
   const res = await api.get('/orders/monthly-sales');
   return res.data?.result as Array<{ month: string; amount: number }>;
+}
+
+// Order Management APIs
+export async function fetchAllOrders() {
+  const res = await api.get('/orders');
+  return res.data?.result as Order[];
+}
+
+export async function fetchUserOrders() {
+  const res = await api.get('/orders/my-orders');
+  return res.data?.result as Order[];
+}
+
+export async function fetchOrderById(orderId: string) {
+  const res = await api.get(`/orders/${orderId}`);
+  return res.data?.result as Order;
+}
+
+export async function updateOrderStatus(orderId: string, status: 'PROCESSING' | 'COMPLETED' | 'CANCELLED') {
+  const res = await api.patch(`/orders/${orderId}/status`, { status });
+  return res.data?.result as Order;
+}
+
+export async function completeOrder(orderId: string, licenseKey: string) {
+  const res = await api.patch(`/orders/${orderId}/complete`, { 
+    license_key: licenseKey,
+    status: 'COMPLETED' 
+  });
+  return res.data?.result as Order;
+}
+
+export async function createOrder(items: OrderItem[], paymentMethod: string) {
+  const res = await api.post('/orders', {
+    items,
+    paymentMethod,
+    status: 'PROCESSING'
+  });
+  return res.data?.result as Order;
+}
+
+// MoMo Payment API
+export type MoMoPaymentRequest = {
+  amount: number;
+  orderInfo: string;
+  returnUrl?: string;
+  notifyUrl?: string;
+  extraData?: string;
+};
+
+export type MoMoPaymentItem = {
+  gameId: string;
+  gameName: string;
+  unitPrice: number;
+  quantity: number;
+  salePercent?: number;
+};
+
+export type MoMoPaymentWithItemsRequest = {
+  orderId: string;
+  amount: number;
+  orderInfo: string;
+  returnUrl?: string;
+  notifyUrl?: string;
+  items: MoMoPaymentItem[];
+};
+
+export type MoMoPaymentResponse = {
+  payUrl: string;
+  deeplink?: string;
+  qrCodeUrl?: string;
+  orderId: string;
+  requestId: string;
+};
+
+export async function createMoMoPayment(request: MoMoPaymentRequest): Promise<MoMoPaymentResponse> {
+  const res = await api.post('/payment/momo/create', request);
+  return res.data?.result as MoMoPaymentResponse;
+}
+
+export async function createMoMoPaymentWithItems(request: MoMoPaymentWithItemsRequest): Promise<MoMoPaymentResponse> {
+  const res = await api.post('/payment/momo/create-with-items', request);
+  return res.data?.result as MoMoPaymentResponse;
+}
+
+export async function checkMoMoPaymentStatus(orderId: string) {
+  const res = await api.get(`/payment/momo/status/${orderId}`);
+  return res.data?.result;
+}
+
+export async function confirmMoMoPayment(orderId: string, payload: { resultCode: string; message?: string }) {
+  const res = await api.post(`/payment/momo/confirm/${orderId}`, payload);
+  return res.data?.result;
+}
+
+export async function confirmTopupPayment(transactionId: string, payload: { resultCode: string; message?: string }) {
+  const res = await api.post(`/topup/momo/confirm`, { transactionId, ...payload });
+  return res.data?.result;
+}
+
+// Game Rating API
+export type GameRating = {
+  id: string;
+  gameId: string;
+  userId: string;
+  userName?: string;
+  rating: number; // 1-5
+  comment?: string;
+  createdAt?: string;
+};
+
+export type CreateRatingPayload = {
+  gameId: string;
+  rating: number; // 1-5
+  comment?: string;
+};
+
+export type UpdateRatingPayload = {
+  rating?: number;
+  comment?: string;
+};
+
+export async function createGameRating(payload: CreateRatingPayload): Promise<GameRating> {
+  const res = await api.post('/game-ratings', payload);
+  return res.data?.result as GameRating;
+}
+
+export async function updateGameRating(id: string, payload: UpdateRatingPayload): Promise<GameRating> {
+  const res = await api.put(`/game-ratings/${id}`, payload);
+  return res.data?.result as GameRating;
+}
+
+export async function deleteGameRating(id: string): Promise<void> {
+  await api.delete(`/game-ratings/${id}`);
+}
+
+export async function getGameRatings(gameId: string): Promise<GameRating[]> {
+  const res = await api.get(`/game-ratings/game/${gameId}`);
+  return res.data?.result as GameRating[];
+}
+
+export async function getMyRatingForGame(gameId: string): Promise<GameRating | null> {
+  try {
+    const res = await api.get(`/game-ratings/my-rating/${gameId}`);
+    return res.data?.result as GameRating;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+// Auth - Logout & Refresh Token
+export async function logout(token: string): Promise<void> {
+  await api.post('/auth/logout', { token });
+  localStorage.removeItem('wgs_token');
+  localStorage.removeItem('token');
+}
+
+export async function refreshToken(token: string): Promise<string> {
+  const res = await api.post('/auth/refresh', { token });
+  const newToken = res.data?.result?.token as string;
+  if (newToken) {
+    setAuthToken(newToken);
+  }
+  return newToken;
+}
+
+// Avatar Upload API
+export async function uploadAvatar(file: File): Promise<any> {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  const res = await api.post('/users/avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data?.result;
+}
+
+export async function deleteAvatar(): Promise<any> {
+  const res = await api.delete('/users/avatar');
+  return res.data?.result;
+}
+
+// Topup API
+export type TopupPayload = {
+  amount: number;
+  description?: string;
+};
+
+export async function createMoMoTopup(payload: TopupPayload): Promise<any> {
+  const res = await api.post('/topup/momo', payload);
+  return res.data?.result;
+}
+
+export async function getTransactionHistory(): Promise<any[]> {
+  const res = await api.get('/topup/history');
+  return res.data?.result as any[];
+}
+
+export async function getBalance(): Promise<{ balance: number; username: string }> {
+  const res = await api.get('/topup/balance');
+  return res.data?.result;
+}
+
+// Cart API
+export type AddToCartPayload = {
+  gameId: string;
+  quantity: number;
+};
+
+export async function addToCart(payload: AddToCartPayload): Promise<void> {
+  await api.post('/cart/add', payload);
 }
 
 
