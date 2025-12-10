@@ -395,6 +395,16 @@ export async function createOrder(items: OrderItem[], paymentMethod: string) {
   return res.data?.result as Order;
 }
 
+// Create order with balance payment
+export async function createOrderWithBalance(orderData: {
+  items: { gameId: string; quantity: number }[];
+  email?: string;
+  phone?: string;
+}) {
+  const res = await api.post('/orders/pay-with-balance', orderData);
+  return res.data?.result;
+}
+
 // MoMo Payment API
 export type MoMoPaymentRequest = {
   amount: number;

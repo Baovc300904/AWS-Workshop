@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useCurrency, formatPrice } from '../context/CurrencyContext';
 import { getGameImage as getGameImageUtil } from '../utils/imageUtils';
-import { createMoMoPaymentWithItems } from '../api/client';
+import { createMoMoPaymentWithItems, getBalance, createOrderWithBalance } from '../api/client';
 import './CheckoutPage.css';
 
-type PaymentMethod = 'credit_card' | 'momo' | 'banking' | 'paypal';
+type PaymentMethod = 'balance' | 'momo';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -14,7 +14,8 @@ export default function CheckoutPage() {
   const { currency } = useCurrency();
   const [isProcessing, setIsProcessing] = useState(false);
   const [step, setStep] = useState<'cart' | 'payment'>('cart');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('momo');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('balance');
+  const [userBalance, setUserBalance] = useState<number>(0);
   
   // Payment form fields
   const [cardNumber, setCardNumber] = useState('');
@@ -34,6 +35,20 @@ export default function CheckoutPage() {
       navigate('/login', { replace: true });
     }
   }, [navigate]);
+
+  // Fetch user balance
+  useEffect(() => {
+    const token = localStorage.getItem('token') || localStorage.getItem('wgs_token');
+    if (token) {
+      getBalance()
+        .then((data) => {
+          setUserBalance(data.balance || 0);
+        })
+        .catch(() => {
+          setUserBalance(0);
+        });
+    }
+  }, []);
 
   const getGameImage = (item: any) => {
     return item.image || item.cover || `https://via.placeholder.com/300x169/1a2332/4facfe?text=${encodeURIComponent(item.name)}`;
@@ -55,18 +70,10 @@ export default function CheckoutPage() {
     // Validate payment info
     const newErrors: Record<string, string> = {};
 
-    if (paymentMethod === 'credit_card') {
-      if (!cardNumber || cardNumber.replace(/\s/g, '').length !== 16) {
-        newErrors.cardNumber = 'Số thẻ phải có 16 chữ số';
-      }
-      if (!cardName.trim()) {
-        newErrors.cardName = 'Vui lòng nhập tên chủ thẻ';
-      }
-      if (!cardExpiry || !/^\d{2}\/\d{2}$/.test(cardExpiry)) {
-        newErrors.cardExpiry = 'Định dạng: MM/YY';
-      }
-      if (!cardCvv || cardCvv.length !== 3) {
-        newErrors.cardCvv = 'CVV phải có 3 chữ số';
+    // Check balance if using balance payment
+    if (paymentMethod === 'balance') {
+      if (userBalance < totalRaw) {
+        newErrors.balance = `Số dư không đủ. Bạn cần thêm ${formatPrice(totalRaw - userBalance, currency)}`;
       }
     }
 
@@ -91,6 +98,33 @@ export default function CheckoutPage() {
 
     setIsProcessing(true);
     setErrors({});
+
+    // Handle Balance payment
+    if (paymentMethod === 'balance') {
+      try {
+        const orderData = {
+          items: cart.map(item => ({
+            gameId: item.id,
+            quantity: item.quantity,
+          })),
+          email,
+          phone,
+        };
+
+        const response = await createOrderWithBalance(orderData);
+        
+        alert(`✅ Thanh toán thành công!\n\nSố tiền: ${formatPrice(totalRaw, currency)}\nĐã trừ từ tài khoản của bạn.\n\nMã đơn hàng: ${response.orderId || 'N/A'}`);
+        clear();
+        setIsProcessing(false);
+        navigate('/orders');
+        return;
+      } catch (error: any) {
+        setIsProcessing(false);
+        const errorMsg = error?.response?.data?.message || error?.message || 'Không thể thanh toán bằng số dư';
+        alert(`❌ Lỗi thanh toán:\n\n${errorMsg}`);
+        return;
+      }
+    }
 
     // Handle MoMo payment
     if (paymentMethod === 'momo') {
@@ -158,17 +192,6 @@ export default function CheckoutPage() {
       }
       return;
     }
-
-    // Simulate payment processing for other methods
-    setTimeout(() => {
-      alert(`✅ Thanh toán thành công!\n\nPhương thức: ${
-        paymentMethod === 'credit_card' ? 'Thẻ tín dụng' :
-        paymentMethod === 'paypal' ? 'PayPal' : 'Chuyển khoản ngân hàng'
-      }\nTổng tiền: ${formatPrice(totalRaw, currency)}\n\n(Đây là demo - Backend chưa có API orders)`);
-      clear();
-      setIsProcessing(false);
-      navigate('/');
-    }, 2000);
   };
 
   // Calculate totals
@@ -346,6 +369,22 @@ export default function CheckoutPage() {
                   <h3>Chọn phương thức thanh toán</h3>
                   <div className="methodGrid">
                     <button
+                      className={`methodCard ${paymentMethod === 'balance' ? 'active' : ''}`}
+                      onClick={() => setPaymentMethod('balance')}
+                    >
+                      <div className="methodIcon">🪙</div>
+                      <div className="methodName">Số dư tài khoản</div>
+                      <div className="methodDesc">
+                        Số dư: {formatPrice(userBalance, currency)}
+                      </div>
+                      {userBalance < totalRaw && (
+                        <div className="methodWarning">
+                          ⚠️ Số dư không đủ
+                        </div>
+                      )}
+                    </button>
+
+                    <button
                       className={`methodCard ${paymentMethod === 'momo' ? 'active' : ''}`}
                       onClick={() => setPaymentMethod('momo')}
                     >
@@ -353,18 +392,72 @@ export default function CheckoutPage() {
                       <div className="methodName">Ví MoMo</div>
                       <div className="methodDesc">Thanh toán qua MoMo</div>
                     </button>
+                  </div>
+                </div>
 
-                    <button
-                      className={`methodCard ${paymentMethod === 'credit_card' ? 'active' : ''}`}
-                      onClick={() => setPaymentMethod('credit_card')}
-                    >
-                      <div className="methodIcon">💳</div>
-                      <div className="methodName">Thẻ tín dụng</div>
-                      <div className="methodDesc">Visa, Mastercard, JCB</div>
-                    </button>
+                {paymentMethod === 'balance' && (
+                  <div className="paymentForm balanceForm">
+                    <div className="balanceHeader">
+                      <div className="balanceIcon">🪙</div>
+                      <h3>Thanh toán bằng số dư tài khoản</h3>
+                    </div>
 
-                    <button
-                      className={`methodCard ${paymentMethod === 'banking' ? 'active' : ''}`}
+                    <div className="balanceInfo">
+                      <div className="balanceRow">
+                        <span>Số dư hiện tại:</span>
+                        <span className="balanceValue">{formatPrice(userBalance, currency)}</span>
+                      </div>
+                      <div className="balanceRow">
+                        <span>Tổng đơn hàng:</span>
+                        <span className="balanceValue">{formatPrice(totalRaw, currency)}</span>
+                      </div>
+                      <div className="balanceRow highlight">
+                        <span>Số dư sau thanh toán:</span>
+                        <span className={`balanceValue ${userBalance - totalRaw < 0 ? 'negative' : ''}`}>
+                          {formatPrice(userBalance - totalRaw, currency)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {errors.balance && <div className="errorText">{errors.balance}</div>}
+
+                    {userBalance < totalRaw && (
+                      <div className="insufficientBalance">
+                        <p>⚠️ Số dư không đủ. Vui lòng nạp thêm {formatPrice(totalRaw - userBalance, currency)}</p>
+                        <button 
+                          className="topupButton"
+                          onClick={() => navigate('/topup')}
+                        >
+                          Nạp tiền ngay
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="formGroup">
+                      <label>Email nhận hóa đơn *</label>
+                      <input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                      {errors.email && <span className="errorText">{errors.email}</span>}
+                    </div>
+
+                    <div className="formGroup">
+                      <label>Số điện thoại (tuỳ chọn)</label>
+                      <input
+                        type="tel"
+                        placeholder="0901234567"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      />
+                      {errors.phone && <span className="errorText">{errors.phone}</span>}
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === 'momo' && (
                       onClick={() => setPaymentMethod('banking')}
                     >
                       <div className="methodIcon">🏦</div>

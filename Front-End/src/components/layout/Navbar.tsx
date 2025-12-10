@@ -3,13 +3,14 @@ import './Navbar.css';
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { fetchCategories, Category, setAuthToken, logout as apiLogout, getMyInfo } from '../../api/client';
+import { fetchCategories, Category, setAuthToken, logout as apiLogout, getMyInfo, getBalance } from '../../api/client';
 
 export default function Navbar() {
     const { cart } = useCart();
     const { wishlist } = useWishlist();
     const navigate = useNavigate();
     const [categories, setCategories] = useState<Category[]>([]);
+    const [balance, setBalance] = useState<number>(0);
     const [user, setUser] = useState<{ username: string; avatarUrl?: string; roles?: string[] } | null>(() => {
         try {
             const username = localStorage.getItem('username');
@@ -72,6 +73,19 @@ export default function Navbar() {
                     }
                 })
                 .catch(() => { });
+        }
+    }, [user]);
+
+    // Fetch user balance
+    useEffect(() => {
+        if (user && user.username) {
+            getBalance()
+                .then((data) => {
+                    setBalance(data.balance || 0);
+                })
+                .catch(() => {
+                    setBalance(0);
+                });
         }
     }, [user]);
 
@@ -358,11 +372,11 @@ export default function Navbar() {
                                         <div className="balance-box">
                                             <span className="balance-label">Số dư</span>
                                             <span className="balance-amount">
-                                                <span className="coin-icon">🪙</span> 0đ
+                                                <span className="coin-icon">🪙</span> {balance.toLocaleString('vi-VN')}đ
                                             </span>
                                         </div>
                                         <button className="topup-btn" onClick={() => {
-                                            alert('Chức năng nạp tiền đang phát triển');
+                                            navigate('/topup');
                                             setOpenMenu(null);
                                         }}>
                                             Nạp tiền
@@ -384,8 +398,9 @@ export default function Navbar() {
                                             <button 
                                                 className="dropdown-grid-item"
                                                 onClick={() => {
-                                                    alert('Chức năng nạp tiền đang phát triển');
+                                                    navigate('/topup');
                                                     setOpenMenu(null);
+                                                    setMobileOpen(false);
                                                 }}
                                             >
                                                 <span className="grid-item-icon">💰</span>
