@@ -9,6 +9,7 @@ import { CategoriesSection } from '../../components/admin/CategoriesSection';
 import { SettingsSection } from './sections/SettingsSection';
 import AdminOrdersPage from './AdminOrdersPage';
 import AdminUsersManagement from './AdminUsersManagement';
+import AdminTransactionsPage from './AdminTransactionsPage';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
@@ -241,6 +242,9 @@ export default function AdminPage() {
             )}
             {activeTab==='orders' && (
               <AdminOrdersPage />
+            )}
+            {activeTab==='transactions' && (
+              <AdminTransactionsPage />
             )}
             {activeTab==='users' && (
               <AdminUsersManagement />

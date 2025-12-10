@@ -1,0 +1,143 @@
+.adminTransactionsContainer {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.transactionsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.transactionsHeader h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a2332;
+  margin: 0;
+}
+
+.transactionsStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+}
+
+.statLabel {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.transactionsFilters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 8px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.filterBtn:hover {
+  border-color: #4facfe;
+  background: #f0f9ff;
+}
+
+.filterBtn.active {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.transactionsTable {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.transactionsTable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactionsTable thead {
+  background: #f9fafb;
+}
+
+.transactionsTable th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.transactionsTable td {
+  padding: 16px;
+  border-top: 1px solid #f3f4f6;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.transactionsTable tbody tr:hover {
+  background: #f9fafb;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+}
+
+.error {
+  color: #dc2626;
+}
+
+.btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+}
+
+@media (max-width: 768px) {
+  .transactionsTable {
+    overflow-x: auto;
+  }
+
+  .transactionsStats {
+    grid-template-columns: 1fr;
+  }
+}

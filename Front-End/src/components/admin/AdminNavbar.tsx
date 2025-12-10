@@ -5,6 +5,7 @@ type TabKey =
   | 'categories'
   | 'users'
   | 'orders'
+  | 'transactions'
   | 'reports'
   | 'settings';
 
@@ -21,6 +22,7 @@ const DEFAULT_ITEMS: Array<{ key: TabKey; label: string; icon: string }> = [
   { key: 'categories', label: 'Categories', icon: '📁' },
   { key: 'users', label: 'Users', icon: '👥' },
   { key: 'orders', label: 'Orders', icon: '🛒' },
+  { key: 'transactions', label: 'Transactions', icon: '💳' },
   { key: 'reports', label: 'Reports', icon: '📈' },
   { key: 'settings', label: 'Settings', icon: '⚙️' },
 ];
