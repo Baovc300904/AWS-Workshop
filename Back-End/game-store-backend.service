@@ -1,0 +1,36 @@
+[Unit]
+Description=Game Store Backend Spring Boot Application
+After=syslog.target network.target
+
+[Service]
+User=ec2-user
+Type=simple
+SuccessExitStatus=143
+
+# Application directory
+WorkingDirectory=/home/ec2-user/game-store-backend
+
+# Java options
+Environment="JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+
+# Spring Boot profile
+Environment="SPRING_PROFILES_ACTIVE=ec2"
+
+# Load environment variables from file
+EnvironmentFile=/home/ec2-user/game-store-backend/.env
+
+# Start command
+ExecStart=/usr/bin/java $JAVA_OPTS -jar /home/ec2-user/game-store-backend/ShopGameManagement-0.0.1-SNAPSHOT.jar
+
+# Restart policy
+Restart=on-failure
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=game-store-backend
+
+[Install]
+WantedBy=multi-user.target
+
