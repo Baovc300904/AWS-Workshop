@@ -23,7 +23,12 @@ export default function Footer() {
             <div className="link-col">
               <h4>Hỗ trợ</h4>
               <a href="#">FAQ</a>
-              <a href="#">Liên hệ</a>
+              <a href="https://zalo.me/0937839123" target="_blank" rel="noopener noreferrer" className="zalo-link">
+                <span>💬</span> Chat Zalo hỗ trợ
+              </a>
+              <a href="https://zalo.me/g/YOUR_GROUP_ID" target="_blank" rel="noopener noreferrer" className="zalo-link">
+                <span>👥</span> Nhóm Zalo
+              </a>
             </div>
           </div>
         </div>

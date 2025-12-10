@@ -409,6 +409,17 @@ export default function Navbar() {
                                             <button 
                                                 className="dropdown-grid-item"
                                                 onClick={() => {
+                                                    navigate('/orders');
+                                                    setOpenMenu(null);
+                                                    setMobileOpen(false);
+                                                }}
+                                            >
+                                                <span className="grid-item-icon">📦</span>
+                                                <span className="grid-item-text">Đơn hàng của tôi</span>
+                                            </button>
+                                            <button 
+                                                className="dropdown-grid-item"
+                                                onClick={() => {
                                                     navigate('/store');
                                                     setOpenMenu(null);
                                                     setMobileOpen(false);

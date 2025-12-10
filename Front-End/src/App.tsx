@@ -8,6 +8,7 @@ import './App.css';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import BackToTop from './components/ui/BackToTop';
+import ZaloButton from './components/ui/ZaloButton';
 import { CartProvider } from './context/CartContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -108,6 +109,7 @@ function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       {!isAuthPage && <BackToTop />}
+      {!isAuthPage && <ZaloButton />}
       {!isAuthPage && <Footer />}
     </div>
   );
