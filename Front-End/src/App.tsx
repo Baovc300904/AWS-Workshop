@@ -11,6 +11,7 @@ import BackToTop from './components/ui/BackToTop';
 import { CartProvider } from './context/CartContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { ToastProvider } from './context/ToastContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { introspect } from './api/client';
 
@@ -20,6 +21,10 @@ const StorePage = lazy(() => import('./pages/StorePage').then(m => ({ default: m
 const CategoriesPage = lazy(() => import('./pages/CategoriesPage').then(m => ({ default: m.default })));
 const TestCategories = lazy(() => import('./pages/TestCategories'));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
+<<<<<<< HEAD
+const MoMoCallbackPage = lazy(() => import('./pages/MoMoCallbackPage'));
+=======
+>>>>>>> origin/main
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
@@ -27,7 +32,14 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const GameDetailPage = lazy(() => import('./pages/GameDetailPage').then(m => ({ default: m.GameDetailPage })));
 const WishlistPage = lazy(() => import('./pages/WishlistPage'));
 const AdminPage = lazy(() => import('./pages/admin/AdminPage'));
+<<<<<<< HEAD
+const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
+const AdminUsersManagement = lazy(() => import('./pages/admin/AdminUsersManagement'));
+=======
+>>>>>>> origin/main
 const ModeratorPage = lazy(() => import('./pages/ModeratorPage'));
+const MyOrdersPage = lazy(() => import('./pages/MyOrdersPage'));
+const PaymentCallbackPage = lazy(() => import('./pages/PaymentCallbackPage'));
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
   const [status, setStatus] = useState<'checking' | 'allowed' | 'redirect'>('checking');
@@ -110,12 +122,13 @@ function App() {
           v7_relativeSplatPath: true 
         }}
       >
-        <CurrencyProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <Layout>
-                <Suspense fallback={<div className="loading-screen">Đang tải...</div>}>
-                  <Routes>
+        <ToastProvider>
+          <CurrencyProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <Layout>
+                  <Suspense fallback={<div className="loading-screen">Đang tải...</div>}>
+                    <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/store" element={<StorePage />} />
                     <Route path="/categories" element={<CategoriesPage />} />
@@ -131,6 +144,13 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/forgot" element={<ForgotPasswordPage />} />
+<<<<<<< HEAD
+                    <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
+                    <Route path="/checkout/momo-callback" element={<MoMoCallbackPage />} />
+                    <Route path="/payment/callback" element={<MoMoCallbackPage />} />
+                    <Route path="/payment/momo/callback" element={<PaymentCallbackPage />} />
+=======
+>>>>>>> origin/main
                     <Route 
                       path="/profile" 
                       element={
@@ -144,6 +164,14 @@ function App() {
                       element={
                         <ProtectedRoute>
                           <WishlistPage />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/orders" 
+                      element={
+                        <ProtectedRoute>
+                          <MyOrdersPage />
                         </ProtectedRoute>
                       } 
                     />
@@ -164,6 +192,25 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
+<<<<<<< HEAD
+                    <Route
+                      path="/admin/users"
+                      element={
+                        <AdminRoute>
+                          <AdminUsersPage />
+                        </AdminRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/users-management"
+                      element={
+                        <AdminRoute>
+                          <AdminUsersManagement />
+                        </AdminRoute>
+                      }
+                    />
+=======
+>>>>>>> origin/main
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </Suspense>
@@ -171,6 +218,7 @@ function App() {
             </WishlistProvider>
           </CartProvider>
         </CurrencyProvider>
+        </ToastProvider>
       </BrowserRouter>
     </ErrorBoundary>
   );

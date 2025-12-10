@@ -359,6 +359,19 @@ const [showErrorModal, setShowErrorModal] = useState(false);
                     localStorage.setItem('token', token); // Also save as 'token' for compatibility
                     localStorage.setItem('username', username);
                     
+<<<<<<< HEAD
+                    // Clear old shared cart/wishlist data
+                    localStorage.removeItem('demo_cart');
+                    localStorage.removeItem('demo_cart_guest');
+                    localStorage.removeItem('wishlist_ids');
+                    localStorage.removeItem('wishlist_guest');
+                    
+                    // Trigger success animation
+                    setLoginSuccess(true);
+                    await new Promise(resolve => setTimeout(resolve, 800)); // Wait for animation
+                    
+=======
+>>>>>>> origin/main
                     // Kiểm tra xem có redirect URL không
                     const redirectUrl = localStorage.getItem('redirect_after_login');
                     if (redirectUrl) {
