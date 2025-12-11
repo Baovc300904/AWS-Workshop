@@ -1,3 +1,89 @@
+<<<<<<< HEAD
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { fetchGamesByPrice, fetchCategories, Game, Category } from '../api/client';
+import { useCurrency } from '../context/CurrencyContext';
+import { getGameImage as getGameImageUtil } from '../utils/imageUtils';
+import './HomePage.css';
+
+// Category icons
+const CATEGORY_ICONS: Record<string, string> = {
+  Action:'🎯', Adventure:'🗺️', Strategy:'♟️', RPG:'🧙', Sports:'⚽', 
+  Racing:'🏎️', Simulation:'🛠️', Horror:'👻', Puzzle:'🧩', Shooter:'🔫'
+};
+
+// Video URL
+const VIDEO_URL = 'https://www.youtube-nocookie.com/embed/LembwKDo1Dk?autoplay=1&mute=1&loop=1&playlist=LembwKDo1Dk&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0';
+
+// Placeholder images for games (you can replace with real images from backend)
+const GAME_PLACEHOLDERS = [
+  'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=450&fit=crop',
+  'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&h=450&fit=crop',
+  'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&h=450&fit=crop',
+  'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&h=450&fit=crop',
+  'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=800&h=450&fit=crop',
+];
+
+function getGameImage(game: Game): string {
+  return getGameImageUtil(game);
+}
+
+function formatPrice(price: number, currency: string = 'VND'): string {
+  if (currency === 'USD') {
+    return `$${(price / 25000).toFixed(2)}`;
+  }
+  return `${price.toLocaleString('vi-VN')}₫`;
+}
+
+function formatReleaseDate(dateStr?: string): string {
+  if (!dateStr) return '';
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('vi-VN', { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch {
+    return '';
+  }
+}
+
+function renderStars(rating?: number, count?: number): JSX.Element | null {
+  if (!rating || rating === 0) return null;
+  
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+  
+  return (
+    <div className="rating-stars" title={`${rating.toFixed(1)} / 5.0${count ? ` (${count} đánh giá)` : ''}`}>
+      {[...Array(fullStars)].map((_, i) => <span key={`full-${i}`} className="star full">★</span>)}
+      {hasHalfStar && <span className="star half">★</span>}
+      {[...Array(emptyStars)].map((_, i) => <span key={`empty-${i}`} className="star empty">☆</span>)}
+      {count && count > 0 && <span className="rating-count">({count})</span>}
+    </div>
+  );
+}
+
+function getDiscountedPrice(game: Game): number {
+  const price = Number(game.price) || 0;
+  const salePercent = (game.salePercent) || 0;
+  if (salePercent > 0) {
+    return Math.round(price * (100 - salePercent) / 100);
+  }
+  return price;
+}
+
+export function HomePage(){
+  const { currency } = useCurrency();
+  const navigate = useNavigate();
+  
+  // State
+  const [games, setGames] = useState<Game[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [catLimit, setCatLimit] = useState(10);
+
+  // Load games
+=======
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { fetchGamesByPrice, searchGames, Game, getMyInfo, Me, setAuthToken, fetchCategories, Category } from '../api/client';
 import './HomePage.css';
@@ -55,15 +141,48 @@ export function HomePage() {
   const cupheadEmbed = 'https://www.youtube-nocookie.com/embed/NN-9SQXoi50?autoplay=1&mute=1&loop=1&playlist=NN-9SQXoi50&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0&title=0';
   const vRisingEmbed = 'https://www.youtube-nocookie.com/embed/iCEpBpJ3paQ?autoplay=1&mute=1&loop=1&playlist=iCEpBpJ3paQ&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0&title=0';
 
+>>>>>>> origin/main
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
+<<<<<<< HEAD
+    fetchGamesByPrice('asc')
+=======
     fetchGamesByPrice(order)
+>>>>>>> origin/main
       .then((data) => {
         if (!cancelled) setGames(data);
       })
       .catch((err) => {
+<<<<<<< HEAD
+        if (!cancelled) {
+          // Check if it's a network/connection error
+          if (!err.response) {
+            setError('Không thể kết nối tới server. Vui lòng kiểm tra backend đang chạy.');
+          } else if (err.response.status >= 500) {
+            setError('Server đang gặp sự cố. Vui lòng thử lại sau.');
+          } else {
+            setError(err?.response?.data?.message ?? 'Không thể tải danh sách games. Vui lòng thử lại.');
+          }
+        }
+      })
+      .finally(() => !cancelled && setLoading(false));
+    return () => { cancelled = true; };
+  }, []);
+
+  // Load categories
+  useEffect(() => {
+    let cancelled = false;
+    fetchCategories()
+      .then((data) => {
+        if (!cancelled) setCategories(data);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+=======
         if (!cancelled) setError(err?.response?.data?.message ?? 'Failed to load');
       })
       .finally(() => !cancelled && setLoading(false));
@@ -211,6 +330,7 @@ export function HomePage() {
     </div>
   ), [keyword, order, menuOpen, me, showWishlist, catOpen, categories, selectedCategory]);
 =======
+>>>>>>> origin/main
   const visibleCats = (categories || []).slice(0, catLimit);
   const canMoreCat = categories && categories.length > catLimit;
 
@@ -223,7 +343,11 @@ export function HomePage() {
   ), [games]);
   
   const [heroIndex, setHeroIndex] = useState(0);
+<<<<<<< HEAD
+  const hero = heroSlides[heroIndex] || (games.length > 0 ? games[0] : null); // Safe fallback
+=======
   const hero = heroSlides[heroIndex] || games[0]; // Fallback to first game
+>>>>>>> origin/main
   const heroTimer = useRef<number | null>(null);
   const AUTO_MS = 5200;
 
@@ -234,6 +358,12 @@ export function HomePage() {
   function prevHero(){ 
     setHeroIndex(i => (i-1 + (heroSlides || []).length) % Math.max(1, (heroSlides || []).length)); 
   }
+<<<<<<< HEAD
+
+  // Autoplay with pause on hover
+  const heroAreaRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+=======
 >>>>>>> origin/main
 
   // close user menu and category menu on outside click or on scroll
@@ -247,6 +377,7 @@ export function HomePage() {
       if (!clickedInsideMenu && !clickedOnUser) setMenuOpen(false);
       if (!clickedOnCat) setCatOpen(false);
 =======
+>>>>>>> origin/main
     if (!heroSlides || heroSlides.length === 0) return;
     
     function clear(){ 
@@ -265,6 +396,23 @@ export function HomePage() {
     const vis = () => { 
       if(document.visibilityState === 'visible') schedule(); 
       else clear(); 
+<<<<<<< HEAD
+    };
+    document.addEventListener('visibilitychange', vis);
+    
+    const area = heroAreaRef.current;
+    const pause = () => clear();
+    const resume = () => schedule();
+    area?.addEventListener('mouseenter', pause);
+    area?.addEventListener('mouseleave', resume);
+    
+    return () => {
+      clear();
+      document.removeEventListener('visibilitychange', vis);
+      area?.removeEventListener('mouseenter', pause);
+      area?.removeEventListener('mouseleave', resume);
+    };
+=======
 >>>>>>> origin/main
     };
     const onScroll = () => setMenuOpen(false);
@@ -343,6 +491,7 @@ export function HomePage() {
     } catch {}
   };
 =======
+>>>>>>> origin/main
   }, [heroIndex, heroSlides?.length]);
 
   // Game sections
@@ -371,6 +520,20 @@ export function HomePage() {
   const newArrivals = useMemo(() => (
     [...(games || [])].slice(0, 8)
   ), [games]);
+<<<<<<< HEAD
+
+  const sections = useMemo(() => {
+    const allSections = [
+      { id:'best', title:'Bán chạy nhất', items: bestSellers },
+      { id:'discount', title:'Giảm giá sâu (≥30%)', items: deepDiscount },
+      { id:'featured', title:'Nổi bật', items: featured },
+      { id:'free', title:'Miễn phí', items: freeToPlay },
+      { id:'new', title:'Mới ra mắt', items: newArrivals },
+    ];
+    return allSections.filter(s => s.items && s.items.length > 0);
+  }, [bestSellers, deepDiscount, featured, freeToPlay, newArrivals]);
+
+=======
 >>>>>>> origin/main
 
   const buyNow = (g: Game) => {
@@ -407,6 +570,7 @@ export function HomePage() {
               title="Video"
               allow="autoplay; encrypted-media"
 =======
+>>>>>>> origin/main
   if (loading && (!games || games.length === 0)) {
     return (
       <div className="home-model">
@@ -614,6 +778,11 @@ export function HomePage() {
               title={s.title} 
               items={s.items} 
               currency={currency} 
+<<<<<<< HEAD
+            />
+          ))}
+        </div>
+=======
 >>>>>>> origin/main
             />
             <div className="heroOverlay">
@@ -1165,6 +1334,7 @@ export function HomePage() {
                     <button className="btn buy" onClick={() => buyNow(g)}>Buy Now</button>
                   </div>
 =======
+>>>>>>> origin/main
       </div>
     </main>
   );
@@ -1242,6 +1412,17 @@ function SectionShelf({ title, items, id, currency }: SectionShelfProps){
                   ) : (
                     <span className="final solo">{formatPrice(Number(g.price), currency)}</span>
                   )}
+<<<<<<< HEAD
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+=======
 >>>>>>> origin/main
                 </div>
               </div>
@@ -1509,3 +1690,4 @@ function SectionShelf({ title, items, id, currency }: SectionShelfProps){
 }
 
 
+>>>>>>> origin/main

@@ -1,15 +1,29 @@
+<<<<<<< HEAD
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+=======
 import { NavLink, useNavigate } from 'react-router-dom';
+>>>>>>> origin/main
 import './Navbar.css';
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
+<<<<<<< HEAD
+import { fetchCategories, Category, setAuthToken, logout as apiLogout, getMyInfo, getBalance } from '../../api/client';
+=======
 import { fetchCategories, Category, setAuthToken, logout as apiLogout, getMyInfo } from '../../api/client';
+>>>>>>> origin/main
 
 export default function Navbar() {
     const { cart } = useCart();
     const { wishlist } = useWishlist();
     const navigate = useNavigate();
+<<<<<<< HEAD
+    const location = useLocation();
     const [categories, setCategories] = useState<Category[]>([]);
+    const [balance, setBalance] = useState<number>(0);
+=======
+    const [categories, setCategories] = useState<Category[]>([]);
+>>>>>>> origin/main
     const [user, setUser] = useState<{ username: string; avatarUrl?: string; roles?: string[] } | null>(() => {
         try {
             const username = localStorage.getItem('username');
@@ -75,6 +89,43 @@ export default function Navbar() {
         }
     }, [user]);
 
+<<<<<<< HEAD
+    // Fetch balance when user is logged in or location changes
+    useEffect(() => {
+        const fetchUserBalance = async () => {
+            if (user && user.username) {
+                try {
+                    const data = await getBalance();
+                    setBalance(data.balance || 0);
+                } catch (err) {
+                    console.error('Failed to fetch balance:', err);
+                }
+            }
+        };
+
+        fetchUserBalance();
+
+        // Listen for balance updates from other components
+        const handleBalanceUpdate = () => fetchUserBalance();
+        window.addEventListener('balance-updated', handleBalanceUpdate);
+        
+        // Listen for avatar updates
+        const handleAvatarUpdate = (e: Event) => {
+            const customEvent = e as CustomEvent<string>;
+            if (customEvent.detail && user) {
+                setUser(prev => prev ? { ...prev, avatarUrl: customEvent.detail } : prev);
+            }
+        };
+        window.addEventListener('avatar-updated', handleAvatarUpdate);
+        
+        return () => {
+            window.removeEventListener('balance-updated', handleBalanceUpdate);
+            window.removeEventListener('avatar-updated', handleAvatarUpdate);
+        };
+    }, [user, location]);
+
+=======
+>>>>>>> origin/main
     const platforms = useMemo(() => [
         { name: 'PC', icon: '💻' },
         { name: 'PlayStation', icon: '🎮' },
@@ -358,11 +409,19 @@ export default function Navbar() {
                                         <div className="balance-box">
                                             <span className="balance-label">Số dư</span>
                                             <span className="balance-amount">
+<<<<<<< HEAD
+                                                <span className="coin-icon">🪙</span> {balance.toLocaleString('vi-VN')}đ
+                                            </span>
+                                        </div>
+                                        <button className="topup-btn" onClick={() => {
+                                            navigate('/profile');
+=======
                                                 <span className="coin-icon">🪙</span> 0đ
                                             </span>
                                         </div>
                                         <button className="topup-btn" onClick={() => {
                                             alert('Chức năng nạp tiền đang phát triển');
+>>>>>>> origin/main
                                             setOpenMenu(null);
                                         }}>
                                             Nạp tiền

@@ -1,10 +1,16 @@
 import axios from 'axios';
 
 <<<<<<< HEAD
+// Use environment variable for API base URL
+// Default to /api which nginx will proxy to backend at /identity
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+=======
+<<<<<<< HEAD
 // Use /api prefix in production, empty in dev (Vite proxy handles it)
 const API_BASE = import.meta.env.PROD ? '/api' : '';
 =======
 const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8080/identity';
+>>>>>>> origin/main
 >>>>>>> origin/main
 
 export const api = axios.create({
@@ -17,9 +23,15 @@ export const api = axios.create({
 
 // Public endpoints that don't need authentication
 const PUBLIC_ENDPOINTS = [
+<<<<<<< HEAD
+  '/auth/login',
+  '/auth/introspect',
+  // NOTE: /users is handled specially in interceptor (only POST /users for registration is public)
+=======
   '/auth/log-in',
   '/auth/introspect',
   '/users', // POST /users (register)
+>>>>>>> origin/main
   '/users/forgot-password',
   '/users/request-phone-otp',
   '/users/forgot-password/phone/request',
@@ -42,12 +54,34 @@ api.interceptors.request.use(
     const method = (config.method || 'get').toUpperCase();
     
     // Check if this is a public endpoint
+<<<<<<< HEAD
+    let isPublicEndpoint = false;
+    
+    // Special case: POST /users (registration) is public
+    if (url === '/users' && method === 'POST') {
+      isPublicEndpoint = true;
+    } else {
+      // Check other public endpoints
+      isPublicEndpoint = PUBLIC_ENDPOINTS.some(endpoint => {
+        // All GET requests to /games (including /games/{id}) are public
+        if (endpoint === '/games' && method === 'GET') {
+          return url === '/games' || url.startsWith('/games/');
+        }
+        // All GET requests to /category (including /category/{id}) are public
+        if (endpoint === '/category' && method === 'GET') {
+          return url === '/category' || url.startsWith('/category/');
+        }
+        return url.startsWith(endpoint);
+      });
+    }
+=======
     const isPublicEndpoint = PUBLIC_ENDPOINTS.some(endpoint => {
       if (endpoint === '/users' && method === 'POST') return url.startsWith('/users') && !url.includes('/');
       if (endpoint === '/games' && method === 'GET') return url === '/games' || url.startsWith('/games/');
       if (endpoint === '/category' && method === 'GET') return url.startsWith('/category');
       return url.startsWith(endpoint);
     });
+>>>>>>> origin/main
 
     // Only add Authorization header for protected endpoints
     if (!isPublicEndpoint) {
@@ -62,6 +96,91 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+<<<<<<< HEAD
+// Response interceptor to handle common errors and auto-refresh token
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      const endpoint = originalRequest?.url || '';
+      
+      // Don't try to refresh on login/register/public endpoints
+      if (endpoint.includes('/auth/login') || 
+          endpoint.includes('/auth/refresh') || 
+          endpoint.includes('/users') && originalRequest.method === 'post') {
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        // Queue this request while refresh is in progress
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+      
+      if (!token) {
+        localStorage.removeItem('wgs_token');
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
+
+      try {
+        // Try to refresh token
+        const res = await axios.post(`${API_BASE}/auth/refresh`, { token });
+        const newToken = res.data?.result?.token;
+        
+        if (newToken) {
+          setAuthToken(newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          processQueue(null, newToken);
+          return api(originalRequest);
+        } else {
+          throw new Error('No new token received');
+        }
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        localStorage.removeItem('wgs_token');
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+    
+=======
 // Response interceptor to handle common errors
 api.interceptors.response.use(
   (response) => response,
@@ -80,6 +199,7 @@ api.interceptors.response.use(
         }
       }
     }
+>>>>>>> origin/main
     return Promise.reject(error);
   }
 );
@@ -97,6 +217,27 @@ export type Game = {
   ratingCount?: number; // Total ratings
   salePercent?: number;
   categories?: { name: string; description?: string }[];
+<<<<<<< HEAD
+  systemRequirements?: {
+    minimum?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+    recommended?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+  };
+=======
+>>>>>>> origin/main
 };
 
 export type Category = {
@@ -116,6 +257,11 @@ export function setAuthToken(token: string | null) {
 }
 
 export async function fetchGamesByPrice(order: 'asc' | 'desc') {
+<<<<<<< HEAD
+  const url = order === 'asc' ? '/games/by-price-asc' : '/games/by-price-desc';
+  const res = await api.get(url);
+  return res.data.result as Game[];
+=======
   try {
     const url = order === 'asc' ? '/games/by-price-asc' : '/games/by-price-desc';
     const res = await api.get(url);
@@ -127,6 +273,7 @@ export async function fetchGamesByPrice(order: 'asc' | 'desc') {
     }
     throw error;
   }
+>>>>>>> origin/main
 }
 
 export async function searchGames(keyword: string) {
@@ -140,6 +287,10 @@ export async function fetchGame(id: string) {
 }
 
 export async function fetchCategories() {
+<<<<<<< HEAD
+  const res = await api.get('/category');
+  return res.data.result as Category[];
+=======
   try {
     const res = await api.get('/category');
     return res.data.result as Category[];
@@ -151,6 +302,7 @@ export async function fetchCategories() {
     }
     throw error;
   }
+>>>>>>> origin/main
 }
 
 export async function createCategory(payload: { name: string; description?: string }) {
@@ -164,7 +316,32 @@ export type GameCreatePayload = {
   quantity: number;
   price: number;
   salePercent?: number | null;
+<<<<<<< HEAD
+  image?: string; // S3 URL or path
+  cover?: string; // S3 URL or path
+  video?: string; // YouTube URL or S3 URL
   categories?: string[]; // ids (optional)
+  systemRequirements?: {
+    minimum?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+    recommended?: {
+      os?: string;
+      cpu?: string;
+      ram?: string;
+      gpu?: string;
+      storage?: string;
+      network?: string;
+    };
+  };
+=======
+  categories?: string[]; // ids (optional)
+>>>>>>> origin/main
 };
 
 export type GameUpdatePayload = Partial<GameCreatePayload>;
@@ -184,6 +361,9 @@ export async function deleteGame(id: string) {
 }
 
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> origin/main
 // S3 Upload functions
 export async function uploadImageToS3(file: File): Promise<string> {
   const formData = new FormData();
@@ -202,12 +382,22 @@ export async function uploadImageToS3(file: File): Promise<string> {
   }
 }
 
+<<<<<<< HEAD
+export async function login(username: string, password: string) {
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/auth/login', { username, password });
+  const token = res.data?.result?.token as string;
+  if (!token) {
+    throw new Error('No token received from server');
+  }
+=======
 =======
 >>>>>>> origin/main
 export async function login(username: string, password: string) {
   // Public endpoint - interceptor will not add token
   const res = await api.post('/auth/log-in', { username, password });
   const token = res.data?.result?.token as string;
+>>>>>>> origin/main
   return token;
 }
 
@@ -248,6 +438,11 @@ export async function requestPhoneOtp(phone: string) {
 
 // Request email OTP for registration
 export async function requestEmailOtp(email: string): Promise<string> {
+<<<<<<< HEAD
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/email/request-otp', { email });
+  return res.data?.result as string; // Backend returns "OTP sent successfully" or the OTP code
+=======
   try {
     // Public endpoint - interceptor will not add token
     const res = await api.post('/email/request-otp', { email });
@@ -258,6 +453,7 @@ export async function requestEmailOtp(email: string): Promise<string> {
     console.error('[requestEmailOtp] Error:', error.response?.data || error.message);
     throw error;
   }
+>>>>>>> origin/main
 }
 
 export async function forgotPhoneRequest(username: string) {
@@ -294,7 +490,20 @@ export type UpdateProfilePayload = {
 };
 
 export async function updateMyInfo(payload: UpdateProfilePayload) {
+<<<<<<< HEAD
+  console.log('📡 API: Getting current user ID...');
+  // First get user ID from myInfo
+  const currentUser = await getMyInfo();
+  const userId = currentUser.id;
+  console.log('📡 API: User ID =', userId);
+  
+  console.log('📡 API: Calling PUT /users/' + userId + ' with:', payload);
+  // Then update using /users/{userId} endpoint
+  const res = await api.put(`/users/${userId}`, payload);
+  console.log('📡 API: PUT Response:', res.data);
+=======
   const res = await api.put('/users/myInfo', payload);
+>>>>>>> origin/main
   return res.data?.result as Me;
 }
 
@@ -357,6 +566,9 @@ export async function fetchMonthlySales() {
 }
 
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> origin/main
 // Order Management APIs
 export async function fetchAllOrders() {
   const res = await api.get('/orders');
@@ -572,6 +784,9 @@ export async function addToCart(payload: AddToCartPayload): Promise<void> {
   await api.post('/cart/add', payload);
 }
 
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> origin/main
 >>>>>>> origin/main
 

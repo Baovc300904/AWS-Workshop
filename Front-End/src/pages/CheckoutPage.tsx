@@ -55,6 +55,8 @@ export default function CheckoutPage() {
     // Validate payment info
     const newErrors: Record<string, string> = {};
 
+<<<<<<< HEAD
+=======
     if (paymentMethod === 'credit_card') {
       if (!cardNumber || cardNumber.replace(/\s/g, '').length !== 16) {
         newErrors.cardNumber = 'Số thẻ phải có 16 chữ số';
@@ -70,6 +72,7 @@ export default function CheckoutPage() {
       }
     }
 
+>>>>>>> origin/main
     if (paymentMethod === 'momo') {
       if (!momoPhone || !/^(0|\+84)[0-9]{9,10}$/.test(momoPhone.replace(/\s/g, ''))) {
         newErrors.momoPhone = 'Số điện thoại MoMo không hợp lệ';
@@ -92,6 +95,24 @@ export default function CheckoutPage() {
     setIsProcessing(true);
     setErrors({});
 
+<<<<<<< HEAD
+    // Handle Balance payment
+    if (paymentMethod === 'balance') {
+      try {
+        // TODO: Call API to purchase with balance
+        alert('💰 Thanh toán bằng số dư tài khoản\n\nChức năng đang được phát triển...');
+        setIsProcessing(false);
+        return;
+      } catch (error: any) {
+        setIsProcessing(false);
+        const errorMsg = error?.response?.data?.message || error?.message || 'Không thể thanh toán bằng số dư';
+        alert(`❌ Lỗi thanh toán:\n\n${errorMsg}`);
+        return;
+      }
+    }
+
+=======
+>>>>>>> origin/main
     // Handle MoMo payment
     if (paymentMethod === 'momo') {
       try {
@@ -158,6 +179,8 @@ export default function CheckoutPage() {
       }
       return;
     }
+<<<<<<< HEAD
+=======
 
     // Simulate payment processing for other methods
     setTimeout(() => {
@@ -169,6 +192,7 @@ export default function CheckoutPage() {
       setIsProcessing(false);
       navigate('/');
     }, 2000);
+>>>>>>> origin/main
   };
 
   // Calculate totals
@@ -355,6 +379,14 @@ export default function CheckoutPage() {
                     </button>
 
                     <button
+<<<<<<< HEAD
+                      className={`methodCard ${paymentMethod === 'balance' ? 'active' : ''}`}
+                      onClick={() => setPaymentMethod('balance')}
+                    >
+                      <div className="methodIcon">💰</div>
+                      <div className="methodName">Số dư tài khoản</div>
+                      <div className="methodDesc">Thanh toán bằng số dư</div>
+=======
                       className={`methodCard ${paymentMethod === 'credit_card' ? 'active' : ''}`}
                       onClick={() => setPaymentMethod('credit_card')}
                     >
@@ -370,6 +402,7 @@ export default function CheckoutPage() {
                       <div className="methodIcon">🏦</div>
                       <div className="methodName">Chuyển khoản</div>
                       <div className="methodDesc">Internet Banking</div>
+>>>>>>> origin/main
                     </button>
                   </div>
                 </div>
@@ -417,6 +450,8 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
+<<<<<<< HEAD
+=======
                 {paymentMethod === 'credit_card' && (
                   <div className="paymentForm">
                     <h3>Thông tin thẻ</h3>
@@ -497,6 +532,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
+>>>>>>> origin/main
                 <div className="contactForm">
                   <h3>Thông tin liên hệ</h3>
                   

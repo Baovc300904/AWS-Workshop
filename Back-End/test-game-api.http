@@ -1,0 +1,152 @@
+### Test Game API with System Requirements
+
+### 1. Login để lấy token (Admin)
+POST http://localhost:8080/identity/auth/log-in
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+> {%
+    client.global.set("auth_token", response.body.result.token);
+    client.log("Token: " + response.body.result.token);
+%}
+
+###
+
+### 2. Tạo game mới với system requirements - Cyberpunk 2077
+POST http://localhost:8080/identity/games
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": "Cyberpunk 2077",
+  "quantity": 100,
+  "price": 599000,
+  "salePercent": 20,
+  "image": "https://example.com/cyberpunk-image.jpg",
+  "cover": "https://example.com/cyberpunk-cover.jpg",
+  "video": "https://www.youtube.com/watch?v=8X2kIfS6fb8",
+  "releaseDate": "2020-12-10",
+  "categories": ["RPG", "Action"],
+  "systemRequirements": "{\"minimum\":{\"os\":\"Windows 10 64-bit\",\"cpu\":\"Intel Core i5-3570K or AMD FX-8310\",\"ram\":\"8 GB\",\"gpu\":\"NVIDIA GeForce GTX 780 or AMD Radeon RX 470\",\"storage\":\"70 GB\",\"network\":\"Broadband Internet connection\"},\"recommended\":{\"os\":\"Windows 10 64-bit\",\"cpu\":\"Intel Core i7-4790 or AMD Ryzen 3 3200G\",\"ram\":\"12 GB\",\"gpu\":\"NVIDIA GeForce GTX 1060 6GB or AMD Radeon R9 Fury\",\"storage\":\"70 GB SSD\",\"network\":\"Broadband Internet connection\"}}"
+}
+
+> {%
+    client.global.set("game_id", response.body.result.id);
+    client.log("Game ID: " + response.body.result.id);
+    client.log("System Requirements: " + response.body.result.systemRequirements);
+%}
+
+###
+
+### 3. Tạo game - The Witcher 3
+POST http://localhost:8080/identity/games
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": "The Witcher 3: Wild Hunt",
+  "quantity": 150,
+  "price": 299000,
+  "salePercent": 50,
+  "image": "https://example.com/witcher3-image.jpg",
+  "cover": "https://example.com/witcher3-cover.jpg",
+  "video": "https://www.youtube.com/watch?v=c0i88t0Kacs",
+  "releaseDate": "2015-05-19",
+  "categories": ["RPG", "Adventure"],
+  "systemRequirements": "{\"minimum\":{\"os\":\"Windows 7 64-bit\",\"cpu\":\"Intel Core i5-2500K or AMD Phenom II X4 940\",\"ram\":\"6 GB\",\"gpu\":\"NVIDIA GeForce GTX 660 or AMD Radeon HD 7870\",\"storage\":\"40 GB\",\"network\":\"Internet connection for updates\"},\"recommended\":{\"os\":\"Windows 10 64-bit\",\"cpu\":\"Intel Core i7-3770 or AMD FX-8350\",\"ram\":\"8 GB\",\"gpu\":\"NVIDIA GeForce GTX 770 or AMD Radeon R9 290\",\"storage\":\"40 GB SSD\",\"network\":\"Broadband Internet connection\"}}"
+}
+
+###
+
+### 4. Tạo game - Elden Ring
+POST http://localhost:8080/identity/games
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": "Elden Ring",
+  "quantity": 200,
+  "price": 1199000,
+  "salePercent": 0,
+  "image": "https://example.com/eldenring-image.jpg",
+  "cover": "https://example.com/eldenring-cover.jpg",
+  "video": "https://www.youtube.com/watch?v=E3Huy2cdih0",
+  "releaseDate": "2022-02-25",
+  "categories": ["RPG", "Action", "Adventure"],
+  "systemRequirements": "{\"minimum\":{\"os\":\"Windows 10 64-bit\",\"cpu\":\"Intel Core i5-8400 or AMD Ryzen 3 3300X\",\"ram\":\"12 GB\",\"gpu\":\"NVIDIA GeForce GTX 1060 3GB or AMD Radeon RX 580 4GB\",\"storage\":\"60 GB\",\"network\":\"Online multiplayer requires internet\"},\"recommended\":{\"os\":\"Windows 10/11 64-bit\",\"cpu\":\"Intel Core i7-8700K or AMD Ryzen 5 3600X\",\"ram\":\"16 GB\",\"gpu\":\"NVIDIA GeForce GTX 1070 8GB or AMD Radeon RX Vega 56 8GB\",\"storage\":\"60 GB SSD\",\"network\":\"Broadband Internet connection\"}}"
+}
+
+###
+
+### 5. Lấy game theo ID (kiểm tra systemRequirements)
+GET http://localhost:8080/identity/games/{{game_id}}
+Authorization: Bearer {{auth_token}}
+
+###
+
+### 6. Lấy tất cả games
+GET http://localhost:8080/identity/games
+Authorization: Bearer {{auth_token}}
+
+###
+
+### 7. Tìm kiếm game
+GET http://localhost:8080/identity/games/search?keyword=Cyberpunk
+Authorization: Bearer {{auth_token}}
+
+###
+
+### 8. Cập nhật system requirements cho game
+PUT http://localhost:8080/identity/games/{{game_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "systemRequirements": "{\"minimum\":{\"os\":\"Windows 10 64-bit\",\"cpu\":\"Intel Core i5-3570K\",\"ram\":\"8 GB\",\"gpu\":\"NVIDIA GeForce GTX 780\",\"storage\":\"70 GB\",\"network\":\"Broadband Internet\"},\"recommended\":{\"os\":\"Windows 11 64-bit\",\"cpu\":\"Intel Core i7-4790\",\"ram\":\"16 GB\",\"gpu\":\"NVIDIA GeForce GTX 1070\",\"storage\":\"100 GB SSD\",\"network\":\"Broadband Internet\"}}"
+}
+
+###
+
+### 9. Cập nhật giá và system requirements cùng lúc
+PUT http://localhost:8080/identity/games/{{game_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "price": 499000,
+  "salePercent": 30,
+  "systemRequirements": "{\"minimum\":{\"os\":\"Windows 10\",\"cpu\":\"i5\",\"ram\":\"8GB\",\"gpu\":\"GTX 780\",\"storage\":\"70GB\",\"network\":\"Broadband\"},\"recommended\":{\"os\":\"Windows 11\",\"cpu\":\"i7\",\"ram\":\"16GB\",\"gpu\":\"GTX 1070\",\"storage\":\"100GB SSD\",\"network\":\"Broadband\"}}"
+}
+
+###
+
+### 10. Lấy games theo giá tăng dần
+GET http://localhost:8080/identity/games/by-price-asc
+Authorization: Bearer {{auth_token}}
+
+###
+
+### 11. Lấy games theo giá giảm dần
+GET http://localhost:8080/identity/games/by-price-desc
+Authorization: Bearer {{auth_token}}
+
+###
+
+### 12. Test tạo game KHÔNG có system requirements (optional field)
+POST http://localhost:8080/identity/games
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": "Simple Game Without Requirements",
+  "quantity": 50,
+  "price": 99000,
+  "salePercent": 0,
+  "categories": ["Casual"]
+}
+
+###
