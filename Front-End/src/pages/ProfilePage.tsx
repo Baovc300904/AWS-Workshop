@@ -118,6 +118,7 @@ export function ProfilePage() {
   const handleSave = async () => {
     if (!profile) return;
     
+<<<<<<< HEAD
     setSaving(true);
     setError(null);
     try {
@@ -143,6 +144,26 @@ export function ProfilePage() {
         phone: updated.phone || '',
         dob: updated.dob || '',
       });
+=======
+    // Validate password confirmation
+    if (!passwordConfirm || passwordConfirm.trim() === '') {
+      alert('⚠️ Vui lòng nhập mật khẩu hiện tại để xác nhận thay đổi!');
+      return;
+    }
+    
+    setSaving(true);
+    setError(null);
+    try {
+      // Include username and password in the update request
+      const updatePayload = {
+        username: profile.username,
+        password: passwordConfirm, // Send current password to preserve it
+        ...formData
+      };
+      
+      const updated = await updateMyInfo(updatePayload as any);
+      setProfile(updated);
+>>>>>>> origin/main
       setEditing(false);
       setPasswordConfirm(''); // Clear password field
       
@@ -201,6 +222,7 @@ export function ProfilePage() {
     setAvatarUploading(true);
     try {
       const updatedUser = await uploadAvatar(file);
+<<<<<<< HEAD
       
       // Update local state with new avatar URL (includes timestamp from backend)
       setProfile(prev => prev ? { ...prev, avatarUrl: updatedUser.avatarUrl } : null);
@@ -208,6 +230,10 @@ export function ProfilePage() {
       // Update navbar avatar - trigger event
       window.dispatchEvent(new CustomEvent('avatar-updated', { detail: updatedUser.avatarUrl }));
       
+=======
+      setProfile(prev => prev ? { ...prev, avatarUrl: updatedUser.avatarUrl } : null);
+      
+>>>>>>> origin/main
       const successMsg = document.createElement('div');
       successMsg.className = 'toast-success';
       successMsg.textContent = '✅ Upload avatar thành công!';

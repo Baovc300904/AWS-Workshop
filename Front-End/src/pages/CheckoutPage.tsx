@@ -55,6 +55,24 @@ export default function CheckoutPage() {
     // Validate payment info
     const newErrors: Record<string, string> = {};
 
+<<<<<<< HEAD
+=======
+    if (paymentMethod === 'credit_card') {
+      if (!cardNumber || cardNumber.replace(/\s/g, '').length !== 16) {
+        newErrors.cardNumber = 'Số thẻ phải có 16 chữ số';
+      }
+      if (!cardName.trim()) {
+        newErrors.cardName = 'Vui lòng nhập tên chủ thẻ';
+      }
+      if (!cardExpiry || !/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+        newErrors.cardExpiry = 'Định dạng: MM/YY';
+      }
+      if (!cardCvv || cardCvv.length !== 3) {
+        newErrors.cardCvv = 'CVV phải có 3 chữ số';
+      }
+    }
+
+>>>>>>> origin/main
     if (paymentMethod === 'momo') {
       if (!momoPhone || !/^(0|\+84)[0-9]{9,10}$/.test(momoPhone.replace(/\s/g, ''))) {
         newErrors.momoPhone = 'Số điện thoại MoMo không hợp lệ';
@@ -77,6 +95,7 @@ export default function CheckoutPage() {
     setIsProcessing(true);
     setErrors({});
 
+<<<<<<< HEAD
     // Handle Balance payment
     if (paymentMethod === 'balance') {
       try {
@@ -92,6 +111,8 @@ export default function CheckoutPage() {
       }
     }
 
+=======
+>>>>>>> origin/main
     // Handle MoMo payment
     if (paymentMethod === 'momo') {
       try {
@@ -158,6 +179,20 @@ export default function CheckoutPage() {
       }
       return;
     }
+<<<<<<< HEAD
+=======
+
+    // Simulate payment processing for other methods
+    setTimeout(() => {
+      alert(`✅ Thanh toán thành công!\n\nPhương thức: ${
+        paymentMethod === 'credit_card' ? 'Thẻ tín dụng' :
+        paymentMethod === 'paypal' ? 'PayPal' : 'Chuyển khoản ngân hàng'
+      }\nTổng tiền: ${formatPrice(totalRaw, currency)}\n\n(Đây là demo - Backend chưa có API orders)`);
+      clear();
+      setIsProcessing(false);
+      navigate('/');
+    }, 2000);
+>>>>>>> origin/main
   };
 
   // Calculate totals
@@ -344,12 +379,30 @@ export default function CheckoutPage() {
                     </button>
 
                     <button
+<<<<<<< HEAD
                       className={`methodCard ${paymentMethod === 'balance' ? 'active' : ''}`}
                       onClick={() => setPaymentMethod('balance')}
                     >
                       <div className="methodIcon">💰</div>
                       <div className="methodName">Số dư tài khoản</div>
                       <div className="methodDesc">Thanh toán bằng số dư</div>
+=======
+                      className={`methodCard ${paymentMethod === 'credit_card' ? 'active' : ''}`}
+                      onClick={() => setPaymentMethod('credit_card')}
+                    >
+                      <div className="methodIcon">💳</div>
+                      <div className="methodName">Thẻ tín dụng</div>
+                      <div className="methodDesc">Visa, Mastercard, JCB</div>
+                    </button>
+
+                    <button
+                      className={`methodCard ${paymentMethod === 'banking' ? 'active' : ''}`}
+                      onClick={() => setPaymentMethod('banking')}
+                    >
+                      <div className="methodIcon">🏦</div>
+                      <div className="methodName">Chuyển khoản</div>
+                      <div className="methodDesc">Internet Banking</div>
+>>>>>>> origin/main
                     </button>
                   </div>
                 </div>
@@ -397,6 +450,89 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
+<<<<<<< HEAD
+=======
+                {paymentMethod === 'credit_card' && (
+                  <div className="paymentForm">
+                    <h3>Thông tin thẻ</h3>
+                    
+                    <div className="formGroup">
+                      <label>Số thẻ *</label>
+                      <input
+                        type="text"
+                        placeholder="1234 5678 9012 3456"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                        className={errors.cardNumber ? 'error' : ''}
+                        maxLength={19}
+                      />
+                      {errors.cardNumber && <span className="errorText">{errors.cardNumber}</span>}
+                    </div>
+
+                    <div className="formGroup">
+                      <label>Tên chủ thẻ *</label>
+                      <input
+                        type="text"
+                        placeholder="NGUYEN VAN A"
+                        value={cardName}
+                        onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                        className={errors.cardName ? 'error' : ''}
+                      />
+                      {errors.cardName && <span className="errorText">{errors.cardName}</span>}
+                    </div>
+
+                    <div className="formRow">
+                      <div className="formGroup">
+                        <label>Ngày hết hạn *</label>
+                        <input
+                          type="text"
+                          placeholder="MM/YY"
+                          value={cardExpiry}
+                          onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                          className={errors.cardExpiry ? 'error' : ''}
+                          maxLength={5}
+                        />
+                        {errors.cardExpiry && <span className="errorText">{errors.cardExpiry}</span>}
+                      </div>
+
+                      <div className="formGroup">
+                        <label>CVV *</label>
+                        <input
+                          type="text"
+                          placeholder="123"
+                          value={cardCvv}
+                          onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 3))}
+                          className={errors.cardCvv ? 'error' : ''}
+                          maxLength={3}
+                        />
+                        {errors.cardCvv && <span className="errorText">{errors.cardCvv}</span>}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === 'paypal' && (
+                  <div className="paymentInfo">
+                    <div className="infoBox">
+                      <p>🅿️ Bạn sẽ được chuyển đến trang PayPal để hoàn tất thanh toán.</p>
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === 'banking' && (
+                  <div className="paymentInfo">
+                    <div className="infoBox">
+                      <h4>Thông tin chuyển khoản</h4>
+                      <p><strong>Ngân hàng:</strong> Vietcombank</p>
+                      <p><strong>Số tài khoản:</strong> 1234567890</p>
+                      <p><strong>Chủ tài khoản:</strong> CONG TY GAME STORE</p>
+                      <p><strong>Số tiền:</strong> {formatPrice(totalRaw, currency)}</p>
+                      <p><strong>Nội dung:</strong> Thanh toan don hang</p>
+                    </div>
+                  </div>
+                )}
+
+>>>>>>> origin/main
                 <div className="contactForm">
                   <h3>Thông tin liên hệ</h3>
                   

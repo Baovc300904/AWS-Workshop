@@ -17,6 +17,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
+<<<<<<< HEAD
     rollupOptions: {
       output: {
         // Add hash to force cache invalidation
@@ -25,6 +26,8 @@ export default defineConfig({
         assetFileNames: `assets/[name]-[hash]-${Date.now()}.[ext]`
       }
     }
+=======
+>>>>>>> origin/main
   }
 });
 

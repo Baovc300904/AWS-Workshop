@@ -46,9 +46,12 @@ const LoginPage: React.FC = () => {
 const [submitting, setSubmitting] = useState(false);
 const [submitError, setSubmitError] = useState<string | null>(null);
 const [showErrorModal, setShowErrorModal] = useState(false);
+<<<<<<< HEAD
 const [isBlinking, setIsBlinking] = useState(false);
 const [loginSuccess, setLoginSuccess] = useState(false);
 const [loginError, setLoginError] = useState(false);
+=======
+>>>>>>> origin/main
   const navigate = useNavigate();
 
 	const getPosition = (el: Element | null) => {
@@ -254,6 +257,7 @@ const [loginError, setLoginError] = useState(false);
 		// Initialize to rest state
 		setArmState('rest');
 		setMouthStatus('small');
+<<<<<<< HEAD
 		
 		// Eye blinking animation
 		const blinkInterval = setInterval(() => {
@@ -262,12 +266,18 @@ const [loginError, setLoginError] = useState(false);
 		}, 3000 + Math.random() * 2000); // Random blink between 3-5 seconds
 		
 		return () => clearInterval(blinkInterval);
+=======
+>>>>>>> origin/main
 	}, [setArmState]);
 
   return (
 		<div className="yetiLoginContainer">
 			<div className="yetiCard">
+<<<<<<< HEAD
 				<div className={`yetiHead ${loginSuccess ? 'celebrate' : ''} ${loginError ? 'shake' : ''} ${submitting ? 'loading' : ''}`}>
+=======
+				<div className="yetiHead">
+>>>>>>> origin/main
 					<div className="svgContainer noBorder">
 						<svg ref={svgRef} className="mySVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
               <defs>
@@ -310,11 +320,19 @@ const [loginError, setLoginError] = useState(false);
                 <path fill="#FFFFFF" d="M138.142,55.064c-4.93,1.259-9.874,2.118-14.787,2.599c-0.336,3.341-0.776,6.689-1.322,10.037 c-4.569-1.465-8.909-3.222-12.996-5.226c-0.98,3.075-2.07,6.137-3.267,9.179c-5.514-3.067-10.559-6.545-15.097-10.329 c-1.806,2.889-3.745,5.73-5.816,8.515c-7.916-4.124-15.053-9.114-21.296-14.738l1.107-11.768h73.475V55.064z" />
 								<path fill="#FFFFFF" stroke="#3A5E77" strokeWidth={2.5} strokeLinecap="round" d="M63.56,55.102 c6.243,5.624,13.38,10.614,21.296,14.738c2.071-2.785,4.01-5.626,5.816-8.515c4.537,3.785,9.583,7.263,15.097,10.329 c1.197-3.043,2.287-6.104,3.267-9.179c4.087,2.004,8.427,3.761,12.996,5.226c0.545-3.348,0.986-6.696,1.322-10.037 c4.913-0.481,9.857-1.34,14.787-2.599" />
 							</g>
+<<<<<<< HEAD
 							<g ref={eyeLRef} className={`eyeL ${isBlinking ? 'blink' : ''}`}>
 								<circle cx="85.5" cy="78.5" r="3.5" fill="#3a5e77" />
 								<circle cx="84" cy="76" r="1" fill="#fff" />
 							</g>
 							<g ref={eyeRRef} className={`eyeR ${isBlinking ? 'blink' : ''}`}>
+=======
+							<g ref={eyeLRef} className="eyeL">
+								<circle cx="85.5" cy="78.5" r="3.5" fill="#3a5e77" />
+								<circle cx="84" cy="76" r="1" fill="#fff" />
+							</g>
+							<g ref={eyeRRef} className="eyeR">
+>>>>>>> origin/main
 								<circle cx="114.5" cy="78.5" r="3.5" fill="#3a5e77" />
 								<circle cx="113" cy="76" r="1" fill="#fff" />
 							</g>
@@ -364,6 +382,7 @@ const [loginError, setLoginError] = useState(false);
                   try {
                     const username = emailRef.current?.value?.trim() || '';
                     const password = passwordRef.current?.value || '';
+<<<<<<< HEAD
                     
                     if (!username || !password) {
                       throw new Error('Vui lòng nhập đầy đủ thông tin');
@@ -373,10 +392,18 @@ const [loginError, setLoginError] = useState(false);
                     
                     if (!token) throw new Error('Đăng nhập thất bại - không nhận được token');
                     
+=======
+                    const token = await login(username, password);
+                    if (!token) throw new Error('Đăng nhập thất bại');
+>>>>>>> origin/main
                     localStorage.setItem('wgs_token', token);
                     localStorage.setItem('token', token); // Also save as 'token' for compatibility
                     localStorage.setItem('username', username);
                     
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> origin/main
                     // Clear old shared cart/wishlist data
                     localStorage.removeItem('demo_cart');
                     localStorage.removeItem('demo_cart_guest');
@@ -387,6 +414,11 @@ const [loginError, setLoginError] = useState(false);
                     setLoginSuccess(true);
                     await new Promise(resolve => setTimeout(resolve, 800)); // Wait for animation
                     
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> origin/main
+>>>>>>> origin/main
                     // Kiểm tra xem có redirect URL không
                     const redirectUrl = localStorage.getItem('redirect_after_login');
                     if (redirectUrl) {
@@ -421,6 +453,7 @@ const [loginError, setLoginError] = useState(false);
                     } catch {}
                     navigate('/');
                   } catch (err: any) {
+<<<<<<< HEAD
                     let errorMsg = 'Đăng nhập thất bại';
                     
                     // Case 1: Network error - Mất kết nối server
@@ -445,15 +478,28 @@ const [loginError, setLoginError] = useState(false);
                     }
                     // Case 6: Generic error
                     else if (err?.message && err.message !== 'Request failed with status code 500') {
+=======
+                    console.error('[Login Error]', err);
+                    let errorMsg = 'Đăng nhập thất bại';
+                    
+                    if (err?.response?.status === 401) {
+                      errorMsg = err?.response?.data?.message || 'Sai tên đăng nhập hoặc mật khẩu';
+                    } else if (err?.response?.data?.message) {
+                      errorMsg = err.response.data.message;
+                    } else if (err?.message) {
+>>>>>>> origin/main
                       errorMsg = err.message;
                     }
                     
                     setSubmitError(errorMsg);
                     setShowErrorModal(true);
+<<<<<<< HEAD
                     
                     // Trigger shake animation on error
                     setLoginError(true);
                     setTimeout(() => setLoginError(false), 600);
+=======
+>>>>>>> origin/main
                   } finally {
                     setSubmitting(false);
                   }
@@ -519,6 +565,7 @@ const [loginError, setLoginError] = useState(false);
 							<button 
 								type="button" 
 								className="googleBtn"
+<<<<<<< HEAD
 								onClick={async () => {
 									try {
 										const { openGoogleAuthPopup, exchangeCodeForToken } = await import('../services/googleAuth');
@@ -543,6 +590,12 @@ const [loginError, setLoginError] = useState(false);
 										setSubmitError(error.message || 'Đăng nhập Google thất bại');
 										setShowErrorModal(true);
 									}
+=======
+								onClick={() => {
+									// TODO: Implement Google OAuth login
+									console.log('Google login clicked');
+									alert('Tính năng đăng nhập Google sẽ được triển khai sớm!');
+>>>>>>> origin/main
 								}}
 							>
 								<svg className="googleIcon" viewBox="0 0 24 24" width="20" height="20">
