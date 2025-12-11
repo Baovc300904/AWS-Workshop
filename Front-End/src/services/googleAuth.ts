@@ -119,7 +119,7 @@ export async function exchangeCodeForToken(code: string): Promise<any> {
   // 4. Create/login user in your system
   // 5. Return your app's JWT token
   
-  const response = await fetch('/identity/auth/google/callback', {
+  const response = await fetch('/api/auth/google/callback', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code }),

@@ -118,24 +118,31 @@ export function ProfilePage() {
   const handleSave = async () => {
     if (!profile) return;
     
-    // Validate password confirmation
-    if (!passwordConfirm || passwordConfirm.trim() === '') {
-      alert('⚠️ Vui lòng nhập mật khẩu hiện tại để xác nhận thay đổi!');
-      return;
-    }
-    
     setSaving(true);
     setError(null);
     try {
-      // Include username and password in the update request
+      // Update profile info WITHOUT sending password
+      // Password should only be sent when explicitly changing password
       const updatePayload = {
-        username: profile.username,
-        password: passwordConfirm, // Send current password to preserve it
         ...formData
       };
       
+      console.log('🔄 Step 1: Preparing update with:', updatePayload);
+      console.log('🔄 Step 2: Calling updateMyInfo...');
+      
       const updated = await updateMyInfo(updatePayload as any);
+      
+      console.log('✅ Step 3: Got response:', updated);
+      
       setProfile(updated);
+      // IMPORTANT: Update formData with new values too!
+      setFormData({
+        firstName: updated.firstName || '',
+        lastName: updated.lastName || '',
+        email: updated.email || '',
+        phone: updated.phone || '',
+        dob: updated.dob || '',
+      });
       setEditing(false);
       setPasswordConfirm(''); // Clear password field
       
@@ -194,7 +201,12 @@ export function ProfilePage() {
     setAvatarUploading(true);
     try {
       const updatedUser = await uploadAvatar(file);
+      
+      // Update local state with new avatar URL (includes timestamp from backend)
       setProfile(prev => prev ? { ...prev, avatarUrl: updatedUser.avatarUrl } : null);
+      
+      // Update navbar avatar - trigger event
+      window.dispatchEvent(new CustomEvent('avatar-updated', { detail: updatedUser.avatarUrl }));
       
       const successMsg = document.createElement('div');
       successMsg.className = 'toast-success';

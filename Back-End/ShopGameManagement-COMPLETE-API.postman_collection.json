@@ -1,0 +1,1571 @@
+{
+  "info": {
+    "name": "Shop Game Management - COMPLETE API Collection",
+    "description": "Complete API collection for Shop Game Management with all endpoints including AWS S3 upload, Email OTP (màu #1B2838), MoMo payment, and more. Updated Nov 2, 2025.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "complete-shop-game-api",
+    "version": "3.0.0"
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin@gmail.com\",\n  \"password\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/log-in",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "log-in"]
+            },
+            "description": "Login với username và password để nhận token"
+          }
+        },
+        {
+          "name": "Introspect Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/introspect",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "introspect"]
+            },
+            "description": "Kiểm tra token có hợp lệ không"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Đăng xuất và vô hiệu hóa token"
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Làm mới token khi hết hạn"
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 User Management",
+      "item": [
+        {
+          "name": "Create User (Public Registration)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user@gmail.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"dob\": \"1990-01-01\",\n  \"phone\": \"0123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Đăng ký user mới (public, role USER mặc định)"
+          }
+        },
+        {
+          "name": "Create User With Custom Roles (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin@gmail.com\",\n  \"password\": \"admin\",\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\",\n  \"dob\": \"1990-01-01\",\n  \"phone\": \"0987654321\",\n  \"roles\": [\"ADMIN\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/create-with-roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "create-with-roles"]
+            },
+            "description": "Tạo user với custom roles (để tạo ADMIN đầu tiên)"
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Lấy danh sách tất cả user"
+          }
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            },
+            "description": "Lấy thông tin user theo ID"
+          }
+        },
+        {
+          "name": "Get My Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/myInfo",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "myInfo"]
+            },
+            "description": "Lấy thông tin user hiện tại đang login"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John Updated\",\n  \"lastName\": \"Doe\",\n  \"dob\": \"1990-01-01\",\n  \"phone\": \"0123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            },
+            "description": "Cập nhật thông tin user"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            },
+            "description": "Xóa user theo ID"
+          }
+        },
+        {
+          "name": "Request Phone OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"0123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/request-phone-otp",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "request-phone-otp"]
+            },
+            "description": "Request OTP qua phone (demo: trả về code trong response)"
+          }
+        },
+        {
+          "name": "Forgot Password - Step 1: Request OTP by Username",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user@gmail.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/forgot-password/phone/request",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "forgot-password", "phone", "request"]
+            },
+            "description": "Bước 1: Request OTP để reset password qua username"
+          }
+        },
+        {
+          "name": "Forgot Password - Step 2: Confirm OTP & Set New Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user@gmail.com\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/forgot-password/phone/confirm",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "forgot-password", "phone", "confirm"]
+            },
+            "description": "Bước 2: Xác nhận OTP và đặt password mới"
+          }
+        },
+        {
+          "name": "Forgot Password (Email)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@gmail.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "forgot-password"]
+            },
+            "description": "Request password reset qua email"
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"reset-token-from-email\",\n  \"newPassword\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "reset-password"]
+            },
+            "description": "Reset password với token nhận từ email"
+          }
+        },
+        {
+          "name": "Grant Permissions to User (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\"GAME_CREATE\", \"GAME_UPDATE\", \"GAME_DELETE\"]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/grant-permissions/{{username}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "grant-permissions", "{{username}}"]
+            },
+            "description": "Admin grant permissions cho user (thêm vào tất cả roles của user)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎮 Game Management",
+      "item": [
+        {
+          "name": "Get All Games",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["games"]
+            },
+            "description": "Lấy danh sách tất cả games (Public)"
+          }
+        },
+        {
+          "name": "Get Game By Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games/{{gameName}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "{{gameName}}"]
+            },
+            "description": "Lấy thông tin game theo tên"
+          }
+        },
+        {
+          "name": "Search Games",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games/search?keyword=action",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "search"],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "action",
+                  "description": "Tìm theo tên game hoặc category"
+                }
+              ]
+            },
+            "description": "Tìm kiếm game theo keyword (tên hoặc category)"
+          }
+        },
+        {
+          "name": "Get Games By Price Ascending",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games/by-price-asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "by-price-asc"]
+            },
+            "description": "Lấy danh sách games sắp xếp theo giá tăng dần"
+          }
+        },
+        {
+          "name": "Get Games By Price Descending",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games/by-price-desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "by-price-desc"]
+            },
+            "description": "Lấy danh sách games sắp xếp theo giá giảm dần"
+          }
+        },
+        {
+          "name": "Create Game (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grand Theft Auto V\",\n  \"price\": 599000,\n  \"quantity\": 100,\n  \"image\": \"https://s3-url/gta5.jpg\",\n  \"cover\": \"https://s3-url/gta5-cover.jpg\",\n  \"video\": \"https://s3-url/gta5-trailer.mp4\",\n  \"releaseDate\": \"2013-09-17\",\n  \"salePercent\": 0,\n  \"categories\": [\"Action\", \"Adventure\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["games"]
+            },
+            "description": "Tạo game mới (Admin only)"
+          }
+        },
+        {
+          "name": "Update Game (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grand Theft Auto V\",\n  \"price\": 499000,\n  \"quantity\": 150,\n  \"salePercent\": 20\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/games/{{gameId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "{{gameId}}"]
+            },
+            "description": "Cập nhật thông tin game (Admin only)"
+          }
+        },
+        {
+          "name": "Delete Game (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/games/{{gameId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "{{gameId}}"]
+            },
+            "description": "Xóa game (Admin only)"
+          }
+        },
+        {
+          "name": "Upload Game Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "Chọn file ảnh (jpg, png, etc.)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/games/{{gameId}}/upload-image",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "{{gameId}}", "upload-image"]
+            },
+            "description": "Upload ảnh game lên S3"
+          }
+        },
+        {
+          "name": "Upload Game Cover",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "Chọn file ảnh cover"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/games/{{gameId}}/upload-cover",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "{{gameId}}", "upload-cover"]
+            },
+            "description": "Upload ảnh cover game lên S3"
+          }
+        },
+        {
+          "name": "Upload Game Video",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "Chọn file video (mp4, avi, etc.)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/games/{{gameId}}/upload-video",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "{{gameId}}", "upload-video"]
+            },
+            "description": "Upload video trailer game lên S3"
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚙️ Admin Game Management",
+      "item": [
+        {
+          "name": "Create Game",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cyberpunk 2077\",\n  \"price\": 899000,\n  \"quantity\": 50,\n  \"image\": \"https://s3-url/cyberpunk.jpg\",\n  \"cover\": \"https://s3-url/cyberpunk-cover.jpg\",\n  \"video\": \"https://s3-url/cyberpunk-trailer.mp4\",\n  \"releaseDate\": \"2020-12-10\",\n  \"salePercent\": 10,\n  \"categories\": [\"Action\", \"RPG\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "games"]
+            },
+            "description": "Admin tạo game mới"
+          }
+        },
+        {
+          "name": "Update Game",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cyberpunk 2077\",\n  \"price\": 699000,\n  \"quantity\": 100,\n  \"salePercent\": 30\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/games/{{gameId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "games", "{{gameId}}"]
+            },
+            "description": "Admin cập nhật game"
+          }
+        },
+        {
+          "name": "Delete Game",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/games/{{gameId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "games", "{{gameId}}"]
+            },
+            "description": "Admin xóa game"
+          }
+        },
+        {
+          "name": "Reseed Categories (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/games/reseed-categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "games", "reseed-categories"]
+            },
+            "description": "Tự động gán categories cho games dựa trên tên"
+          }
+        },
+        {
+          "name": "Reseed Categories (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/games/reseed-categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "games", "reseed-categories"]
+            },
+            "description": "Tự động gán categories cho games (GET variant)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📁 Category Management",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/category",
+              "host": ["{{baseUrl}}"],
+              "path": ["category"]
+            },
+            "description": "Lấy danh sách tất cả categories"
+          }
+        },
+        {
+          "name": "Get Category By Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/category/{{categoryName}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["category", "{{categoryName}}"]
+            },
+            "description": "Lấy thông tin category theo tên"
+          }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"RPG\",\n  \"description\": \"Role Playing Games\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/category",
+              "host": ["{{baseUrl}}"],
+              "path": ["category"]
+            },
+            "description": "Tạo category mới"
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"RPG\",\n  \"description\": \"Role Playing Games - Updated\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/category/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["category", "{{categoryId}}"]
+            },
+            "description": "Cập nhật category"
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/category/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["category", "{{categoryId}}"]
+            },
+            "description": "Xóa category"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛒 Cart Management",
+      "item": [
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"gameId\": \"{{gameId}}\",\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "add"]
+            },
+            "description": "Thêm game vào giỏ hàng"
+          }
+        }
+      ]
+    },
+    {
+      "name": "💳 Payment (MoMo)",
+      "item": [
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORDER_{{$timestamp}}\",\n  \"amount\": 100000,\n  \"orderInfo\": \"Thanh toán đơn hàng game\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payment/momo/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "momo", "create"]
+            },
+            "description": "Tạo payment MoMo từ cart"
+          }
+        },
+        {
+          "name": "Create Payment with Items",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORDER_{{$timestamp}}\",\n  \"amount\": 599000,\n  \"orderInfo\": \"Thanh toán game GTA V\",\n  \"items\": [\n    {\n      \"gameId\": \"{{gameId}}\",\n      \"quantity\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payment/momo/create-with-items",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "momo", "create-with-items"]
+            },
+            "description": "Tạo payment MoMo với danh sách items cụ thể"
+          }
+        },
+        {
+          "name": "MoMo Callback (IPN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORDER_123\",\n  \"resultCode\": \"0\",\n  \"message\": \"Successful\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payment/momo/callback",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "momo", "callback"]
+            },
+            "description": "Webhook callback từ MoMo khi thanh toán hoàn tất"
+          }
+        },
+        {
+          "name": "Test Successful Payment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payment/momo/test-success/{{orderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "momo", "test-success", "{{orderId}}"]
+            },
+            "description": "Test endpoint để simulate payment thành công"
+          }
+        }
+      ]
+    },
+    {
+      "name": "⭐ Game Rating",
+      "item": [
+        {
+          "name": "Submit Rating",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"score\": 5,\n  \"clientId\": \"user-browser-fingerprint-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ratings/{{gameId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["ratings", "{{gameId}}"]
+            },
+            "description": "Đánh giá game (1-5 sao)"
+          }
+        },
+        {
+          "name": "Get Average Rating",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ratings/{{gameId}}/avg",
+              "host": ["{{baseUrl}}"],
+              "path": ["ratings", "{{gameId}}", "avg"]
+            },
+            "description": "Lấy điểm trung bình của game"
+          }
+        },
+        {
+          "name": "Get Rating Count",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ratings/{{gameId}}/count",
+              "host": ["{{baseUrl}}"],
+              "path": ["ratings", "{{gameId}}", "count"]
+            },
+            "description": "Lấy số lượng đánh giá của game"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📧 Email Service",
+      "item": [
+        {
+          "name": "Request Email OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@gmail.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/email/request-otp",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "request-otp"]
+            },
+            "description": "Request OTP qua email (Gmail SMTP)"
+          }
+        },
+        {
+          "name": "AWS SES - Send Test Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/email/ses/send-test?toEmail=your-email@gmail.com&subject=Test Email&body=This is a test!",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "ses", "send-test"],
+              "query": [
+                {
+                  "key": "toEmail",
+                  "value": "your-email@gmail.com",
+                  "description": "Email người nhận"
+                },
+                {
+                  "key": "subject",
+                  "value": "Test Email",
+                  "description": "Tiêu đề email"
+                },
+                {
+                  "key": "body",
+                  "value": "This is a test!",
+                  "description": "Nội dung email"
+                }
+              ]
+            },
+            "description": "Gửi email test qua AWS SES"
+          }
+        },
+        {
+          "name": "AWS SES - Send HTML Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/email/ses/send-html-test?toEmail=your-email@gmail.com&subject=HTML Test&htmlBody=<h1>Hello</h1><p>This is <b>HTML</b></p>",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "ses", "send-html-test"],
+              "query": [
+                {
+                  "key": "toEmail",
+                  "value": "your-email@gmail.com"
+                },
+                {
+                  "key": "subject",
+                  "value": "HTML Test"
+                },
+                {
+                  "key": "htmlBody",
+                  "value": "<h1>Hello</h1><p>This is <b>HTML</b></p>"
+                }
+              ]
+            },
+            "description": "Gửi HTML email qua AWS SES"
+          }
+        },
+        {
+          "name": "AWS SES - Send OTP Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/email/ses/send-otp?toEmail=your-email@gmail.com&otp=123456",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "ses", "send-otp"],
+              "query": [
+                {
+                  "key": "toEmail",
+                  "value": "your-email@gmail.com"
+                },
+                {
+                  "key": "otp",
+                  "value": "123456",
+                  "description": "Mã OTP 6 số"
+                }
+              ]
+            },
+            "description": "Gửi OTP email với template đẹp qua AWS SES"
+          }
+        },
+        {
+          "name": "AWS SES - Send Password Reset Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/email/ses/send-password-reset?toEmail=your-email@gmail.com&resetToken=abc123xyz&resetUrl=http://localhost:3000/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "ses", "send-password-reset"],
+              "query": [
+                {
+                  "key": "toEmail",
+                  "value": "your-email@gmail.com"
+                },
+                {
+                  "key": "resetToken",
+                  "value": "abc123xyz"
+                },
+                {
+                  "key": "resetUrl",
+                  "value": "http://localhost:3000/reset-password"
+                }
+              ]
+            },
+            "description": "Gửi email reset password qua AWS SES"
+          }
+        },
+        {
+          "name": "AWS SES - Send Welcome Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/email/ses/send-welcome?toEmail=your-email@gmail.com&firstName=John",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "ses", "send-welcome"],
+              "query": [
+                {
+                  "key": "toEmail",
+                  "value": "your-email@gmail.com"
+                },
+                {
+                  "key": "firstName",
+                  "value": "John"
+                }
+              ]
+            },
+            "description": "Gửi welcome email cho user mới qua AWS SES"
+          }
+        },
+        {
+          "name": "AWS SES - Verify Email Address",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/email/ses/verify-email?email=your-email@gmail.com",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "ses", "verify-email"],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "your-email@gmail.com",
+                  "description": "Email cần verify trong AWS SES"
+                }
+              ]
+            },
+            "description": "Verify email address trong AWS SES (gửi verification link)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Role Management",
+      "item": [
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles"]
+            },
+            "description": "Lấy danh sách tất cả roles"
+          }
+        },
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MODERATOR\",\n  \"description\": \"Moderator role\",\n  \"permissions\": [\"GAME_READ\", \"GAME_UPDATE\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles"]
+            },
+            "description": "Tạo role mới với danh sách permissions"
+          }
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles/{{roleName}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "{{roleName}}"]
+            },
+            "description": "Xóa role theo tên"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔑 Permission Management",
+      "item": [
+        {
+          "name": "Get All Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/permission",
+              "host": ["{{baseUrl}}"],
+              "path": ["permission"]
+            },
+            "description": "Lấy danh sách tất cả permissions"
+          }
+        },
+        {
+          "name": "Create Permission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"GAME_DELETE\",\n  \"description\": \"Quyền xóa game\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/permission",
+              "host": ["{{baseUrl}}"],
+              "path": ["permission"]
+            },
+            "description": "Tạo permission mới"
+          }
+        },
+        {
+          "name": "Delete Permission",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/permission/{{permissionName}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["permission", "{{permissionName}}"]
+            },
+            "description": "Xóa permission theo tên"
+          }
+        }
+      ]
+    },
+    {
+      "name": "☁️ AWS S3 File Management",
+      "item": [
+        {
+          "name": "Upload File to S3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "Chọn file để upload"
+                },
+                {
+                  "key": "folder",
+                  "value": "games/images",
+                  "type": "text",
+                  "description": "Tên folder trong S3 bucket (ví dụ: games/images, games/covers, games/videos)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/s3/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["s3", "upload"]
+            },
+            "description": "Upload file bất kỳ lên S3 bucket"
+          }
+        },
+        {
+          "name": "Upload Game Image to S3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "Chọn file ảnh (jpg, png, etc.)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/s3/upload/game-image",
+              "host": ["{{baseUrl}}"],
+              "path": ["s3", "upload", "game-image"]
+            },
+            "description": "Upload ảnh game lên S3 (chỉ chấp nhận image/*)"
+          }
+        },
+        {
+          "name": "Delete File from S3",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/s3/delete?fileUrl=https://game-store-images-2025-vietnam.s3.ap-southeast-1.amazonaws.com/games/images/filename.jpg",
+              "host": ["{{baseUrl}}"],
+              "path": ["s3", "delete"],
+              "query": [
+                {
+                  "key": "fileUrl",
+                  "value": "https://game-store-images-2025-vietnam.s3.ap-southeast-1.amazonaws.com/games/images/filename.jpg",
+                  "description": "URL đầy đủ của file trên S3"
+                }
+              ]
+            },
+            "description": "Xóa file từ S3 bucket"
+          }
+        },
+        {
+          "name": "Generate Presigned URL",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/s3/presigned-url?fileName=games/images/filename.jpg&expiresInMinutes=60",
+              "host": ["{{baseUrl}}"],
+              "path": ["s3", "presigned-url"],
+              "query": [
+                {
+                  "key": "fileName",
+                  "value": "games/images/filename.jpg",
+                  "description": "Đường dẫn file trong S3 bucket (key)"
+                },
+                {
+                  "key": "expiresInMinutes",
+                  "value": "60",
+                  "description": "Thời gian URL có hiệu lực (phút, mặc định 60)"
+                }
+              ]
+            },
+            "description": "Tạo presigned URL để truy cập file S3 tạm thời"
+          }
+        },
+        {
+          "name": "Check File Exists",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/s3/exists?fileUrl=https://game-store-images-2025-vietnam.s3.ap-southeast-1.amazonaws.com/games/images/filename.jpg",
+              "host": ["{{baseUrl}}"],
+              "path": ["s3", "exists"],
+              "query": [
+                {
+                  "key": "fileUrl",
+                  "value": "https://game-store-images-2025-vietnam.s3.ap-southeast-1.amazonaws.com/games/images/filename.jpg",
+                  "description": "URL đầy đủ của file trên S3"
+                }
+              ]
+            },
+            "description": "Kiểm tra file có tồn tại trong S3 không"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔧 Maintenance",
+      "item": [
+        {
+          "name": "Reseed Categories (POST)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/maintenance/reseed-categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["maintenance", "reseed-categories"]
+            },
+            "description": "Tự động gán lại categories cho tất cả games dựa trên tên"
+          }
+        },
+        {
+          "name": "Reseed Categories (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/maintenance/reseed-categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["maintenance", "reseed-categories"]
+            },
+            "description": "Tự động gán lại categories cho tất cả games (GET variant - dùng từ browser)"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/identity",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT access token sau khi login"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT refresh token"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string",
+      "description": "ID của user"
+    },
+    {
+      "key": "username",
+      "value": "",
+      "type": "string",
+      "description": "Username/email của user"
+    },
+    {
+      "key": "gameId",
+      "value": "",
+      "type": "string",
+      "description": "ID của game"
+    },
+    {
+      "key": "gameName",
+      "value": "",
+      "type": "string",
+      "description": "Tên của game"
+    },
+    {
+      "key": "categoryId",
+      "value": "",
+      "type": "string",
+      "description": "ID của category"
+    },
+    {
+      "key": "categoryName",
+      "value": "",
+      "type": "string",
+      "description": "Tên của category"
+    },
+    {
+      "key": "roleName",
+      "value": "",
+      "type": "string",
+      "description": "Tên của role"
+    },
+    {
+      "key": "permissionName",
+      "value": "",
+      "type": "string",
+      "description": "Tên của permission"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string",
+      "description": "ID của order thanh toán"
+    }
+  ]
+}
+

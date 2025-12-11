@@ -129,7 +129,7 @@ export function HomePage(){
   ), [games]);
   
   const [heroIndex, setHeroIndex] = useState(0);
-  const hero = heroSlides[heroIndex] || games[0]; // Fallback to first game
+  const hero = heroSlides[heroIndex] || (games.length > 0 ? games[0] : null); // Safe fallback
   const heroTimer = useRef<number | null>(null);
   const AUTO_MS = 5200;
 
