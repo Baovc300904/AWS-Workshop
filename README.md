@@ -1,976 +1,1263 @@
-<div id="top">
+# 🎮 Devteria Game Store - AWS E-Commerce Platform
 
-<!-- HEADER STYLE: CLASSIC -->
-<div align="center">
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-18.3.1-blue)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6.2-blue)](https://www.typescriptlang.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0.42-orange)](https://www.mysql.com/)
+[![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20RDS%20%7C%20S3-orange)](https://aws.amazon.com/)
 
-# Shop Game Management System
+## 📋 Tổng Quan
 
-<em>Empowering E-Commerce Through Seamless Gaming Platform Innovation</em>
+**Devteria Game Store** là nền tảng thương mại điện tử chuyên bán game keys, được xây dựng với **Monolithic Architecture**, triển khai đầy đủ trên AWS Cloud Infrastructure.
 
-<em>Built with the tools and technologies:</em>
+### 🏗️ Architecture: **MONOLITHIC APPLICATION**
 
-<img src="https://img.shields.io/badge/Spring%20Boot-6DB33F.svg?style=flat&logo=Spring-Boot&logoColor=white" alt="Spring Boot">
-<img src="https://img.shields.io/badge/React-61DAFB.svg?style=flat&logo=React&logoColor=black" alt="React">
-<img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=flat&logo=TypeScript&logoColor=white" alt="TypeScript">
-<img src="https://img.shields.io/badge/MySQL-4479A1.svg?style=flat&logo=MySQL&logoColor=white" alt="MySQL">
-<img src="https://img.shields.io/badge/Docker-2496ED.svg?style=flat&logo=Docker&logoColor=white" alt="Docker">
-<img src="https://img.shields.io/badge/Amazon%20AWS-232F3E.svg?style=flat&logo=Amazon-AWS&logoColor=white" alt="AWS">
-<br>
-<img src="https://img.shields.io/badge/Vite-646CFF.svg?style=flat&logo=Vite&logoColor=white" alt="Vite">
-<img src="https://img.shields.io/badge/JSON-000000.svg?style=flat&logo=JSON&logoColor=white" alt="JSON">
-<img src="https://img.shields.io/badge/Maven-C71A36.svg?style=flat&logo=Apache-Maven&logoColor=white" alt="Maven">
-<img src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&logo=Axios&logoColor=white" alt="Axios">
-<img src="https://img.shields.io/badge/JWT-000000.svg?style=flat&logo=JSON-Web-Tokens&logoColor=white" alt="JWT">
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         AWS CLOUD                               │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │          EC2 Instance (t2.medium - Ubuntu 24.04)          │  │
+│  │                                                           │  │
+│  │  ┌──────────────────┐      ┌──────────────────────────┐  │  │
+│  │  │   NGINX Web      │      │  Spring Boot Backend    │  │  │
+│  │  │   Server         │──────▶  (Port 8080)             │  │  │
+│  │  │   Port 80/443    │      │  • REST API             │  │  │
+│  │  │  • React Static  │      │  • Business Logic       │  │  │
+│  │  │  • SSL/TLS       │      │  • Security Layer       │  │  │
+│  │  │  • Reverse Proxy │      │  • Payment Integration  │  │  │
+│  │  └──────────────────┘      └──────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                               ↕                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │         MySQL RDS (db.t3.micro - 8.0.42)                 │  │
+│  │  • Users & Authentication                                │  │
+│  │  • Games, Categories, Ratings                            │  │
+│  │  • Orders, Transactions, Inventory                       │  │
+│  │  • Cart, Wishlist, Permissions                           │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                               ↕                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │              AWS S3 Storage (2 Buckets)                  │  │
+│  │  • game-store-avatars-2025   (User avatars)              │  │
+│  │  • game-store-images-2025    (Game images/covers)        │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │              External Integrations                        │  │
+│  │  • MoMo Payment Gateway (QR Code & Callback)             │  │
+│  │  • Google OAuth 2.0 (Social Login)                       │  │
+│  │  • Let's Encrypt SSL (Auto-renewal)                      │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-</div>
-<br>
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-    - [Usage](#usage)
-    - [Testing](#testing)
-- [Features](#features)
-- [Project Structure](#project-structure)
-    - [Project Index](#project-index)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-
----
-
-## Overview
-
-Shop Game Management System is a comprehensive full-stack e-commerce platform designed specifically for digital game distribution and management. It provides a robust backend API built with Spring Boot and a modern React-based frontend for managing game inventory, user transactions, and payment processing. The platform streamlines game sales operations with secure, role-based access, comprehensive data models, and intuitive interfaces.
-
-**Why Shop Game Management System?**
-
-This project aims to facilitate efficient digital game commerce through scalable APIs and user-friendly dashboards. The core features include:
-
-- 🎮 **Game Catalog Management:** Complete CRUD operations for games, categories, and system requirements with advanced filtering capabilities.
-- 🔐 **Secure Authentication:** JWT-based security with OAuth2 Google integration and role-based access control.
-- 💳 **Payment Integration:** Support for multiple payment gateways including MoMo and VNPay for seamless transactions.
-- ☁️ **Cloud Infrastructure:** AWS integration for scalable storage (S3), database (RDS), and email services (SES).
-- 🛒 **E-Commerce Features:** Complete shopping cart, wishlist, and order management system.
-- 📊 **Admin Dashboard:** Comprehensive admin interface for inventory, orders, and user management.
-- ⚙️ **Developer Focused:** Modular architecture with Docker deployment for easy scaling and maintenance.
+**Tại sao chọn Monolithic?**
+- ✅ **Đơn giản**: Dễ triển khai, dễ quản lý, dễ debug
+- ✅ **Chi phí thấp**: 1 EC2 instance cho toàn bộ hệ thống
+- ✅ **Performance**: Single-process communication (no network overhead)
+- ✅ **Phù hợp quy mô**: Vừa và nhỏ, không cần phức tạp hóa
+- ✅ **Development speed**: Nhanh hơn microservices cho MVP
 
 ---
 
-## Features
+## 🛠️ Technology Stack
 
-|      | Component       | Details                                                                                     |
-| :--- | :-------------- | :------------------------------------------------------------------------------------------ |
-| ⚙️  | **Architecture**  | <ul><li>Spring Boot 3.5.5 backend with RESTful API design</li><li>React 18 + TypeScript frontend with Vite</li><li>Microservices-ready architecture with clear separation of concerns</li><li>Uses MVC pattern with service layer for backend</li></ul> |
-| 🔩 | **Code Quality**  | <ul><li>TypeScript for type safety in frontend</li><li>MapStruct for DTO mapping in backend</li><li>Lombok for boilerplate reduction</li><li>Consistent code organization and naming conventions</li></ul> |
-| 📄 | **Documentation** | <ul><li>Comprehensive README with setup instructions</li><li>Postman API collections included</li><li>Detailed setup guides for Google OAuth, Payment gateways, and AWS services</li></ul> |
-| 🔌 | **Integrations**  | <ul><li>AWS RDS for MySQL database</li><li>AWS S3 for file storage</li><li>AWS SES for email services</li><li>Google OAuth2 for social login</li><li>MoMo and VNPay payment gateways</li></ul> |
-| 🧩 | **Modularity**    | <ul><li>Frontend components are highly modular and reusable</li><li>Backend organized into distinct layers: controller, service, repository, entity</li><li>Environment-specific configurations</li></ul> |
-| 🧪 | **Testing**       | <ul><li>Spring Boot Test framework for backend testing</li><li>HTTP test files included for API testing</li><li>Postman collections for integration testing</li></ul> |
-| ⚡️  | **Performance**   | <ul><li>Vite for lightning-fast frontend builds</li><li>Spring Boot with optimized JPA queries</li><li>Docker containerization for consistent deployment</li><li>AWS RDS for scalable database performance</li></ul> |
-| 🛡️ | **Security**      | <ul><li>JWT tokens for stateless authentication</li><li>OAuth2 integration for secure social login</li><li>Role-based access control (ADMIN, USER, MOD)</li><li>AWS security best practices</li></ul> |
-| 📦 | **Dependencies**  | <ul><li>Backend: Spring Boot 3.5.5, Spring Security, Spring Data JPA, AWS SDK, MapStruct, Lombok</li><li>Frontend: React 18, TypeScript, Vite, Axios, React Router, GSAP</li><li>Package management via Maven and npm</li></ul> |
+### Backend Technologies
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Spring Boot** | 3.5.5 | Application Framework |
+| **Java** | 21 (LTS) | Programming Language |
+| **Spring Security** | 6.x | Authentication & Authorization |
+| **Spring Data JPA** | 3.x | Database ORM |
+| **MySQL Connector** | 8.0.x | Database Driver |
+| **JWT (jjwt)** | 0.12.x | Token-based Auth |
+| **MapStruct** | 1.6.x | DTO Mapping |
+| **Lombok** | 1.18.x | Boilerplate Reduction |
+| **AWS SDK S3** | 2.x | File Storage |
+| **Jackson** | 2.17.x | JSON Processing |
+| **Maven** | 3.9.6 | Build Tool |
+
+### Frontend Technologies
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **React** | 18.3.1 | UI Framework |
+| **TypeScript** | 5.6.2 | Type Safety |
+| **Vite** | 5.4.20 | Build Tool & Dev Server |
+| **Axios** | 1.7.7 | HTTP Client |
+| **React Router DOM** | 7.1.1 | Client-side Routing |
+| **Context API** | Built-in | State Management |
+
+### Infrastructure & DevOps
+| Component | Specification | Purpose |
+|-----------|--------------|---------|
+| **AWS EC2** | t2.medium, Ubuntu 24.04 | Application Server |
+| **AWS RDS** | MySQL 8.0.42, db.t3.micro | Database |
+| **AWS S3** | 2 buckets, ap-southeast-1 | Object Storage |
+| **NGINX** | 1.24.x | Web Server & Reverse Proxy |
+| **Let's Encrypt** | Auto-renewal | SSL/TLS Certificates |
+| **systemd** | Built-in | Process Management |
+| **Git** | 2.x | Version Control |
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
-```sh
-└── Workshop-AWS/
-    ├── .github
-    │   └── workflows
-    │       └── deploy.yml
-    ├── Back-End
-    │   ├── .env.example
-    │   ├── docker-compose.yml
-    │   ├── Dockerfile
-    │   ├── mvnw
-    │   ├── mvnw.cmd
-    │   ├── pom.xml
-    │   ├── setup.bat
-    │   ├── setup.sh
-    │   ├── README.md
-    │   ├── GOOGLE_LOGIN_SETUP.md
-    │   ├── PAYMENT_INTEGRATION.md
-    │   ├── VNPAY_SETUP.md
-    │   ├── scripts
-    │   │   └── reseed_categories.sql
-    │   ├── src
-    │   │   ├── main
-    │   │   │   ├── java
-    │   │   │   │   └── com/se182393/baidautien
-    │   │   │   │       ├── configuration
-    │   │   │   │       ├── controller
-    │   │   │   │       ├── dto
-    │   │   │   │       ├── entity
-    │   │   │   │       ├── exception
-    │   │   │   │       ├── mapper
-    │   │   │   │       ├── repository
-    │   │   │   │       └── service
-    │   │   │   └── resources
-    │   │   │       ├── application.yaml
-    │   │   │       ├── application-aws.yaml
-    │   │   │       ├── application-docker.yaml
-    │   │   │       └── templates
-    │   │   └── test
-    │   └── target
-    └── Front-End
-        ├── .env
-        ├── .gitignore
-        ├── index.html
-        ├── package.json
-        ├── tsconfig.json
-        ├── vite.config.ts
-        ├── README.md
-        ├── GOOGLE-OAUTH-SETUP.md
-        ├── S3_INTEGRATION_GUIDE.md
-        ├── docker
-        │   ├── docker-compose.yml
-        │   ├── Dockerfile
-        │   ├── Dockerfile.dev
-        │   ├── nginx.conf
-        │   └── README.md
-        ├── public
-        ├── src
-        │   ├── api
-        │   │   └── client.ts
-        │   ├── components
-        │   │   ├── admin
-        │   │   ├── common
-        │   │   ├── layout
-        │   │   └── ui
-        │   ├── context
-        │   │   ├── CartContext.tsx
-        │   │   ├── CurrencyContext.tsx
-        │   │   └── WishlistContext.tsx
-        │   ├── pages
-        │   ├── services
-        │   └── styles
-        └── README.md
+```
+Workshop-AWS/
+│
+├── README.md                          # ⭐ Documentation tổng (file này)
+├── DEPLOYMENT_GUIDE.md                # Hướng dẫn deploy chi tiết
+├── LOGIN_API_FIX_SUMMARY.md           # Fix log history
+├── PRODUCTION_SETUP.md                # Production configuration
+│
+├── Back-End/                          # 🔧 Spring Boot Monolithic App
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/se182393/baidautien/
+│   │   │   │   │
+│   │   │   │   ├── controller/        # 🎯 REST API Controllers
+│   │   │   │   │   ├── AuthenticationController.java
+│   │   │   │   │   ├── GameController.java
+│   │   │   │   │   ├── OrderController.java
+│   │   │   │   │   ├── PaymentController.java
+│   │   │   │   │   ├── CategoryController.java
+│   │   │   │   │   └── UserController.java
+│   │   │   │   │
+│   │   │   │   ├── service/           # 💼 Business Logic Layer
+│   │   │   │   │   ├── AuthenticationService.java
+│   │   │   │   │   ├── GameService.java
+│   │   │   │   │   ├── OrderService.java      # ⭐ Order processing
+│   │   │   │   │   ├── PaymentService.java    # 💳 MoMo integration
+│   │   │   │   │   ├── UserService.java
+│   │   │   │   │   └── S3Service.java         # ☁️ AWS S3 uploads
+│   │   │   │   │
+│   │   │   │   ├── repository/        # 🗄️ Data Access Layer (JPA)
+│   │   │   │   │   ├── UserRepository.java
+│   │   │   │   │   ├── GameRepository.java
+│   │   │   │   │   ├── OrderRepository.java
+│   │   │   │   │   ├── OrderItemRepository.java
+│   │   │   │   │   ├── CategoryRepository.java
+│   │   │   │   │   └── TopupTransactionRepository.java
+│   │   │   │   │
+│   │   │   │   ├── entity/            # 📊 Database Models (JPA Entities)
+│   │   │   │   │   ├── User.java
+│   │   │   │   │   ├── Game.java
+│   │   │   │   │   ├── Order.java
+│   │   │   │   │   ├── OrderItem.java
+│   │   │   │   │   ├── Category.java
+│   │   │   │   │   ├── Role.java
+│   │   │   │   │   ├── Permission.java
+│   │   │   │   │   └── TopupTransaction.java
+│   │   │   │   │
+│   │   │   │   ├── dto/               # 📦 Data Transfer Objects
+│   │   │   │   │   ├── request/       # API Request DTOs
+│   │   │   │   │   └── response/      # API Response DTOs
+│   │   │   │   │
+│   │   │   │   ├── mapper/            # 🔄 MapStruct Mappers
+│   │   │   │   │   ├── UserMapper.java
+│   │   │   │   │   ├── GameMapper.java
+│   │   │   │   │   └── OrderMapper.java
+│   │   │   │   │
+│   │   │   │   ├── configuration/     # ⚙️ Spring Configuration
+│   │   │   │   │   ├── SecurityConfig.java    # Security setup
+│   │   │   │   │   ├── JwtAuthFilter.java     # JWT filter
+│   │   │   │   │   ├── ApplicationInitConfig.java
+│   │   │   │   │   └── CorsConfig.java
+│   │   │   │   │
+│   │   │   │   ├── exception/         # ⚠️ Exception Handling
+│   │   │   │   │   ├── GlobalExceptionHandler.java
+│   │   │   │   │   ├── AppException.java
+│   │   │   │   │   └── ErrorCode.java
+│   │   │   │   │
+│   │   │   │   └── enums/             # 📋 Enumerations
+│   │   │   │       ├── OrderStatus.java
+│   │   │   │       └── PaymentMethod.java
+│   │   │   │
+│   │   │   └── resources/
+│   │   │       ├── application.yaml           # Main config
+│   │   │       ├── application-ec2.yaml       # Production config
+│   │   │       ├── application-docker.yaml    # Docker config
+│   │   │       └── data.sql                   # Seed data
+│   │   │
+│   │   └── test/                      # 🧪 Unit & Integration Tests
+│   │
+│   ├── pom.xml                        # Maven dependencies
+│   ├── Dockerfile                     # Docker build
+│   ├── docker-compose.yml             # Local dev setup
+│   ├── game-store-backend.service     # Systemd service
+│   └── deploy-backend-ec2.sh          # Deployment script
+│
+├── Front-End/                         # ⚛️ React SPA Application
+│   ├── src/
+│   │   │
+│   │   ├── api/                       # 🌐 API Client Layer
+│   │   │   └── client.ts              # Axios instance + API functions
+│   │   │
+│   │   ├── components/                # 🧩 Reusable Components
+│   │   │   ├── common/                # Shared UI components
+│   │   │   │   ├── GameCard.tsx
+│   │   │   │   ├── GameRating.tsx
+│   │   │   │   └── LoadingSpinner.tsx
+│   │   │   ├── admin/                 # Admin-specific components
+│   │   │   │   ├── GamesSection.tsx
+│   │   │   │   └── UsersSection.tsx
+│   │   │   ├── layout/                # Layout components
+│   │   │   │   ├── Header.tsx
+│   │   │   │   ├── Footer.tsx
+│   │   │   │   └── Sidebar.tsx
+│   │   │   └── ui/                    # Basic UI elements
+│   │   │       ├── Button.tsx
+│   │   │       ├── Modal.tsx
+│   │   │       └── Toast.tsx
+│   │   │
+│   │   ├── pages/                     # 📄 Page Components (Routes)
+│   │   │   ├── admin/                 # Admin panel pages
+│   │   │   │   ├── AdminPage.tsx
+│   │   │   │   ├── AdminOrdersPage.tsx    # ⭐ Order management
+│   │   │   │   └── AdminUsersPage.tsx
+│   │   │   │
+│   │   │   ├── HomePage.tsx           # Landing page
+│   │   │   ├── StorePage.tsx          # Game catalog
+│   │   │   ├── GameDetailPage.tsx     # Game details
+│   │   │   ├── CheckoutPage.tsx       # 💳 Checkout flow
+│   │   │   ├── MyOrdersPage.tsx       # 📦 User orders + keys
+│   │   │   ├── ProfilePage.tsx        # User profile
+│   │   │   ├── LoginPage.tsx          # Authentication
+│   │   │   ├── RegisterPage.tsx       # Registration
+│   │   │   ├── WishlistPage.tsx       # Wishlist
+│   │   │   └── CategoriesPage.tsx     # Categories
+│   │   │
+│   │   ├── context/                   # 🔄 React Context (State)
+│   │   │   ├── CartContext.tsx        # Shopping cart
+│   │   │   ├── CurrencyContext.tsx    # Multi-currency
+│   │   │   ├── ToastContext.tsx       # Notifications
+│   │   │   └── WishlistContext.tsx    # Wishlist
+│   │   │
+│   │   ├── services/                  # 📡 Business Logic Services
+│   │   │   ├── authService.ts
+│   │   │   └── paymentService.ts
+│   │   │
+│   │   ├── utils/                     # 🛠️ Utility Functions
+│   │   │   ├── formatters.ts
+│   │   │   ├── validators.ts
+│   │   │   └── keyGenerator.ts
+│   │   │
+│   │   ├── styles/                    # 🎨 Global Styles
+│   │   │   └── globals.css
+│   │   │
+│   │   ├── App.tsx                    # Main app component
+│   │   ├── main.tsx                   # Entry point
+│   │   └── vite-env.d.ts              # Vite types
+│   │
+│   ├── public/                        # Static assets
+│   ├── package.json                   # NPM dependencies
+│   ├── vite.config.ts                 # Vite configuration
+│   ├── tsconfig.json                  # TypeScript config
+│   └── deploy-frontend-ec2.sh         # Deployment script
+│
+└── [Scripts & Configs]
+    ├── deploy.sh                      # Main deployment script
+    ├── deploy.bat                     # Windows deployment
+    ├── deploy-production.bat          # Production deploy
+    ├── start.bat                      # Local development
+    └── .gitignore                     # Git ignore rules
 ```
 
 ---
 
-### Project Index
+## 🚀 Core Features
 
-<details open>
-	<summary><b><code>WORKSHOP-AWS/</code></b></summary>
-	<!-- Back-End Submodule -->
-	<details>
-		<summary><b>Back-End</b></summary>
-		<blockquote>
-			<div class='directory-path' style='padding: 8px 0; color: #666;'>
-				<code><b>⦿ Back-End</b></code>
-			<table style='width: 100%; border-collapse: collapse;'>
-			<thead>
-				<tr style='background-color: #f8f9fa;'>
-					<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-					<th style='text-align: left; padding: 8px;'>Summary</th>
-				</tr>
-			</thead>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='https://github.com/minikoi408/ShopGameManagement/blob/master/Back-End/pom.xml'>pom.xml</a></b></td>
-					<td style='padding: 8px;'>- Defines the project dependencies and build configuration for the Spring Boot-based game shop backend<br>- Manages core frameworks including Spring Security for authentication, JPA for data persistence, AWS SDK for cloud services, and payment integration libraries<br>- Ensures proper dependency versions and build processes for a production-ready e-commerce platform.</td>
-				</tr>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='https://github.com/minikoi408/ShopGameManagement/blob/master/Back-End/README.md'>README.md</a></b></td>
-					<td style='padding: 8px;'>- Provides comprehensive documentation for the backend API, including authentication endpoints, game management operations, cart and order handling, and payment processing<br>- Details RESTful API design, security mechanisms, and integration patterns for the game shop management system.</td>
-				</tr>
-			</table>
-			<!-- Configuration Submodule -->
-			<details>
-				<summary><b>configuration</b></summary>
-				<blockquote>
-					<table style='width: 100%; border-collapse: collapse;'>
-					<thead>
-						<tr style='background-color: #f8f9fa;'>
-							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-							<th style='text-align: left; padding: 8px;'>Summary</th>
-						</tr>
-					</thead>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>SecurityConfig.java</b></td>
-							<td style='padding: 8px;'>- Configures Spring Security with JWT authentication filter, CORS policies, and endpoint authorization rules<br>- Implements stateless session management and integrates custom authentication providers for secure API access control across the application.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>AWSConfig.java</b></td>
-							<td style='padding: 8px;'>- Establishes AWS service clients for S3, SES, and RDS connectivity<br>- Manages credentials and regional configuration for cloud resource access, enabling file storage, email delivery, and database operations within the applications infrastructure.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>CorsConfig.java</b></td>
-							<td style='padding: 8px;'>- Defines Cross-Origin Resource Sharing policies to allow frontend applications to communicate with the backend API<br>- Configures allowed origins, methods, and headers for secure cross-domain requests.</td>
-						</tr>
-					</table>
-				</blockquote>
-			</details>
-			<!-- Controller Submodule -->
-			<details>
-				<summary><b>controller</b></summary>
-				<blockquote>
-					<table style='width: 100%; border-collapse: collapse;'>
-					<thead>
-						<tr style='background-color: #f8f9fa;'>
-							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-							<th style='text-align: left; padding: 8px;'>Summary</th>
-						</tr>
-					</thead>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>AuthController.java</b></td>
-							<td style='padding: 8px;'>- Handles user authentication endpoints including login, registration, OAuth2 integration, password reset, and profile management<br>- Serves as the primary interface for user identity operations within the RESTful API architecture.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>GameController.java</b></td>
-							<td style='padding: 8px;'>- Provides REST endpoints for game catalog management including CRUD operations, search, filtering by category and price range, and media upload handling<br>- Implements pagination and sorting capabilities for efficient data retrieval.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>CartController.java</b></td>
-							<td style='padding: 8px;'>- Manages shopping cart operations through RESTful endpoints, enabling users to view cart contents, add items, update quantities, and remove items<br>- Integrates with user authentication to maintain cart state across sessions.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>OrderController.java</b></td>
-							<td style='padding: 8px;'>- Facilitates order management including order creation, retrieval of order history, status tracking, and order cancellation<br>- Provides both user-specific and admin-level order access patterns for comprehensive e-commerce workflow support.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>PaymentController.java</b></td>
-							<td style='padding: 8px;'>- Integrates payment gateway APIs for MoMo and VNPay, handling payment initiation, callback processing, and transaction verification<br>- Manages payment lifecycle events and status updates for secure transaction processing.</td>
-						</tr>
-					</table>
-				</blockquote>
-			</details>
-			<!-- Service Submodule -->
-			<details>
-				<summary><b>service</b></summary>
-				<blockquote>
-					<table style='width: 100%; border-collapse: collapse;'>
-					<thead>
-						<tr style='background-color: #f8f9fa;'>
-							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-							<th style='text-align: left; padding: 8px;'>Summary</th>
-						</tr>
-					</thead>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>AuthService.java</b></td>
-							<td style='padding: 8px;'>- Implements core authentication logic including JWT token generation/validation, password encryption, OAuth2 integration, and user session management<br>- Handles email verification workflows via AWS SES.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>GameService.java</b></td>
-							<td style='padding: 8px;'>- Manages game inventory operations including CRUD functionality, category assignment, media upload to AWS S3, search indexing, and system requirements tracking<br>- Implements business logic for game catalog management.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>CartService.java</b></td>
-							<td style='padding: 8px;'>- Handles shopping cart business logic including item addition with duplicate checking, quantity updates, cart total calculation, and cart persistence<br>- Manages cart-to-order conversion during checkout process.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>OrderService.java</b></td>
-							<td style='padding: 8px;'>- Processes order lifecycle including order creation from cart, status tracking, payment verification, order fulfillment, and cancellation logic<br>- Manages order history and sends confirmation emails via AWS SES.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>PaymentService.java</b></td>
-							<td style='padding: 8px;'>- Integrates with MoMo and VNPay APIs for payment processing, handles callback verification, manages transaction records, and updates order status based on payment outcomes<br>- Implements secure payment workflows.</td>
-						</tr>
-					</table>
-				</blockquote>
-			</details>
-			<!-- Entity Submodule -->
-			<details>
-				<summary><b>entity</b></summary>
-				<blockquote>
-					<table style='width: 100%; border-collapse: collapse;'>
-					<thead>
-						<tr style='background-color: #f8f9fa;'>
-							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-							<th style='text-align: left; padding: 8px;'>Summary</th>
-						</tr>
-					</thead>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>User.java</b></td>
-							<td style='padding: 8px;'>- Defines the User entity with fields for authentication, profile information, roles, and account status<br>- Maps to the users database table and establishes relationships with orders and cart entities.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>Game.java</b></td>
-							<td style='padding: 8px;'>- Represents the Game entity containing product details including title, description, pricing, category, media URLs, system requirements, and inventory status<br>- Includes metadata timestamps and category relationships.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>Cart.java</b></td>
-							<td style='padding: 8px;'>- Models shopping cart data structure with user association, cart items collection, and total price calculation<br>- Supports cart persistence across user sessions with timestamp tracking.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>Order.java</b></td>
-							<td style='padding: 8px;'>- Defines order entity including user reference, order items, total amount, order status, payment method, and timestamp tracking<br>- Establishes order-to-items relationships for complete order representation.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>Payment.java</b></td>
-							<td style='padding: 8px;'>- Represents payment transaction records with order association, payment gateway details, transaction ID, amount, status, and timestamp tracking<br>- Supports payment reconciliation and audit trails.</td>
-						</tr>
-					</table>
-				</blockquote>
-			</details>
-		</blockquote>
-	</details>
-	<!-- Front-End Submodule -->
-	<details>
-		<summary><b>Front-End</b></summary>
-		<blockquote>
-			<div class='directory-path' style='padding: 8px 0; color: #666;'>
-				<code><b>⦿ Front-End</b></code>
-			<table style='width: 100%; border-collapse: collapse;'>
-			<thead>
-				<tr style='background-color: #f8f9fa;'>
-					<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-					<th style='text-align: left; padding: 8px;'>Summary</th>
-				</tr>
-			</thead>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='https://github.com/minikoi408/ShopGameManagement/blob/master/Front-End/package.json'>package.json</a></b></td>
-					<td style='padding: 8px;'>- Defines frontend application dependencies, scripts, and configuration for a React-based game shop interface<br>- Manages build tools (Vite), UI libraries, routing, state management, and development utilities for creating a modern, responsive e-commerce experience.</td>
-				</tr>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='https://github.com/minikoi408/ShopGameManagement/blob/master/Front-End/vite.config.ts'>vite.config.ts</a></b></td>
-					<td style='padding: 8px;'>- Configures Vite build tool with React plugin, development server settings, and optimization parameters<br>- Enables fast refresh, hot module replacement, and production build optimization for enhanced development experience.</td>
-				</tr>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='https://github.com/minikoi408/ShopGameManagement/blob/master/Front-End/README.md'>README.md</a></b></td>
-					<td style='padding: 8px;'>- Provides comprehensive documentation for frontend setup, component architecture, styling guidelines, and deployment instructions<br>- Details React component hierarchy, routing configuration, and integration with backend API services.</td>
-				</tr>
-			</table>
-			<!-- Components Submodule -->
-			<details>
-				<summary><b>components</b></summary>
-				<blockquote>
-					<table style='width: 100%; border-collapse: collapse;'>
-					<thead>
-						<tr style='background-color: #f8f9fa;'>
-							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-							<th style='text-align: left; padding: 8px;'>Summary</th>
-						</tr>
-					</thead>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>ErrorBoundary.tsx</b></td>
-							<td style='padding: 8px;'>- Implements React error boundary for graceful error handling, displaying user-friendly error messages and providing recovery options<br>- Captures component tree errors to prevent full application crashes.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>Header.tsx</b></td>
-							<td style='padding: 8px;'>- Renders the main navigation header with logo, search functionality, cart icon with item count, user authentication status, and responsive menu<br>- Integrates with cart context and authentication state.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>GameCard.tsx</b></td>
-							<td style='padding: 8px;'>- Displays individual game information in card format including thumbnail, title, price, rating, and quick action buttons<br>- Supports add-to-cart, wishlist toggle, and game detail navigation functionality.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>CartDrawer.tsx</b></td>
-							<td style='padding: 8px;'>- Provides sliding cart panel showing current cart items, quantities, subtotal, and checkout button<br>- Enables quantity updates and item removal with real-time total calculation.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>CheckoutForm.tsx</b></td>
-							<td style='padding: 8px;'>- Implements multi-step checkout process including shipping information collection, payment method selection (MoMo/VNPay), order review, and payment submission<br>- Handles form validation and payment gateway integration.</td>
-						</tr>
-					</table>
-				</blockquote>
-			</details>
-			<!-- Pages Submodule -->
-			<details>
-				<summary><b>pages</b></summary>
-				<blockquote>
-					<table style='width: 100%; border-collapse: collapse;'>
-					<thead>
-						<tr style='background-color: #f8f9fa;'>
-							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-							<th style='text-align: left; padding: 8px;'>Summary</th>
-						</tr>
-					</thead>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>HomePage.tsx</b></td>
-							<td style='padding: 8px;'>- Displays featured games, promotional banners, category navigation, and trending games section<br>- Serves as the main landing page with curated content and calls-to-action for user engagement.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>GameDetailPage.tsx</b></td>
-							<td style='padding: 8px;'>- Shows comprehensive game information including screenshots, videos, description, system requirements, user reviews, and purchase options<br>- Enables game purchase and wishlist addition.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>CategoriesPage.tsx</b></td>
-							<td style='padding: 8px;'>- Displays games filtered by category with sorting and filtering controls<br>- Implements grid layout with pagination for browsing large game catalogs organized by genre or tag.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>CheckoutPage.tsx</b></td>
-							<td style='padding: 8px;'>- Manages checkout workflow including cart review, shipping details, payment method selection, and order confirmation<br>- Integrates with payment services for transaction processing.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>ProfilePage.tsx</b></td>
-							<td style='padding: 8px;'>- Displays user profile information, purchase history, wishlist, and account settings<br>- Enables profile editing, password changes, and order tracking.</td>
-						</tr>
-					</table>
-				</blockquote>
-			</details>
-			<!-- Services Submodule -->
-			<details>
-				<summary><b>services</b></summary>
-				<blockquote>
-					<table style='width: 100%; border-collapse: collapse;'>
-					<thead>
-						<tr style='background-color: #f8f9fa;'>
-							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-							<th style='text-align: left; padding: 8px;'>Summary</th>
-						</tr>
-					</thead>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>authService.ts</b></td>
-							<td style='padding: 8px;'>- Handles authentication API calls including login, registration, logout, token refresh, and OAuth2 integration<br>- Manages JWT token storage and automatic authentication header injection.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>gameService.ts</b></td>
-							<td style='padding: 8px;'>- Provides API client methods for game catalog operations including fetching games, categories, search, filtering, and game details retrieval<br>- Handles pagination and sorting parameters.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>cartService.ts</b></td>
-							<td style='padding: 8px;'>- Manages cart-related API interactions including fetching cart, adding items, updating quantities, and removing items<br>- Syncs local cart state with backend cart data.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>orderService.ts</b></td>
-							<td style='padding: 8px;'>- Handles order management API calls including order creation, fetching order history, order details, and order cancellation<br>- Processes order status updates and tracking information.</td>
-						</tr>
-						<tr style='border-bottom: 1px solid #eee;'>
-							<td style='padding: 8px;'><b>paymentService.ts</b></td>
-							<td style='padding: 8px;'>- Integrates with payment gateway APIs for initiating payments, handling callbacks, and verifying transaction status<br>- Supports MoMo and VNPay payment flows.</td>
-						</tr>
-					</table>
-				</blockquote>
-			</details>
-		</blockquote>
-	</details>
-</details>
+### 👤 **User Features**
+
+#### Authentication & Profile
+- ✅ Email/Password registration & login
+- ✅ Google OAuth 2.0 integration
+- ✅ JWT token-based authentication
+- ✅ Profile management (avatar upload to S3)
+- ✅ Password reset via email
+
+#### Shopping Experience
+- ✅ Browse game catalog with filters
+- ✅ Search games by name/category
+- ✅ Game detail page with ratings & reviews
+- ✅ Add to cart & wishlist
+- ✅ Real-time stock availability check
+- ✅ Multi-currency support (VND/USD/EUR)
+
+#### Payment & Orders
+- ✅ **MoMo QR Code payment** (scan to pay)
+- ✅ **Balance payment** (wallet topup)
+- ✅ Order tracking & history
+- ✅ **Automatic license key delivery**
+- ✅ Download license keys as text file
+
+#### Membership & Rewards
+- ✅ Tiered membership system:
+  - 🥉 **Thường**: < 1.000.000đ lifetime spend
+  - 🥇 **Vàng**: ≥ 1.000.000đ (3% discount)
+  - 💎 **Kim Cương**: ≥ 10.000.000đ (5% discount)
+- ✅ Points accumulation tracking
+- ✅ Transaction history
 
 ---
 
-## Getting Started
+### 🔧 **Admin Features**
+
+#### Dashboard & Analytics
+- ✅ Sales overview dashboard
+- ✅ Monthly revenue reports
+- ✅ Order statistics (processing/completed)
+- ✅ User growth metrics
+
+#### Game Management
+- ✅ CRUD operations (Create, Read, Update, Delete)
+- ✅ **Image upload to AWS S3**
+- ✅ Cover image & video URL support
+- ✅ Category assignment (many-to-many)
+- ✅ Sale percentage configuration
+- ✅ **Stock/inventory management**
+- ✅ Auto-scroll to form when editing
+
+#### Order Management
+- ✅ **View all orders** with details
+- ✅ **Sort orders** by date/amount/status
+- ✅ **Filter by status** (All/Processing/Completed/Cancelled)
+- ✅ **Fulfill orders** (assign license keys)
+- ✅ Auto-generate Steam-format keys
+- ✅ Bulk key assignment for multiple items
+
+#### User & Access Control
+- ✅ User management (CRUD)
+- ✅ Role-based access control (RBAC)
+- ✅ Permission management
+- ✅ View user spending & membership tier
+
+---
+
+### 🎯 **Business Logic**
+
+#### Inventory Management
+```java
+// Automatic stock deduction on order creation
+if (game.getQuantity() < orderedQuantity) {
+    throw new RuntimeException("Hết hàng!");
+}
+game.setQuantity(currentQuantity - orderedQuantity);
+```
+
+#### Payment Processing
+```java
+// Balance payment flow
+1. Validate user balance
+2. Deduct amount from wallet
+3. Create order with COMPLETED status
+4. Admin fulfills with license key
+5. User receives key instantly
+```
+
+#### Order Workflow
+```
+PROCESSING → Admin assigns keys → COMPLETED
+```
+
+#### Membership Discounts
+```typescript
+// Auto-apply discount based on tier
+const discount = 
+  tier === 'Kim Cương' ? 5% :
+  tier === 'Vàng' ? 3% : 0%;
+```
+
+---
+
+## 🗄️ Database Schema
+
+### **Core Tables**
+
+#### Users & Authentication
+```sql
+users (
+    id UUID PRIMARY KEY,
+    username VARCHAR(255) UNIQUE,
+    password VARCHAR(255),  -- BCrypt hashed
+    email VARCHAR(255) UNIQUE,
+    balance DECIMAL(15,2) DEFAULT 0,
+    avatarUrl TEXT,
+    roles SET<Role>
+)
+
+roles (
+    name VARCHAR(50) PRIMARY KEY,
+    description TEXT,
+    permissions SET<Permission>
+)
+
+permissions (
+    name VARCHAR(100) PRIMARY KEY,
+    description TEXT
+)
+```
+
+#### Game Catalog
+```sql
+games (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255),
+    price DECIMAL(10,2),
+    quantity INT DEFAULT 0,  -- Stock count
+    salePercent DOUBLE DEFAULT 0,
+    image TEXT,  -- S3 URL
+    cover TEXT,  -- S3 URL
+    video TEXT,  -- YouTube URL
+    releaseDate DATE,
+    categories SET<Category>
+)
+
+categories (
+    id UUID PRIMARY KEY,
+    name VARCHAR(100) UNIQUE,
+    description TEXT
+)
+
+game_ratings (
+    id UUID PRIMARY KEY,
+    game_id UUID,
+    user_id UUID,
+    rating INT CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT,
+    FOREIGN KEY (game_id) REFERENCES games(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)
+```
+
+#### Orders & Payment
+```sql
+orders (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    orderId VARCHAR(50) UNIQUE,  -- ORDER_timestamp
+    user_id UUID,
+    totalAmount DECIMAL(15,2),
+    status ENUM('PROCESSING', 'COMPLETED', 'CANCELLED'),
+    paymentMethod VARCHAR(50),  -- MOMO, BALANCE
+    createdAt TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)
+
+order_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT,
+    game_id UUID,
+    quantity INT,
+    unitPrice DECIMAL(10,2),
+    totalPrice DECIMAL(15,2),
+    licenseKey TEXT,  -- Assigned by admin
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (game_id) REFERENCES games(id)
+)
+
+topup_transactions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id UUID,
+    amount DECIMAL(15,2),
+    momoTransId VARCHAR(255),
+    status VARCHAR(50),
+    createdAt TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)
+```
+
+#### Shopping
+```sql
+cart_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id UUID,
+    game_id UUID,
+    quantity INT,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (game_id) REFERENCES games(id)
+)
+
+wishlist_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id UUID,
+    game_id UUID,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (game_id) REFERENCES games(id)
+)
+```
+
+---
+
+## 🔐 Security Implementation
+
+### JWT Authentication Flow
+```
+1. User login → POST /identity/auth/token
+   Request: { username, password }
+   
+2. Backend validates credentials (BCrypt)
+   
+3. Generate JWT with user info + roles
+   Token payload: {
+     userId: "...",
+     scope: "ROLE_USER GAME_READ ORDER_CREATE",
+     iat: timestamp,
+     exp: timestamp + 1h
+   }
+   
+4. Frontend stores JWT in localStorage
+   
+5. Every API call includes header:
+   Authorization: Bearer <JWT>
+   
+6. JwtAuthFilter validates token on each request
+   
+7. Token expires after 1 hour
+   Frontend calls /auth/refresh to get new token
+```
+
+### Security Features
+- ✅ **Password Hashing**: BCrypt with salt
+- ✅ **JWT Tokens**: Stateless authentication
+- ✅ **RBAC**: Role-based access control
+- ✅ **CORS**: Configured for frontend domain
+- ✅ **Input Validation**: @Valid annotations on DTOs
+- ✅ **SQL Injection Prevention**: JPA Parameterized queries
+- ✅ **XSS Protection**: React escaping by default
+- ✅ **HTTPS**: Let's Encrypt SSL certificates
+- ✅ **Secure Headers**: NGINX security headers
+
+---
+
+## 💳 Payment Integration
+
+### MoMo Payment Gateway
+
+#### QR Code Payment Flow
+```
+┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
+│  User    │   │ Frontend │   │ Backend  │   │  MoMo    │
+└────┬─────┘   └────┬─────┘   └────┬─────┘   └────┬─────┘
+     │              │              │              │
+     │─── Checkout ─▶              │              │
+     │              │─ POST /momo-checkout ──▶    │
+     │              │              │─ Create payment request ─▶
+     │              │              │◀─ Return QR URL ────────│
+     │              │◀─ QR URL ────│              │
+     │◀─ Display QR │              │              │
+     │              │              │              │
+     │───── Scan QR ─────────────────────────────▶│
+     │              │              │◀─ Callback ──│
+     │              │              │  (validate signature)
+     │              │              │─ Update order status
+     │              │              │─ Update inventory
+     │◀─ Redirect to success page ─┘              │
+```
+
+#### Implementation
+```java
+@PostMapping("/momo-checkout")
+public MoMoResponse createPayment(@RequestBody PaymentRequest request) {
+    // 1. Generate order ID
+    String orderId = "ORDER_" + System.currentTimeMillis();
+    
+    // 2. Create signature
+    String rawSignature = String.format(
+        "accessKey=%s&amount=%s&orderId=%s&...",
+        momoAccessKey, amount, orderId
+    );
+    String signature = hmacSHA256(rawSignature, momoSecretKey);
+    
+    // 3. Call MoMo API
+    String payUrl = momoGateway.createPayment(orderId, amount, signature);
+    
+    // 4. Return QR URL to frontend
+    return new MoMoResponse(payUrl, orderId);
+}
+
+@PostMapping("/momo-callback")
+public void handleCallback(@RequestBody MoMoCallback callback) {
+    // 1. Validate signature from MoMo
+    if (!validateSignature(callback)) {
+        throw new SecurityException("Invalid signature");
+    }
+    
+    // 2. Update order status
+    if (callback.getResultCode() == 0) {  // Success
+        Order order = orderRepository.findByOrderId(callback.getOrderId());
+        order.setStatus("COMPLETED");
+        orderRepository.save(order);
+    }
+}
+```
+
+### Balance Payment
+
+#### Wallet Topup Flow
+```
+1. User navigates to Profile → Nạp tiền
+2. Enter amount (100,000đ - 50,000,000đ)
+3. System creates topup transaction
+4. Redirect to MoMo QR for topup payment
+5. After payment, MoMo callback updates balance
+6. User can use balance for purchases
+```
+
+#### Balance Payment Flow
+```java
+@PostMapping("/checkout-with-balance")
+public OrderResponse checkoutWithBalance(@RequestBody OrderRequest request) {
+    User user = getCurrentUser();
+    double total = calculateTotal(request.getItems());
+    
+    // 1. Validate balance
+    if (user.getBalance() < total) {
+        throw new RuntimeException("Insufficient balance");
+    }
+    
+    // 2. Deduct balance
+    user.setBalance(user.getBalance() - total);
+    userRepository.save(user);
+    
+    // 3. Create order with COMPLETED status
+    Order order = createOrder(request, user);
+    order.setStatus("COMPLETED");
+    order.setPaymentMethod("BALANCE");
+    
+    return orderMapper.toResponse(order);
+}
+```
+
+---
+
+## 📊 API Endpoints
+
+### Authentication (`/identity/auth`)
+```http
+POST   /token                  # Login
+POST   /introspect            # Validate JWT
+POST   /logout                # Invalidate token
+POST   /refresh               # Refresh JWT
+GET    /outbound/google       # Google OAuth callback
+```
+
+### Games (`/identity/games`)
+```http
+GET    /                      # List all games (with filters)
+GET    /{id}                  # Get game by ID
+GET    /search?q={query}     # Search games
+POST   /                      # Create game (ADMIN)
+PUT    /{id}                  # Update game (ADMIN)
+DELETE /{id}                  # Delete game (ADMIN)
+GET    /by-price             # Filter by price range
+```
+
+### Orders (`/identity/orders`)
+```http
+GET    /                      # Get current user's orders
+GET    /all                   # Get all orders (ADMIN)
+GET    /{id}                  # Get order by ID
+POST   /checkout-with-balance # Create order with balance
+PUT    /{id}/fulfill          # Fulfill order with keys (ADMIN)
+```
+
+### Categories (`/identity/categories`)
+```http
+GET    /                      # List all categories
+POST   /                      # Create category (ADMIN)
+PUT    /{id}                  # Update category (ADMIN)
+DELETE /{id}                  # Delete category (ADMIN)
+```
+
+### Payment (`/identity/payment`)
+```http
+POST   /momo-checkout         # Create MoMo payment
+POST   /momo-callback         # MoMo callback handler (internal)
+```
+
+### Users (`/identity/users`)
+```http
+GET    /myInfo                # Get current user profile
+PUT    /myInfo                # Update profile
+POST   /avatar                # Upload avatar to S3
+GET    /                      # List users (ADMIN)
+POST   /                      # Create user (ADMIN)
+PUT    /{id}                  # Update user (ADMIN)
+DELETE /{id}                  # Delete user (ADMIN)
+```
+
+### Topup (`/identity/topup`)
+```http
+GET    /balance               # Get current balance
+POST   /momo                  # Create topup transaction
+GET    /history               # Get topup history
+```
+
+---
+
+## 🌐 Production Deployment
+
+### Server Specifications
+```yaml
+Domain: keygamezspace.space
+SSL: HTTPS (Let's Encrypt)
+
+EC2 Instance:
+  Type: t2.medium
+  vCPU: 2
+  Memory: 4 GB
+  Storage: 30 GB SSD
+  OS: Ubuntu 24.04 LTS
+  Region: ap-southeast-1 (Singapore)
+  IP: 13.214.135.223
+
+RDS Database:
+  Engine: MySQL 8.0.42
+  Instance: db.t3.micro
+  Storage: 20 GB SSD
+  Multi-AZ: No
+  Backup: 7 days retention
+
+S3 Buckets:
+  - game-store-avatars-2025 (Private)
+  - game-store-images-2025 (Public Read)
+  Region: ap-southeast-1
+```
+
+### NGINX Configuration
+```nginx
+# /etc/nginx/sites-available/game-store
+server {
+    listen 80;
+    listen [::]:80;
+    server_name keygamezspace.space;
+    
+    # Redirect HTTP to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name keygamezspace.space;
+    
+    # SSL Configuration
+    ssl_certificate /etc/letsencrypt/live/keygamezspace.space/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/keygamezspace.space/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    
+    # Security Headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+    
+    # Frontend (React SPA)
+    location / {
+        root /var/www/game-store;
+        try_files $uri $uri/ /index.html;
+        expires 1d;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    # Backend API (Spring Boot)
+    location /identity/ {
+        proxy_pass http://localhost:8080/identity/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # WebSocket support
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+    
+    # File upload size
+    client_max_body_size 10M;
+}
+```
+
+### Systemd Service
+```ini
+# /etc/systemd/system/game-store-backend.service
+[Unit]
+Description=Devteria Game Store Backend
+Documentation=https://github.com/your-repo
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu
+
+# Java application
+ExecStart=/usr/bin/java -jar /home/ubuntu/app.jar --spring.profiles.active=ec2
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=game-store
+
+# Resource limits
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+```
+
+---
+
+## 🔨 Build & Deployment Guide
 
 ### Prerequisites
-
-This project requires the following dependencies:
-
-- **Java:** Version 21 or higher
-- **Node.js:** Version 18 or higher
-- **npm:** Version 9 or higher
-- **Maven:** Version 3.8 or higher
-- **Docker:** Version 20.10 or higher (optional but recommended)
-- **MySQL:** Version 9.4 or higher (or use Docker container)
-
-### Installation
-
-Build Shop Game Management System from source and install dependencies:
-
-#### **Backend Setup (Windows):**
-
-```powershell
-# 1. Clone the repository
-git clone https://github.com/minikoi408/ShopGameManagement.git
-cd Workshop-AWS\Back-End
-
-# 2. Configure environment variables
-copy .env.example .env.aws
-# Edit .env.aws with your AWS credentials and database settings
-
-# 3. Run setup script
-.\setup.bat
-
-# 4. Start with Docker (recommended)
-docker-compose up -d
-
-# Or build and run manually
-mvn clean install
-mvn spring-boot:run
-```
-
-#### **Backend Setup (Linux/Mac):**
-
 ```bash
-# 1. Clone the repository
-git clone https://github.com/minikoi408/ShopGameManagement.git
-cd Workshop-AWS/Back-End
+# Backend
+Java 21 JDK
+Maven 3.9+
+MySQL 8.0+
 
-# 2. Configure environment variables
-cp .env.example .env.aws
-# Edit .env.aws with your AWS credentials and database settings
+# Frontend
+Node.js 18+
+npm 9+
 
-# 3. Make scripts executable and run setup
-chmod +x *.sh
-./setup.sh
-
-# 4. Start with Docker (recommended)
-docker-compose up -d
-
-# Or build and run manually
-mvn clean install
-mvn spring-boot:run
+# Deployment
+SSH access to EC2
+AWS CLI (for S3)
+Git
 ```
 
-#### **Frontend Setup:**
+### Local Development
 
-**Using [npm](https://www.npmjs.com/):**
+#### Backend Setup
+```bash
+cd Back-End
 
-```powershell
-cd ..\Front-End
+# Configure database
+# Edit src/main/resources/application.yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/devteria
+    username: root
+    password: your_password
+
+# Run application
+mvn spring-boot:run
+
+# Or with specific profile
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+#### Frontend Setup
+```bash
+cd Front-End
 
 # Install dependencies
 npm install
 
-# Configure environment
-# Edit .env file with API endpoint
+# Configure API endpoint
+# Create .env file
+echo "VITE_API_BASE_URL=http://localhost:8080/identity" > .env
 
-# Start development server
+# Start dev server
 npm run dev
+
+# Access at http://localhost:5173
 ```
 
-**Using [yarn](https://yarnpkg.com/):**
+### Production Build
 
-```powershell
-cd ..\Front-End
-
-# Install dependencies
-yarn install
-
-# Configure environment
-# Edit .env file with API endpoint
-
-# Start development server
-yarn dev
-```
-
-### Usage
-
-Run the project with:
-
-#### **Backend:**
-
-**Using [Docker](https://www.docker.com/) (Recommended):**
-
-```sh
-cd Back-End
-docker-compose up -d
-```
-
-**Using [Maven](https://maven.apache.org/):**
-
-```sh
-cd Back-End
-mvn spring-boot:run
-```
-
-#### **Frontend:**
-
-**Using [npm](https://www.npmjs.com/):**
-
-```sh
-cd Front-End
-npm run dev
-```
-
-**Using [yarn](https://yarnpkg.com/):**
-
-```sh
-cd Front-End
-yarn dev
-```
-
-#### **Access URLs:**
-
-| Service | URL | Description |
-|---------|-----|-------------|
-| Frontend | http://localhost:5173 | React application |
-| Backend API | http://localhost:8080 | Spring Boot REST API |
-| MySQL | localhost:3307 | Database (Docker) |
-| API Docs | http://localhost:8080/swagger-ui.html | Swagger documentation |
-
-### Testing
-
-Shop Game Management System uses JUnit and Spring Boot Test framework. Run the test suite with:
-
-#### **Backend Testing:**
-
-**Using [Maven](https://maven.apache.org/):**
-
-```sh
-cd Back-End
-
-# Run all tests
-mvn test
-
-# Run specific test class
-mvn test -Dtest=GameServiceTest
-
-# Run tests with coverage
-mvn clean test jacoco:report
-```
-
-#### **Frontend Testing:**
-
-**Using [npm](https://www.npmjs.com/):**
-
-```sh
-cd Front-End
-
-# Run tests
-npm test
-
-# Run tests with coverage
-npm run test:coverage
-```
-
-**Using [yarn](https://yarnpkg.com/):**
-
-```sh
-cd Front-End
-
-# Run tests
-yarn test
-
-# Run tests with coverage
-yarn test:coverage
-```
-
-#### **API Testing:**
-
-Import the provided Postman collections:
-- `ShopGameManagement-COMPLETE-API.postman_collection.json`
-- `VNPay-API.postman_collection.json`
-
----
-
-## Roadmap
-
-### ✅ Completed (v1.0)
-
-- [X] **JWT + OAuth2 Authentication:** Secure user authentication with Google social login
-- [X] **Game Catalog CRUD:** Complete game management with categories and system requirements
-- [X] **Shopping Cart:** Add to cart, update quantities, cart persistence
-- [X] **Payment Integration:** MoMo and VNPay payment gateway support
-- [X] **AWS Integration:** S3 storage, SES email, RDS database
-- [X] **Responsive UI:** Mobile-first design with smooth animations
-- [X] **Docker Deployment:** Containerized application for easy deployment
-- [X] **Order Management:** Complete order processing and tracking
-
-### 🚧 In Progress (v1.5)
-
-- [ ] **Advanced Search:** Elasticsearch integration for better search performance
-- [ ] **User Reviews:** Game rating and review system
-- [ ] **Wishlist Sharing:** Share wishlists with friends
-- [ ] **Admin Analytics:** Enhanced dashboard with charts and metrics
-- [ ] **Email Templates:** Improved email notifications with branded templates
-
-### 📋 Planned (v2.0)
-
-- [ ] **Multi-language Support:** i18n implementation for multiple languages
-- [ ] **Real-time Notifications:** WebSocket-based live notifications
-- [ ] **Mobile App:** React Native application for iOS and Android
-- [ ] **AI Recommendations:** Machine learning-based game recommendations
-- [ ] **Kubernetes Deployment:** K8s configurations for scalable cloud deployment
-- [ ] **Social Features:** User profiles, friends system, activity feeds
-- [ ] **Gift Cards:** Digital gift card purchase and redemption
-- [ ] **Subscription Service:** Game subscription plans with recurring billing
-
----
-
-## Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-### Contributing Guidelines
-
-1. **Fork the Repository**: Start by forking the project repository to your GitHub account.
-2. **Clone Locally**: Clone the forked repository to your local machine.
-   ```sh
-   git clone https://github.com/minikoi408/ShopGameManagement
-   cd ShopGameManagement
-   ```
-3. **Create a New Branch**: Always work on a new branch with a descriptive name.
-   ```sh
-   git checkout -b feature/amazing-feature
-   ```
-4. **Make Your Changes**: Develop and test your changes locally.
-5. **Follow Code Style**: Ensure your code follows the project's coding standards.
-6. **Write Tests**: Add tests for new features or bug fixes.
-7. **Commit Your Changes**: Commit with a clear, descriptive message.
-   ```sh
-   git commit -m 'feat: add amazing feature'
-   ```
-8. **Push to GitHub**: Push the changes to your forked repository.
-   ```sh
-   git push origin feature/amazing-feature
-   ```
-9. **Submit a Pull Request**: Create a PR against the original project repository.
-10. **Code Review**: Wait for code review and address any feedback.
-
-### Development Guidelines
-
-- Follow Java code conventions for backend development
-- Use TypeScript and follow React best practices for frontend
-- Write meaningful commit messages following conventional commits
-- Add JSDoc/JavaDoc comments for public APIs
-- Update documentation when adding new features
-- Ensure all tests pass before submitting PR
-
-### Community
-
-- **💬 [Join the Discussions](https://github.com/minikoi408/ShopGameManagement/discussions)**: Share insights, provide feedback, or ask questions.
-- **🐛 [Report Issues](https://github.com/minikoi408/ShopGameManagement/issues)**: Submit bugs found or log feature requests.
-- **💡 [Submit Pull Requests](https://github.com/minikoi408/ShopGameManagement/pulls)**: Review open PRs and submit your own.
-
----
-
-## License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
-## Documentation
-
-### Additional Resources
-
-#### Backend Documentation
-
-| File | Description |
-|------|-------------|
-| [Backend README](./Back-End/README.md) | Detailed Spring Boot backend documentation |
-| [Google OAuth Setup](./Back-End/GOOGLE_LOGIN_SETUP.md) | Google OAuth2 integration guide |
-| [Payment Integration](./Back-End/PAYMENT_INTEGRATION.md) | MoMo & VNPay integration guide |
-| [VNPay Setup](./Back-End/VNPAY_SETUP.md) | VNPay configuration instructions |
-| [VNPay Quickstart](./Back-End/VNPAY_QUICKSTART.md) | Quick start guide for VNPay |
-| [System Requirements](./Back-End/SYSTEM-REQUIREMENTS-README.md) | System requirements documentation |
-
-#### Frontend Documentation
-
-| File | Description |
-|------|-------------|
-| [Frontend README](./Front-End/README.md) | Detailed React frontend documentation |
-| [Google OAuth Frontend](./Front-End/GOOGLE-OAUTH-SETUP.md) | Frontend OAuth setup guide |
-| [S3 Integration](./Front-End/S3_INTEGRATION_GUIDE.md) | AWS S3 integration guide |
-| [Docker Guide](./Front-End/docker/README.md) | Docker deployment instructions |
-
-### API Documentation
-
-The complete API documentation is available in Postman format:
-
-- **[Complete API Collection](./Back-End/ShopGameManagement-COMPLETE-API.postman_collection.json)**
-- **[VNPay API Collection](./Back-End/VNPay-API.postman_collection.json)**
-
-Import these collections into Postman to test all available endpoints!
-
-### Environment Configuration
-
-#### Backend (.env.aws)
-
+#### Backend Build
 ```bash
-# AWS Configuration
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_REGION=ap-southeast-1
-AWS_S3_BUCKET_NAME=your-bucket-name
-AWS_SES_FROM_EMAIL=noreply@yourdomain.com
+cd Back-End
 
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=shop_game_management
-DB_USERNAME=root
-DB_PASSWORD=your_password
+# Clean and package
+mvn clean package -DskipTests
 
-# JWT Configuration
-JWT_SIGNER_KEY=your-secure-key-min-512-bits
-JWT_VALID_DURATION=3600
-JWT_REFRESHABLE_DURATION=86400
-
-# Google OAuth2
-GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-secret
-
-# Payment Gateways
-MOMO_PARTNER_CODE=your_code
-MOMO_ACCESS_KEY=your_key
-MOMO_SECRET_KEY=your_secret
-
-VNPAY_TMN_CODE=your_code
-VNPAY_HASH_SECRET=your_secret
+# Output: target/ShopGameManagement-0.0.1-SNAPSHOT.jar (66MB)
 ```
 
-#### Frontend (.env)
-
+#### Frontend Build
 ```bash
-VITE_API_BASE=http://localhost:8080
-VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+cd Front-End
+
+# Build for production
+npm run build
+
+# Output: dist/ folder (~230KB compressed)
+```
+
+### Deploy to AWS EC2
+
+#### Step 1: Upload Backend
+```bash
+# From local machine
+cd Back-End/target
+
+# Upload JAR file
+scp -i /path/to/key.pem \
+    ShopGameManagement-0.0.1-SNAPSHOT.jar \
+    ubuntu@13.214.135.223:/home/ubuntu/app.jar
+
+# SSH to EC2
+ssh -i /path/to/key.pem ubuntu@13.214.135.223
+
+# Restart backend service
+sudo systemctl restart game-store-backend
+
+# Check status
+sudo systemctl status game-store-backend
+
+# View logs
+sudo journalctl -u game-store-backend -f
+```
+
+#### Step 2: Deploy Frontend
+```bash
+# From local machine
+cd Front-End
+
+# Create deployment package
+npm run build
+cd dist
+zip -r ../dist-$(date +%Y%m%d%H%M%S).zip *
+cd ..
+
+# Upload to EC2
+scp -i /path/to/key.pem \
+    dist-*.zip \
+    ubuntu@13.214.135.223:/tmp/frontend.zip
+
+# SSH to EC2
+ssh -i /path/to/key.pem ubuntu@13.214.135.223
+
+# Deploy frontend
+cd /tmp
+unzip -o frontend.zip -d frontend-temp
+sudo rm -rf /var/www/game-store/*
+sudo mv frontend-temp/* /var/www/game-store/
+sudo chown -R www-data:www-data /var/www/game-store
+rm -rf frontend-temp frontend.zip
+
+# Verify
+ls -la /var/www/game-store
+```
+
+#### Step 3: Verify Deployment
+```bash
+# Test backend health
+curl http://localhost:8080/identity/health
+
+# Check NGINX
+sudo nginx -t
+sudo systemctl status nginx
+
+# Test SSL
+curl https://keygamezspace.space
+
+# Monitor logs
+tail -f /var/log/nginx/access.log
+sudo journalctl -u game-store-backend -f
 ```
 
 ---
 
-## Troubleshooting
+## 🐛 Troubleshooting Guide
 
 ### Common Issues
 
-#### Backend Issues
+#### ❌ Issue 1: Order COMPLETED nhưng không có license key
+**Triệu chứng**: User thấy order status "Hoàn thành" nhưng không thấy mã kích hoạt
 
-**Issue: Backend won't start**
+**Nguyên nhân**: 
+- Order đã thanh toán (COMPLETED)
+- Admin chưa fulfill order (chưa gán license key)
 
-```powershell
-# Check Java version (should be 21+)
-java -version
-
-# Rebuild the project
-cd Back-End
-mvn clean install -DskipTests
-
-# Check if port 8080 is available
-netstat -ano | findstr :8080  # Windows
-lsof -i :8080  # Linux/Mac
+**Giải pháp**:
+```
+1. Admin login vào /admin
+2. Vào tab "Orders"
+3. Tìm order cần fulfill
+4. Click "Complete Order"
+5. Nhập license key (hoặc auto-generate)
+6. Click Submit
+7. User sẽ thấy key ngay lập tức
 ```
 
-**Issue: Database connection error**
+#### ❌ Issue 2: Balance payment trả về 400 Bad Request
+**Triệu chứng**: Console log hiển thị 400 error khi thanh toán bằng số dư
 
-```powershell
-# Verify MySQL is running
-docker ps | findstr mysql
+**Nguyên nhân**: 
+- Frontend gửi request thiếu field `paymentMethod`
+- Backend validation yêu cầu field này
 
-# Reset database
-cd Back-End
-docker-compose down -v
-docker-compose up -d
-
-# Check database logs
-docker-compose logs mysql
-```
-
-**Issue: AWS S3 upload failed**
-
-```powershell
-# Verify AWS credentials
-echo $env:AWS_ACCESS_KEY_ID  # Windows PowerShell
-echo $AWS_ACCESS_KEY_ID  # Linux/Mac
-
-# Test S3 access using AWS CLI
-aws s3 ls s3://your-bucket-name
-
-# Check IAM permissions for S3 and SES
-```
-
-#### Frontend Issues
-
-**Issue: Frontend won't start**
-
-```powershell
-# Clear node modules and reinstall
-cd Front-End
-rm -rf node_modules package-lock.json
-npm install
-
-# Or with yarn
-rm -rf node_modules yarn.lock
-yarn install
-
-# Check Node version (should be 18+)
-node --version
-```
-
-**Issue: API calls failing**
-
-```powershell
-# Verify backend is running
-curl http://localhost:8080/api/health
-
-# Check CORS configuration in backend
-# Verify .env file has correct API_BASE URL
-
-# Check browser console for detailed errors
-```
-
-#### Payment Gateway Issues
-
-**Issue: Payment callback not received**
-
-```powershell
-# For local testing, use ngrok
-ngrok http 8080
-
-# Update .env.aws with ngrok URL
-# Update payment gateway callback URLs in provider dashboard
-```
-
-**Issue: Payment verification failed**
-
+**Giải pháp**:
 ```bash
-# Verify payment gateway credentials
-# Check hash/signature generation algorithm
-# Review payment gateway API logs
-# Ensure timezone synchronization for timestamp validation
+# Đã fix trong version mới nhất
+# Cần hard refresh browser:
+Windows/Linux: Ctrl + Shift + R
+Mac: Cmd + Shift + R
 ```
 
----
+#### ❌ Issue 3: Backend không khởi động
+**Triệu chứng**: `sudo systemctl status game-store-backend` hiển thị failed
 
-## Docker Commands
-
+**Debug**:
 ```bash
-# Start all services
-docker-compose up -d
+# Check logs
+sudo journalctl -u game-store-backend -n 100
 
-# View logs
-docker-compose logs -f
+# Common issues:
+# 1. Database connection failed
+#    → Check RDS security group
+#    → Verify credentials in application-ec2.yaml
 
-# View specific service logs
-docker-compose logs -f backend
-docker-compose logs -f mysql
+# 2. Port 8080 already in use
+#    → sudo lsof -i :8080
+#    → Kill process: sudo kill -9 <PID>
 
-# Stop services
-docker-compose down
+# 3. JAR file not found
+#    → ls -la /home/ubuntu/app.jar
 
-# Stop and remove volumes (reset database)
-docker-compose down -v
+# 4. Java not installed
+#    → java -version
+#    → sudo apt install openjdk-21-jdk
+```
 
-# Rebuild containers
-docker-compose up -d --build
+#### ❌ Issue 4: Frontend hiển thị blank page
+**Triệu chứng**: Website chỉ hiển thị màn hình trắng
 
-# Execute commands in running container
-docker-compose exec backend bash
-docker-compose exec mysql mysql -u root -p
+**Debug**:
+```bash
+# 1. Check browser console (F12)
+#    → Look for 404 errors on JS/CSS files
+
+# 2. Verify NGINX is serving files
+curl http://localhost/
+
+# 3. Check file permissions
+ls -la /var/www/game-store/
+# Should be: www-data:www-data
+
+# 4. Fix permissions
+sudo chown -R www-data:www-data /var/www/game-store
+
+# 5. Check NGINX error log
+sudo tail -f /var/log/nginx/error.log
+```
+
+#### ❌ Issue 5: SSL Certificate expired
+**Triệu chứng**: Browser hiển thị "Your connection is not private"
+
+**Giải pháp**:
+```bash
+# Check certificate status
+sudo certbot certificates
+
+# Renew certificate
+sudo certbot renew
+
+# Reload NGINX
+sudo systemctl reload nginx
+
+# Test auto-renewal
+sudo certbot renew --dry-run
+```
+
+#### ❌ Issue 6: Cannot upload images to S3
+**Triệu chứng**: Admin panel hiển thị "Failed to upload image"
+
+**Debug**:
+```bash
+# 1. Check AWS credentials in backend logs
+sudo journalctl -u game-store-backend | grep S3
+
+# 2. Verify S3 bucket exists
+aws s3 ls
+
+# 3. Check IAM permissions
+aws sts get-caller-identity
+
+# 4. Test S3 upload manually
+aws s3 cp test.jpg s3://game-store-images-2025/
 ```
 
 ---
 
-## Default Credentials
+## 📈 Performance & Optimization
 
-### Admin Account
+### Current Performance Metrics
+```
+Backend Response Time: ~100-300ms
+Frontend Load Time: ~1.5s (First Load)
+Database Query Time: ~50-150ms
+Image Load Time: ~200-500ms (from S3)
+```
 
-| Email | Password | Role |
-|-------|----------|------|
-| admin@shopgame.com | Admin@123 | ADMIN |
+### Optimization Techniques Applied
+- ✅ **Database Indexing**: Indexed on foreign keys
+- ✅ **Connection Pooling**: HikariCP (default Spring Boot)
+- ✅ **Lazy Loading**: JPA lazy fetch for relationships
+- ✅ **CDN**: S3 with CloudFront (optional)
+- ✅ **Gzip Compression**: NGINX gzip enabled
+- ✅ **Browser Caching**: Cache-Control headers
+- ✅ **Code Splitting**: Vite dynamic imports
+- ✅ **Image Optimization**: WebP format support
 
-### Test Users
-
-| Email | Password | Role |
-|-------|----------|------|
-| user1@test.com | User@123 | USER |
-| mod1@test.com | Mod@123 | MOD |
-
-**⚠️ Important:** Change these credentials in production!
+### Future Improvements
+- [ ] **Redis Caching**: Cache game catalog, user sessions
+- [ ] **Elasticsearch**: Full-text search for games
+- [ ] **CloudFront CDN**: Faster static asset delivery
+- [ ] **Database Read Replicas**: Scale read operations
+- [ ] **Load Balancer**: AWS ALB for multiple EC2 instances
+- [ ] **Auto-scaling**: EC2 Auto Scaling Group
+- [ ] **Monitoring**: CloudWatch, New Relic, or Datadog
+- [ ] **CI/CD Pipeline**: GitHub Actions or AWS CodePipeline
 
 ---
 
-## Contact & Support
+## 🔮 Roadmap
 
-- **GitHub Repository:** [minikoi408/ShopGameManagement](https://github.com/minikoi408/ShopGameManagement)
-- **Current Branch:** `feature/vnpay-integration`
-- **Issues:** [GitHub Issues](https://github.com/minikoi408/ShopGameManagement/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/minikoi408/ShopGameManagement/discussions)
+### Phase 1: Current State ✅
+- [x] Monolithic application deployed
+- [x] Core e-commerce features
+- [x] Payment integration (MoMo)
+- [x] Admin panel
+- [x] AWS infrastructure
+
+### Phase 2: Enhancements (Q1 2026)
+- [ ] **Microservices Migration**
+  - Auth Service
+  - Game Catalog Service
+  - Order Service
+  - Payment Service
+  - Notification Service
+- [ ] **Advanced Features**
+  - Wishlist sharing
+  - Gift cards
+  - Referral program
+  - Reviews & ratings v2
+- [ ] **Performance**
+  - Redis caching layer
+  - CDN integration
+  - Database optimization
+
+### Phase 3: Scale (Q2-Q3 2026)
+- [ ] **Infrastructure**
+  - Kubernetes deployment
+  - Service mesh (Istio)
+  - Message queue (RabbitMQ/Kafka)
+- [ ] **Features**
+  - Live chat support
+  - Email notifications
+  - Mobile app (React Native)
+  - Advanced analytics
 
 ---
 
-<div align="center">
+## 👥 Team & Contributors
 
-**Made with ❤️ by ShopGameManagement Team**
+**Project Team**: SE182393
+- **Architecture**: Monolithic Spring Boot + React
+- **Cloud Provider**: AWS (EC2, RDS, S3)
+- **Development Period**: November 2025 - December 2025
 
-⭐ Star this repo if you find it helpful!
+---
 
-[⬆ Back to Top](#top)
+## 📄 License
 
-</div>
+This project is developed for educational purposes as part of the SE182393 course.
+
+**© 2025 Devteria Game Store. All Rights Reserved.**
+
+---
+
+## 📞 Support & Contact
+
+### Technical Support
+- **Issues**: Check logs first
+  ```bash
+  # Backend logs
+  sudo journalctl -u game-store-backend -n 100
+  
+  # NGINX logs
+  sudo tail -f /var/log/nginx/error.log
+  
+  # Browser console
+  Press F12 → Console tab
+  ```
+
+### Useful Commands
+```bash
+# Backend service management
+sudo systemctl start game-store-backend
+sudo systemctl stop game-store-backend
+sudo systemctl restart game-store-backend
+sudo systemctl status game-store-backend
+
+# NGINX management
+sudo nginx -t                    # Test config
+sudo systemctl reload nginx      # Reload config
+sudo systemctl restart nginx     # Restart server
+
+# Database access
+mysql -h <RDS_ENDPOINT> -u admin -p devteria
+
+# View real-time logs
+sudo journalctl -u game-store-backend -f
+
+# Disk space check
+df -h
+
+# Memory usage
+free -m
+```
+
+---
+
+## 🌟 Key Highlights
+
+### Why This Architecture?
+1. **Simplicity First**: Monolithic cho phép MVP nhanh
+2. **Cost Effective**: 1 EC2 thay vì nhiều containers
+3. **Easy Maintenance**: Single codebase, single deployment
+4. **Performance**: No inter-service network calls
+5. **Development Speed**: Faster iteration, less complexity
+
+### Production-Ready Features
+- ✅ SSL/TLS with Let's Encrypt
+- ✅ Systemd process management
+- ✅ NGINX reverse proxy
+- ✅ AWS RDS for database
+- ✅ S3 for file storage
+- ✅ JWT authentication
+- ✅ Payment gateway integration
+- ✅ Admin panel
+- ✅ Order fulfillment system
+- ✅ Inventory management
+- ✅ Multi-currency support
+
+---
+
+**Last Updated**: December 12, 2025
+**Project Version**: 1.0.0
+**Architecture**: Monolithic (Spring Boot + React)
+**Deployment**: AWS Cloud (Production)
+**Status**: ✅ **Live & Production Ready**
+
+---
+
+**🎮 Happy Gaming!**
