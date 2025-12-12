@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { register as apiRegister, requestEmailOtp, RegisterPayload } from '../api/client';
+import { ErrorModal } from '../components/common/ErrorModal';
 import './RegisterPage.css';
 
 const RegisterPage: React.FC = () => {
@@ -24,6 +25,9 @@ const RegisterPage: React.FC = () => {
   const [info, setInfo] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState<string>('');
 
   const onRequestEmailOtp = useCallback(async () => {
     setError(null);
@@ -44,13 +48,16 @@ const RegisterPage: React.FC = () => {
       setSendingOtp(true);
       const code = await requestEmailOtp(email);
       // For demo: show code. In production, email would be sent by backend
-      setInfo(`📧 OTP đã gửi đến ${email}. Mã demo: ${code} (Kiểm tra console log)`);
+      setInfo(`► OTP đã gửi đến ${email}. Mã demo: ${code} (Kiểm tra console log)`);
+      setModalMessage(`▸ OTP đã được gửi đến ${email}.\n\nMã xác thực: ${code}\n\n(Trong môi trường production, mã này sẽ được gửi qua email)`);
+      setShowSuccessModal(true);
     } catch (err: any) {
-      if (!err.response) {
-        setError('❌ Không thể gửi OTP. Vui lòng thử lại.');
-      } else {
-        setError(err?.response?.data?.message ?? err?.message ?? 'Gửi OTP thất bại');
-      }
+      const errorMsg = !err.response 
+        ? 'Không thể gửi OTP. Vui lòng kiểm tra kết nối mạng và thử lại.'
+        : (err?.response?.data?.message ?? err?.message ?? 'Gửi OTP thất bại');
+      setError(errorMsg);
+      setModalMessage(errorMsg);
+      setShowErrorModal(true);
     } finally {
       setSendingOtp(false);
     }
@@ -129,11 +136,15 @@ const RegisterPage: React.FC = () => {
     try {
       setSubmitting(true);
       const result = await apiRegister(payload);
-      setInfo(`✅ Đăng ký thành công! Chào mừng ${result.username}. Đang chuyển đến trang đăng nhập...`);
-      setTimeout(() => navigate('/login'), 1500);
+      setInfo(`◆ Đăng ký thành công! Chào mừng ${result.username}. Đang chuyển đến trang đăng nhập...`);
+      setModalMessage(`◆ Đăng ký thành công!\n\nChào mừng ${result.username} đến với cộng đồng của chúng tôi.\n\nBạn sẽ được chuyển đến trang đăng nhập sau giây lát...`);
+      setShowSuccessModal(true);
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err: any) {
       // Parse backend error messages
       const errorMsg = err?.response?.data?.message;
+      let displayError = '';
+      
       if (errorMsg) {
         // Map backend error codes to Vietnamese
         const errorMap: Record<string, string> = {
@@ -144,12 +155,16 @@ const RegisterPage: React.FC = () => {
           'INVALID_PHONE': 'Số điện thoại không hợp lệ',
           'USER_EXISTED': 'Username đã tồn tại, vui lòng chọn tên khác',
         };
-        setError(errorMap[errorMsg] || errorMsg || 'Đăng ký thất bại');
+        displayError = errorMap[errorMsg] || errorMsg || 'Đăng ký thất bại';
       } else if (!err.response) {
-        setError('❌ Không thể kết nối tới server. Vui lòng kiểm tra backend đang chạy.');
+        displayError = 'Không thể kết nối tới server. Vui lòng kiểm tra kết nối mạng và thử lại.';
       } else {
-        setError(err?.message || 'Đăng ký thất bại');
+        displayError = err?.message || 'Đăng ký thất bại';
       }
+      
+      setError(displayError);
+      setModalMessage(displayError);
+      setShowErrorModal(true);
     } finally {
       setSubmitting(false);
     }
@@ -212,7 +227,7 @@ const RegisterPage: React.FC = () => {
                     className={fieldErrors.password ? 'error' : ''}
                   />
                   <button type="button" className="inlineBtn" onClick={() => setShowPassword(v => !v)}>
-                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                    {showPassword ? 'HIDE' : 'SHOW'}
                   </button>
                 </div>
                 {fieldErrors.password && (
@@ -249,7 +264,7 @@ const RegisterPage: React.FC = () => {
 
               <div className="fieldGroup">
                 <label htmlFor="dob" className="fieldLabel">
-                  📅 Ngày sinh
+                  <span className="labelIcon">◆</span> Ngày sinh
                 </label>
                 <input 
                   id="dob" 
@@ -283,7 +298,7 @@ const RegisterPage: React.FC = () => {
                     onClick={onRequestEmailOtp} 
                     disabled={sendingOtp}
                   >
-                    {sendingOtp ? '⏳ Đang gửi' : '📧 Gửi OTP'}
+                    {sendingOtp ? '▶ Đang gửi' : '► Gửi OTP'}
                   </button>
                 </div>
                 {fieldErrors.email && (
@@ -321,18 +336,22 @@ const RegisterPage: React.FC = () => {
                 <span className="fieldHint">Tùy chọn - để liên hệ khi cần</span>
               </div>
 
-              {error && <div className="regError fullRow" role="alert">⚠️ {error}</div>}
-              {info && <div className="regInfo fullRow">{info}</div>}
+              {error && <div className="regError fullRow" role="alert"><span className="msgIcon">▲</span> {error}</div>}
+              {info && <div className="regInfo fullRow"><span className="msgIcon">▼</span> {info}</div>}
             </div>
 
             <div className="actions">
               <button className="primaryBtn" type="submit" disabled={submitting}>
                 {submitting ? (
                   <>
-                    <span>⏳ Đang đăng ký...</span>
+                    <span className="btnIcon">●</span>
+                    <span>Đang đăng ký...</span>
                   </>
                 ) : (
-                  <>🚀 Tạo tài khoản</>
+                  <>
+                    <span className="btnIcon">▸</span>
+                    <span>Tạo tài khoản</span>
+                  </>
                 )}
               </button>
 
@@ -343,10 +362,32 @@ const RegisterPage: React.FC = () => {
               <button 
                 type="button" 
                 className="googleBtn"
-                onClick={() => {
-                  // TODO: Implement Google OAuth registration
-                  console.log('Google register clicked');
-                  alert('Tính năng đăng ký Google sẽ được triển khai sớm!');
+                onClick={async () => {
+                  try {
+                    const { openGoogleAuthPopup, exchangeCodeForToken } = await import('../services/googleAuth');
+                    const { code } = await openGoogleAuthPopup();
+                    
+                    // Exchange code for token via backend
+                    const result = await exchangeCodeForToken(code);
+                    
+                    // Save token and redirect
+                    if (result?.token) {
+                      localStorage.setItem('wgs_token', result.token);
+                      localStorage.setItem('token', result.token);
+                      if (result.user) {
+                        localStorage.setItem('user', JSON.stringify(result.user));
+                      }
+                      setInfo('✅ Đăng ký Google thành công! Đang chuyển hướng...');
+                      setTimeout(() => navigate('/'), 1500);
+                    } else {
+                      throw new Error('No token received from server');
+                    }
+                  } catch (error: any) {
+                    console.error('Google register error:', error);
+                    setError(error.message || 'Đăng ký Google thất bại');
+                    setModalMessage(error.message || 'Đăng ký Google thất bại');
+                    setShowErrorModal(true);
+                  }
                 }}
               >
                 <svg className="googleIcon" viewBox="0 0 24 24" width="20" height="20">
@@ -366,6 +407,24 @@ const RegisterPage: React.FC = () => {
           </form>
         </div>
       </div>
+
+      {/* Error Modal */}
+      <ErrorModal 
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        title="Đăng ký thất bại"
+        message={modalMessage}
+        type="error"
+      />
+
+      {/* Success Modal */}
+      <ErrorModal 
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Đăng ký thành công"
+        message={modalMessage}
+        type="success"
+      />
     </div>
   );
 };

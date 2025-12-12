@@ -126,7 +126,7 @@ export default function CategoriesPage() {
                         </div>
 
                         <div className="categories-grid">
-                            {categories.map((category, index) => {
+                            {(categories || []).map((category, index) => {
                                 const count = categoryCounts[category.name] || 0;
                                 
                                 return (

@@ -3,6 +3,7 @@ import './LoginPage.css';
 import { gsap } from 'gsap';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/client';
+import { ErrorModal } from '../components/common/ErrorModal';
 
 // Converted from original vanilla JS animation logic (TweenMax v2 style) to GSAP v3 + React/TSX.
 // Mouth morphing: fallback to toggling visibility (no MorphSVG plugin bundled).
@@ -44,6 +45,10 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
 const [submitting, setSubmitting] = useState(false);
 const [submitError, setSubmitError] = useState<string | null>(null);
+const [showErrorModal, setShowErrorModal] = useState(false);
+const [isBlinking, setIsBlinking] = useState(false);
+const [loginSuccess, setLoginSuccess] = useState(false);
+const [loginError, setLoginError] = useState(false);
   const navigate = useNavigate();
 
 	const getPosition = (el: Element | null) => {
@@ -249,12 +254,20 @@ const [submitError, setSubmitError] = useState<string | null>(null);
 		// Initialize to rest state
 		setArmState('rest');
 		setMouthStatus('small');
+		
+		// Eye blinking animation
+		const blinkInterval = setInterval(() => {
+			setIsBlinking(true);
+			setTimeout(() => setIsBlinking(false), 150);
+		}, 3000 + Math.random() * 2000); // Random blink between 3-5 seconds
+		
+		return () => clearInterval(blinkInterval);
 	}, [setArmState]);
 
   return (
 		<div className="yetiLoginContainer">
 			<div className="yetiCard">
-				<div className="yetiHead">
+				<div className={`yetiHead ${loginSuccess ? 'celebrate' : ''} ${loginError ? 'shake' : ''} ${submitting ? 'loading' : ''}`}>
 					<div className="svgContainer noBorder">
 						<svg ref={svgRef} className="mySVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
               <defs>
@@ -297,11 +310,11 @@ const [submitError, setSubmitError] = useState<string | null>(null);
                 <path fill="#FFFFFF" d="M138.142,55.064c-4.93,1.259-9.874,2.118-14.787,2.599c-0.336,3.341-0.776,6.689-1.322,10.037 c-4.569-1.465-8.909-3.222-12.996-5.226c-0.98,3.075-2.07,6.137-3.267,9.179c-5.514-3.067-10.559-6.545-15.097-10.329 c-1.806,2.889-3.745,5.73-5.816,8.515c-7.916-4.124-15.053-9.114-21.296-14.738l1.107-11.768h73.475V55.064z" />
 								<path fill="#FFFFFF" stroke="#3A5E77" strokeWidth={2.5} strokeLinecap="round" d="M63.56,55.102 c6.243,5.624,13.38,10.614,21.296,14.738c2.071-2.785,4.01-5.626,5.816-8.515c4.537,3.785,9.583,7.263,15.097,10.329 c1.197-3.043,2.287-6.104,3.267-9.179c4.087,2.004,8.427,3.761,12.996,5.226c0.545-3.348,0.986-6.696,1.322-10.037 c4.913-0.481,9.857-1.34,14.787-2.599" />
 							</g>
-							<g ref={eyeLRef} className="eyeL">
+							<g ref={eyeLRef} className={`eyeL ${isBlinking ? 'blink' : ''}`}>
 								<circle cx="85.5" cy="78.5" r="3.5" fill="#3a5e77" />
 								<circle cx="84" cy="76" r="1" fill="#fff" />
 							</g>
-							<g ref={eyeRRef} className="eyeR">
+							<g ref={eyeRRef} className={`eyeR ${isBlinking ? 'blink' : ''}`}>
 								<circle cx="114.5" cy="78.5" r="3.5" fill="#3a5e77" />
 								<circle cx="113" cy="76" r="1" fill="#fff" />
 							</g>
@@ -353,29 +366,26 @@ const [submitError, setSubmitError] = useState<string | null>(null);
                     const password = passwordRef.current?.value || '';
                     
                     if (!username || !password) {
-                      setSubmitError('Vui lòng nhập đầy đủ username và mật khẩu');
-                      setSubmitting(false);
-                      return;
+                      throw new Error('Vui lòng nhập đầy đủ thông tin');
                     }
                     
-                    console.log('[Login] Attempting login for:', username);
                     const token = await login(username, password);
-<<<<<<< Updated upstream
-                    console.log('[Login] Received token:', token ? 'YES' : 'NO');
                     
                     if (!token) throw new Error('Đăng nhập thất bại - không nhận được token');
                     
                     localStorage.setItem('wgs_token', token);
-                    localStorage.setItem('token', token); // Backward compatibility
-                    localStorage.setItem('username', username);
-                    setAuthToken(token);
-                    
-                    console.log('[Login] Token saved to localStorage');
-=======
-                    if (!token) throw new Error('Đăng nhập thất bại');
-                    localStorage.setItem('wgs_token', token);
                     localStorage.setItem('token', token); // Also save as 'token' for compatibility
                     localStorage.setItem('username', username);
+                    
+                    // Clear old shared cart/wishlist data
+                    localStorage.removeItem('demo_cart');
+                    localStorage.removeItem('demo_cart_guest');
+                    localStorage.removeItem('wishlist_ids');
+                    localStorage.removeItem('wishlist_guest');
+                    
+                    // Trigger success animation
+                    setLoginSuccess(true);
+                    await new Promise(resolve => setTimeout(resolve, 800)); // Wait for animation
                     
                     // Kiểm tra xem có redirect URL không
                     const redirectUrl = localStorage.getItem('redirect_after_login');
@@ -384,71 +394,66 @@ const [submitError, setSubmitError] = useState<string | null>(null);
                       navigate(redirectUrl);
                       return;
                     }
->>>>>>> Stashed changes
                     
                     // decode jwt to get roles/authorities (scope)
                     try {
-										const payloadPart = token.split('.')[1];
-										const json = JSON.parse(decodeURIComponent(escape(window.atob(payloadPart.replace(/-/g, '+').replace(/_/g, '/')))));
-										console.log('[Login] JWT payload:', json);
-										
-										const scope = json.scope || json.scp || json.roles || '';
-										const roles = Array.isArray(scope)
+                      const payloadPart = token.split('.')[1];
+                      const json = JSON.parse(decodeURIComponent(escape(window.atob(payloadPart.replace(/-/g, '+').replace(/_/g, '/')))));
+                      const scope = json.scope || json.scp || json.roles || '';
+                      const roles = Array.isArray(scope)
 											? scope
 											: (typeof scope === 'string' ? scope.split(/[\s,;,:|]+/) : []);
 										// Normalize role strings (some backends use 'ADMIN' or 'ROLE_ADMIN')
 										const normalized = roles.map((r: any) => ('' + (r?.authority || r)).toUpperCase());
-										console.log('[Login] User roles:', normalized);
-										
 										localStorage.setItem('user', JSON.stringify({ username, authorities: normalized }));
-										
-										// Kiểm tra redirect URL trước khi navigate theo role
-										const redirectUrl = localStorage.getItem('redirect_after_login');
-										if (redirectUrl) {
-											console.log('[Login] Redirecting to:', redirectUrl);
-											localStorage.removeItem('redirect_after_login');
-											navigate(redirectUrl);
-											return;
-										}
-										
 										if (normalized.includes('ROLE_ADMIN') || normalized.includes('ADMIN')) {
-											console.log('[Login] Redirecting to admin page');
 											navigate('/admin');
 											return;
 										}
 										if (normalized.includes('ROLE_MOD') || normalized.includes('MOD') || normalized.includes('ROLE_MODERATOR') || normalized.includes('MODERATOR')) {
-											console.log('[Login] Redirecting to moderator page');
 											navigate('/moderator');
 											return;
 										}
 										if (normalized.includes('ROLE_USER') || normalized.includes('USER')) {
-											console.log('[Login] Redirecting to home page');
 											navigate('/');
 											return;
 										}
-                    } catch (jwtErr) {
-                      console.error('[Login] Error parsing JWT:', jwtErr);
+                    } catch {}
+                    navigate('/');
+                  } catch (err: any) {
+                    let errorMsg = 'Đăng nhập thất bại';
+                    
+                    // Case 1: Network error - Mất kết nối server
+                    if (err?.code === 'ECONNABORTED' || err?.code === 'ERR_NETWORK' || err?.message?.includes('Network Error') || !err?.response) {
+                      errorMsg = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.';
+                    }
+                    // Case 2: 401 - Sai username/password
+                    else if (err?.response?.status === 401) {
+                      errorMsg = 'Tên đăng nhập hoặc mật khẩu không chính xác. Vui lòng thử lại.';
+                    }
+                    // Case 3: 500 - Server error
+                    else if (err?.response?.status === 500) {
+                      errorMsg = 'Máy chủ đang gặp sự cố. Vui lòng thử lại sau.';
+                    }
+                    // Case 4: Timeout
+                    else if (err?.code === 'ECONNABORTED' || err?.message?.includes('timeout')) {
+                      errorMsg = 'Yêu cầu quá thời gian chờ. Vui lòng thử lại.';
+                    }
+                    // Case 5: Other HTTP errors
+                    else if (err?.response?.data?.message) {
+                      errorMsg = err.response.data.message;
+                    }
+                    // Case 6: Generic error
+                    else if (err?.message && err.message !== 'Request failed with status code 500') {
+                      errorMsg = err.message;
                     }
                     
-                    // Fallback: check redirect URL nếu không parse được token
-                    const redirectUrl = localStorage.getItem('redirect_after_login');
-                    if (redirectUrl) {
-                    	console.log('[Login] Fallback redirect to:', redirectUrl);
-                    	localStorage.removeItem('redirect_after_login');
-                    	navigate(redirectUrl);
-                    } else {
-                    	console.log('[Login] Fallback redirect to home');
-                    	navigate('/');
-                    }
-                  } catch (err: any) {
-                    console.error('[Login] Error:', err);
-                    const errorMessage = err?.response?.data?.message || err?.message || 'Đăng nhập thất bại';
-                    console.error('[Login] Error details:', {
-                      status: err?.response?.status,
-                      statusText: err?.response?.statusText,
-                      data: err?.response?.data
-                    });
-                    setSubmitError(errorMessage);
+                    setSubmitError(errorMsg);
+                    setShowErrorModal(true);
+                    
+                    // Trigger shake animation on error
+                    setLoginError(true);
+                    setTimeout(() => setLoginError(false), 600);
                   } finally {
                     setSubmitting(false);
                   }
@@ -514,10 +519,30 @@ const [submitError, setSubmitError] = useState<string | null>(null);
 							<button 
 								type="button" 
 								className="googleBtn"
-								onClick={() => {
-									// TODO: Implement Google OAuth login
-									console.log('Google login clicked');
-									alert('Tính năng đăng nhập Google sẽ được triển khai sớm!');
+								onClick={async () => {
+									try {
+										const { openGoogleAuthPopup, exchangeCodeForToken } = await import('../services/googleAuth');
+										const { code } = await openGoogleAuthPopup();
+										
+										// Exchange code for token via backend
+										const result = await exchangeCodeForToken(code);
+										
+										// Save token and redirect
+										if (result?.token) {
+											localStorage.setItem('wgs_token', result.token);
+											localStorage.setItem('token', result.token);
+											if (result.user) {
+												localStorage.setItem('user', JSON.stringify(result.user));
+											}
+											navigate('/');
+										} else {
+											throw new Error('No token received from server');
+										}
+									} catch (error: any) {
+										console.error('Google login error:', error);
+										setSubmitError(error.message || 'Đăng nhập Google thất bại');
+										setShowErrorModal(true);
+									}
 								}}
 							>
 								<svg className="googleIcon" viewBox="0 0 24 24" width="20" height="20">
@@ -533,9 +558,17 @@ const [submitError, setSubmitError] = useState<string | null>(null);
 								<span>Chưa có tài khoản? </span><a href="/register" className="registerLink">Đăng ký</a>
           </div>
         </div>
-                        {submitError && <div className="cp-error">{submitError}</div>}
       </form>
 			</div>
+
+      {/* Error Modal */}
+      <ErrorModal 
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        title="Đăng nhập thất bại"
+        message={submitError || 'Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.'}
+        type="error"
+      />
     </div>
   );
 };

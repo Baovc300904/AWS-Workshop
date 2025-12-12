@@ -1,7 +1,107 @@
-.to-top-btn{position:fixed;bottom:24px;right:24px;width:48px;height:48px;background:var(--color-accent);border:1px solid var(--color-border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 24px -8px rgba(0,0,0,.6);z-index:100;opacity:0;pointer-events:none;transform:translateY(10px);transition:var(--dur) var(--ease);}
-.to-top-btn[data-show]{opacity:1;pointer-events:auto;transform:translateY(0);}
-.to-top-btn:hover{background:var(--color-accent-hover);transform:translateY(-2px);box-shadow:0 12px 32px -10px rgba(0,0,0,.7);}
-.to-top-btn .arrow{font-size:.8rem;color:#fff;font-weight:700;}
-@media (max-width:768px){
-  .to-top-btn{width:42px;height:42px;bottom:18px;right:18px;}
+/* Floating Buttons Container */
+.floating-buttons-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.floating-buttons-container[data-show] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Base Floating Button */
+.floating-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.floating-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.7);
+}
+
+/* WhatsApp Button */
+.whatsapp-btn {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+}
+
+.whatsapp-btn:hover {
+  background: linear-gradient(135deg, #20BA5A 0%, #0F7A6C 100%);
+}
+
+/* Zalo Button */
+.zalo-btn {
+  background: linear-gradient(135deg, #0068FF 0%, #0052CC 100%);
+  color: white;
+}
+
+.zalo-btn:hover {
+  background: linear-gradient(135deg, #0056D6 0%, #0043A3 100%);
+}
+
+/* Back to Top Button */
+.to-top-btn {
+  background: var(--color-accent);
+  border: 1px solid var(--color-border);
+}
+
+.to-top-btn:hover {
+  background: var(--color-accent-hover);
+}
+
+.to-top-btn .arrow {
+  font-size: 0.9rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .floating-buttons-container {
+    bottom: 18px;
+    right: 18px;
+    gap: 10px;
+  }
+
+  .floating-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .floating-btn svg {
+    width: 20px;
+    height: 20px;
+  }
 }

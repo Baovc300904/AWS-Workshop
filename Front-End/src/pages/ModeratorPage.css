@@ -1,1 +1,84 @@
-.modPageRoot { padding: 24px; }
+.modPageRoot {
+  min-height: calc(100vh - 80px);
+  padding: 140px 24px 40px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.modPageHeader {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+.modPageHeader h2 {
+  margin: 0 0 12px;
+  font-size: 42px;
+  font-weight: 800;
+  color: #e2e8f0;
+  text-shadow: 0 0 20px rgba(103, 232, 249, 0.3);
+}
+
+.modPageHeader p {
+  margin: 0;
+  font-size: 18px;
+  color: #94a3b8;
+}
+
+.modPageGrid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.modCard {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 16px;
+  padding: 32px;
+  border: 2px solid rgba(103, 232, 249, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+}
+
+.modCard:hover {
+  border-color: rgba(103, 232, 249, 0.5);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+.modCardIcon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 10px rgba(103, 232, 249, 0.3));
+}
+
+.modCard h3 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.modCard p {
+  margin: 0;
+  font-size: 15px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .modPageRoot {
+    padding: 100px 20px 40px;
+  }
+
+  .modPageHeader h2 {
+    font-size: 32px;
+  }
+
+  .modPageGrid {
+    grid-template-columns: 1fr;
+  }
+}

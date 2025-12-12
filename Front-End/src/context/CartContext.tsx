@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Game } from '../api/client';
+import { Game, addToCart as apiAddToCart } from '../api/client';
 
 interface CartItem extends Game {
   quantity: number;
@@ -17,11 +17,25 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+// Get cart storage key based on logged-in user
+const getCartKey = () => {
+  const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+  if (!token) return 'demo_cart_guest';
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const username = payload.sub || payload.username || 'unknown';
+    return `cart_${username}`;
+  } catch {
+    return 'demo_cart_guest';
+  }
+};
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
-      const raw = localStorage.getItem('demo_cart');
+      const raw = localStorage.getItem(getCartKey());
       return raw ? JSON.parse(raw) : [];
     } catch {
       return [];
@@ -30,13 +44,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem('demo_cart', JSON.stringify(cart));
+      localStorage.setItem(getCartKey(), JSON.stringify(cart));
     } catch {}
   }, [cart]);
 
-  const add = useCallback((game: Game, { redirect = false } = {}) => {
-    // Cho phép thêm vào giỏ hàng mà không cần đăng nhập
-    // Sẽ yêu cầu đăng nhập khi checkout
+  const add = useCallback(async (game: Game, { redirect = false } = {}) => {
+    // Always update local cart first (for immediate UI feedback)
     setCart((prev) => {
       const existing = prev.find((g) => g.id === game.id);
       if (existing) {
@@ -46,6 +59,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { ...game, quantity: 1 }];
     });
+    
+    // Sync with backend if user is logged in
+    const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+    if (token) {
+      try {
+        await apiAddToCart({ gameId: game.id, quantity: 1 });
+        console.log('[CartContext] Synced cart with backend:', game.id);
+      } catch (err) {
+        console.error('[CartContext] Failed to sync cart with backend:', err);
+        // Don't remove from local cart even if API fails - allow offline mode
+      }
+    }
     
     if (redirect) navigate('/checkout');
     return true;

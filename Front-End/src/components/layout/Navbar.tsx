@@ -1,16 +1,18 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { fetchCategories, Category, setAuthToken } from '../../api/client';
+import { fetchCategories, Category, setAuthToken, logout as apiLogout, getMyInfo, getBalance } from '../../api/client';
 
 export default function Navbar() {
     const { cart } = useCart();
     const { wishlist } = useWishlist();
     const navigate = useNavigate();
+    const location = useLocation();
     const [categories, setCategories] = useState<Category[]>([]);
-    const [user, setUser] = useState<{ username: string } | null>(() => {
+    const [balance, setBalance] = useState<number>(0);
+    const [user, setUser] = useState<{ username: string; avatarUrl?: string; roles?: string[] } | null>(() => {
         try {
             const username = localStorage.getItem('username');
             return username ? { username } : null;
@@ -60,6 +62,54 @@ export default function Navbar() {
             .then((cats) => setCategories(cats || []))
             .catch(() => { });
     }, []);
+
+    // Load user profile with avatar and roles
+    useEffect(() => {
+        if (user && user.username && !user.roles) {
+            getMyInfo()
+                .then((profile) => {
+                    if (profile) {
+                        const roles = profile.roles?.map((r: any) => r.name) || [];
+                        setUser({ username: profile.username, avatarUrl: profile.avatarUrl, roles });
+                    }
+                })
+                .catch(() => { });
+        }
+    }, [user]);
+
+    // Fetch balance when user is logged in or location changes
+    useEffect(() => {
+        const fetchUserBalance = async () => {
+            if (user && user.username) {
+                try {
+                    const data = await getBalance();
+                    setBalance(data.balance || 0);
+                } catch (err) {
+                    console.error('Failed to fetch balance:', err);
+                }
+            }
+        };
+
+        fetchUserBalance();
+
+        // Listen for balance updates from other components
+        const handleBalanceUpdate = () => fetchUserBalance();
+        window.addEventListener('balance-updated', handleBalanceUpdate);
+        
+        // Listen for avatar updates
+        const handleAvatarUpdate = (e: Event) => {
+            const customEvent = e as CustomEvent<string>;
+            if (customEvent.detail && user) {
+                setUser(prev => prev ? { ...prev, avatarUrl: customEvent.detail } : prev);
+            }
+        };
+        window.addEventListener('avatar-updated', handleAvatarUpdate);
+        
+        return () => {
+            window.removeEventListener('balance-updated', handleBalanceUpdate);
+            window.removeEventListener('avatar-updated', handleAvatarUpdate);
+        };
+    }, [user, location]);
 
     const platforms = useMemo(() => [
         { name: 'PC', icon: '💻' },
@@ -118,16 +168,43 @@ export default function Navbar() {
         }
     }
 
-    function handleLogout() {
+    async function handleLogout() {
         try {
+            const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
+            
+            // Call backend logout API if token exists
+            if (token) {
+                try {
+                    await apiLogout(token);
+                } catch (err) {
+                    console.error('[Navbar] Logout API error:', err);
+                    // Continue with local cleanup even if API fails
+                }
+            }
+            
+            // Get current username before clearing
+            const username = user?.username || 'unknown';
+            
+            // Clear user-specific cart/wishlist
+            localStorage.removeItem(`cart_${username}`);
+            localStorage.removeItem(`wishlist_${username}`);
+            
+            // Clear old shared data
+            localStorage.removeItem('demo_cart');
+            localStorage.removeItem('wishlist_ids');
+            
+            // Clear local storage
             localStorage.removeItem('wgs_token');
             localStorage.removeItem('token');
+            localStorage.removeItem('username');
             localStorage.removeItem('username');
             localStorage.removeItem('user');
             setAuthToken(null);
             setUser(null);
             navigate('/login');
-        } catch { }
+        } catch (err) {
+            console.error('[Navbar] Logout error:', err);
+        }
     }
 
     return (
@@ -214,10 +291,10 @@ export default function Navbar() {
                                             </button>
                                         ))}
                                     </div>
-                                    {categories.length > 24 && (
+                                    {categories && categories.length > 24 && (
                                         <div className="dd-footer">
                                             <span className="dd-more">
-                                                và {categories.length - 24} thể loại khác...
+                                                và {(categories || []).length - 24} thể loại khác...
                                             </span>
                                         </div>
                                     )}
@@ -300,8 +377,16 @@ export default function Navbar() {
                                 aria-label="Menu người dùng"
                                 aria-expanded={openMenu === 'profile'}
                             >
-                                <span className="avatar-circle">👤</span>
-                                <span className="user-name-inline">{user.username}</span>
+                                {user.avatarUrl ? (
+                                    <img src={user.avatarUrl} alt="Avatar" className="avatar-circle" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                                ) : (
+                                    <span className="avatar-circle">👤</span>
+                                )}
+                                <span className="user-name-inline">
+                                    {user.username}
+                                    {user.roles?.includes('ADMIN') && <span style={{ marginLeft: '4px', padding: '2px 6px', background: '#ff4444', color: 'white', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold' }}>ADMIN</span>}
+                                    {user.roles?.includes('MOD') && !user.roles?.includes('ADMIN') && <span style={{ marginLeft: '4px', padding: '2px 6px', background: '#4CAF50', color: 'white', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold' }}>MOD</span>}
+                                </span>
                             </button>
                             {openMenu === 'profile' && (
                                 <div className="profile-dropdown">
@@ -309,11 +394,11 @@ export default function Navbar() {
                                         <div className="balance-box">
                                             <span className="balance-label">Số dư</span>
                                             <span className="balance-amount">
-                                                <span className="coin-icon">🪙</span> 0đ
+                                                <span className="coin-icon">🪙</span> {balance.toLocaleString('vi-VN')}đ
                                             </span>
                                         </div>
                                         <button className="topup-btn" onClick={() => {
-                                            alert('Chức năng nạp tiền đang phát triển');
+                                            navigate('/profile');
                                             setOpenMenu(null);
                                         }}>
                                             Nạp tiền
@@ -366,13 +451,13 @@ export default function Navbar() {
                                             <button 
                                                 className="dropdown-grid-item"
                                                 onClick={() => {
-                                                    navigate('/checkout');
+                                                    navigate('/orders');
                                                     setOpenMenu(null);
                                                     setMobileOpen(false);
                                                 }}
                                             >
                                                 <span className="grid-item-icon">📝</span>
-                                                <span className="grid-item-text">Lịch sử giao dịch</span>
+                                                <span className="grid-item-text">Đơn hàng của tôi</span>
                                             </button>
                                             <button 
                                                 className="dropdown-grid-item"

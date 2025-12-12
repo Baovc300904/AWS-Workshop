@@ -1,5 +1,40 @@
 /* PROFILE PAGE - MUAKEY SIDEBAR LAYOUT */
 
+/* Toast Notifications */
+.toast-success,
+.toast-error {
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  animation: slideIn 0.3s ease-out;
+}
+
+.toast-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.toast-error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .profilePageContainer {
   min-height: 100vh;
   background: #0f172a;
@@ -41,6 +76,40 @@
   justify-content: center;
   border: 3px solid rgba(79, 165, 219, 0.3);
   box-shadow: 0 8px 24px rgba(79, 172, 254, 0.3);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.sidebarAvatarClickable {
+  cursor: pointer;
+}
+
+.sidebarAvatar:hover {
+  transform: scale(1.05);
+  border-color: rgba(79, 165, 219, 0.6);
+}
+
+.avatarFileInput {
+  display: none;
+}
+
+.sidebarAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatarUploading {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
 }
 
 .sidebarAvatarText {
@@ -63,7 +132,28 @@
 .sidebarUsername {
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.6);
-  margin: 0;
+  margin: 0 0 0.5rem 0;
+}
+
+.sidebarBalance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(79, 165, 219, 0.1);
+  border-radius: 20px;
+  margin-top: 0.5rem;
+}
+
+.balanceIcon {
+  font-size: 1.25rem;
+}
+
+.sidebarBalance .balanceAmount {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4facfe;
 }
 
 .sidebarNav {
@@ -196,6 +286,7 @@
   border: 1px solid rgba(79, 165, 219, 0.2);
   border-radius: 16px;
   overflow: hidden;
+  -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
 
@@ -297,6 +388,55 @@
 
 .editInput::placeholder {
   color: rgba(255, 255, 255, 0.4);
+}
+
+/* Password Confirmation Section */
+.passwordConfirmSection {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.05) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+}
+
+.passwordConfirmHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+}
+
+.passwordConfirmHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+.passwordConfirmNote {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.passwordConfirmInput {
+  margin-top: 1rem;
+}
+
+.passwordConfirmInput .editInput {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.passwordConfirmInput .editInput:focus {
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
 }
 
 .editActions {
@@ -543,6 +683,7 @@
   padding: 3rem;
   text-align: center;
   max-width: 500px;
+  -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
 
@@ -603,6 +744,262 @@
   }
 }
 
+/* Topup Section */
+.balanceDisplay {
+  text-align: center;
+  padding: 2rem;
+}
+
+.balanceDisplay .balanceAmount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.topupForm {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.quickAmounts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.quickAmountBtn {
+  padding: 0.75rem;
+  background: rgba(79, 165, 219, 0.1);
+  border: 1px solid rgba(79, 165, 219, 0.3);
+  border-radius: 8px;
+  color: #4facfe;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quickAmountBtn:hover {
+  background: rgba(79, 165, 219, 0.2);
+  border-color: #4facfe;
+  transform: translateY(-2px);
+}
+
+.topupButton {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+}
+
+.topupButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+}
+
+.topupIcon {
+  font-size: 1.25rem;
+}
+
+.topupNote {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(79, 165, 219, 0.05);
+  border-left: 3px solid #4facfe;
+  border-radius: 4px;
+}
+
+.topupNote p {
+  margin: 0.5rem 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.refreshButton {
+  padding: 0.5rem 1rem;
+  background: rgba(79, 165, 219, 0.1);
+  border: 1px solid rgba(79, 165, 219, 0.3);
+  border-radius: 8px;
+  color: #4facfe;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.refreshButton:hover {
+  background: rgba(79, 165, 219, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Transaction List */
+.transactionList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.transactionItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(30, 27, 46, 0.6) 0%, rgba(22, 20, 31, 0.6) 100%);
+  border: 1px solid rgba(79, 165, 219, 0.2);
+  border-radius: 12px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.transactionItem::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(79, 165, 219, 0.05) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.transactionItem:hover::before {
+  opacity: 1;
+}
+
+.transactionItem:hover {
+  transform: translateY(-2px) translateX(4px);
+  border-color: rgba(79, 165, 219, 0.5);
+  background: linear-gradient(135deg, rgba(30, 27, 46, 0.9) 0%, rgba(22, 20, 31, 0.9) 100%);
+  box-shadow: 0 8px 24px rgba(79, 165, 219, 0.15),
+              0 0 0 1px rgba(79, 165, 219, 0.2);
+}
+
+.transactionIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(79, 165, 219, 0.2) 0%, rgba(79, 165, 219, 0.1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 165, 219, 0.1);
+}
+
+.transactionItem:hover .transactionIcon {
+  transform: scale(1.1) rotate(5deg);
+  background: linear-gradient(135deg, rgba(79, 165, 219, 0.3) 0%, rgba(79, 165, 219, 0.15) 100%);
+  box-shadow: 0 6px 16px rgba(79, 165, 219, 0.2);
+}
+
+.transactionDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.transactionTitle {
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.transactionMeta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.transactionAmount {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.transactionAmount .positive {
+  color: #10b981;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.transactionAmount .negative {
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.transactionStatus {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.transactionStatus.success {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.transactionStatus.pending {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.transactionStatus.failed,
+.transactionStatus.cancelled {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.loadingState {
+  text-align: center;
+  padding: 3rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
 @media (max-width: 768px) {
   .profilePageContainer {
     flex-direction: column;
@@ -610,7 +1007,7 @@
   .profileSidebar {
     position: relative;
     width: 100%;
-    min-height: auto;
+    min-height: 0;
     top: 0;
     border-right: none;
     border-bottom: 1px solid rgba(79, 165, 219, 0.15);

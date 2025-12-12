@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { api, Game } from '../api/client';
+import { fetchGame as apiFetchGame, fetchGamesByPrice, Game } from '../api/client';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency, formatPrice } from '../context/CurrencyContext';
+import { GameRating } from '../components/common/GameRating';
+import { getGameImage as getGameImageUtil } from '../utils/imageUtils';
 import './GameDetailPage.css';
 
 export function GameDetailPage() {
@@ -26,31 +28,49 @@ export function GameDetailPage() {
       return;
     }
 
-    const fetchGame = async () => {
+    const loadGameDetail = async () => {
       try {
         setLoading(true);
+        setError(null);
         
-        // Workaround: Get all games and find by ID since /games/{id} returns 404
-        const response = await api.get('/games');
-        const allGames = response.data.result as Game[];
-        const foundGame = allGames.find(g => g.id === id);
+        // Try to fetch game by ID, fallback to list if 404
+        let gameData: Game | null = null;
         
-        if (foundGame) {
-          setGame(foundGame);
-        } else {
-          setError('Game không tồn tại hoặc đã bị xóa');
-          // Set suggested games (exclude current game if found)
-          setSuggestedGames(allGames.filter(g => g.id !== id).slice(0, 4));
+        try {
+          gameData = await apiFetchGame(id);
+        } catch (fetchError: any) {
+          // If 404 (backend issue), fallback to fetching from list
+          if (fetchError?.response?.status === 404 || fetchError?.response?.data?.code === 1009) {
+            console.warn('[GameDetailPage] Game detail endpoint returned 404, falling back to list');
+            const allGames = await fetchGamesByPrice('asc');
+            gameData = allGames.find((g: Game) => g.id === id) || null;
+            
+            if (!gameData) {
+              throw new Error('Game không tồn tại');
+            }
+          } else {
+            throw fetchError;
+          }
+        }
+        
+        setGame(gameData);
+        
+        // Load suggested games
+        try {
+          const suggested = await fetchGamesByPrice('asc');
+          setSuggestedGames(suggested.filter(g => g.id !== id).slice(0, 4));
+        } catch (suggestErr) {
+          console.error('[GameDetailPage] Error fetching suggested games:', suggestErr);
         }
       } catch (err: any) {
         console.error('[GameDetailPage] Error fetching game:', err);
-        setError(err?.response?.data?.message || 'Không thể tải thông tin game');
+        const errorMessage = err?.message || err?.response?.data?.message || 'Không thể tải thông tin game';
+        setError(errorMessage);
         
-        // Fetch suggested games when there's an error
+        // Load suggested games even when main game fails
         try {
-          const suggestedResponse = await api.get('/games');
-          const allGames = suggestedResponse.data.result as Game[];
-          setSuggestedGames(allGames.slice(0, 4));
+          const suggested = await fetchGamesByPrice('asc');
+          setSuggestedGames(suggested.slice(0, 4));
         } catch (suggestErr) {
           console.error('[GameDetailPage] Error fetching suggested games:', suggestErr);
         }
@@ -59,7 +79,7 @@ export function GameDetailPage() {
       }
     };
 
-    fetchGame();
+    loadGameDetail();
   }, [id]);
 
   const getDiscountedPrice = (game: Game) => {
@@ -69,7 +89,7 @@ export function GameDetailPage() {
   };
 
   const getGameImage = (game: Game) => {
-    return game.image || game.cover || `https://via.placeholder.com/800x450/4eb8dd/ffffff?text=${encodeURIComponent(game.name)}`;
+    return getGameImageUtil(game);
   };
 
   const handleAddToCart = () => {
@@ -131,7 +151,7 @@ export function GameDetailPage() {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
                 gap: '16px' 
               }}>
-                {suggestedGames.map((suggestedGame) => (
+                {(suggestedGames || []).map((suggestedGame) => (
                   <div
                     key={suggestedGame.id}
                     onClick={() => navigate(`/game/${suggestedGame.id}`)}
@@ -212,7 +232,7 @@ export function GameDetailPage() {
               <h1>{game.name}</h1>
               {game.categories && game.categories.length > 0 && (
                 <div className="gameTags">
-                  {game.categories.map((cat) => (
+                  {(game.categories || []).map((cat) => (
                     <span key={cat.name} className="tag">
                       {cat.name}
                     </span>
@@ -283,7 +303,7 @@ export function GameDetailPage() {
                     <h2>📖 Thông tin chi tiết về {game.name}</h2>
                     <div className="gameMetaTags">
                       {game.categories && game.categories.length > 0 && (
-                        game.categories.map((cat) => (
+                        (game.categories || []).map((cat) => (
                           <span key={cat.name} className="metaTag">
                             {cat.name}
                           </span>
@@ -521,27 +541,175 @@ export function GameDetailPage() {
 
             {selectedTab === 'system' && (
               <div className="tabPane">
-                <h2>Cấu hình hệ thống</h2>
-                <div className="systemReqs">
-                  <div className="reqColumn">
-                    <h3>Tối thiểu</h3>
-                    <ul>
-                      <li><strong>OS:</strong> Windows 10 64-bit</li>
-                      <li><strong>CPU:</strong> Intel Core i5-6600K / AMD Ryzen 5 1600</li>
-                      <li><strong>RAM:</strong> 8 GB</li>
-                      <li><strong>GPU:</strong> NVIDIA GTX 1060 / AMD RX 580</li>
-                      <li><strong>Storage:</strong> 50 GB available space</li>
-                    </ul>
+                {game.systemRequirements ? (
+                  <div className="systemReqsModern">
+                    {/* Minimum Requirements */}
+                    {game.systemRequirements.minimum && (
+                      <div className="reqCard minimum">
+                        <div className="reqCardHeader">
+                          <h3>💻 Cấu hình tối thiểu</h3>
+                          <span className="reqBadge">Minimum</span>
+                        </div>
+                        <ul className="reqList">
+                          {game.systemRequirements.minimum.os && (
+                            <li>
+                              <div className="reqIcon">💾</div>
+                              <div className="reqDetails">
+                                <strong>Hệ điều hành:</strong>
+                                <span>{game.systemRequirements.minimum.os}</span>
+                              </div>
+                            </li>
+                          )}
+                          {game.systemRequirements.minimum.cpu && (
+                            <li>
+                              <div className="reqIcon">🔧</div>
+                              <div className="reqDetails">
+                                <strong>Bộ xử lý:</strong>
+                                <span>{game.systemRequirements.minimum.cpu}</span>
+                              </div>
+                            </li>
+                          )}
+                          {game.systemRequirements.minimum.ram && (
+                            <li>
+                              <div className="reqIcon">🧠</div>
+                              <div className="reqDetails">
+                                <strong>Bộ nhớ RAM:</strong>
+                                <span>{game.systemRequirements.minimum.ram}</span>
+                              </div>
+                            </li>
+                          )}
+                          {game.systemRequirements.minimum.gpu && (
+                            <li>
+                              <div className="reqIcon">🎮</div>
+                              <div className="reqDetails">
+                                <strong>Card đồ họa:</strong>
+                                <span>{game.systemRequirements.minimum.gpu}</span>
+                              </div>
+                            </li>
+                          )}
+                          {game.systemRequirements.minimum.storage && (
+                            <li>
+                              <div className="reqIcon">💿</div>
+                              <div className="reqDetails">
+                                <strong>Dung lượng:</strong>
+                                <span>{game.systemRequirements.minimum.storage}</span>
+                              </div>
+                            </li>
+                          )}
+                          {game.systemRequirements.minimum.network && (
+                            <li>
+                              <div className="reqIcon">🌐</div>
+                              <div className="reqDetails">
+                                <strong>Mạng:</strong>
+                                <span>{game.systemRequirements.minimum.network}</span>
+                              </div>
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {/* Recommended Requirements */}
+                    {game.systemRequirements.recommended && (
+                      <div className="reqCard recommended">
+                        <div className="reqCardHeader">
+                          <h3>⚡ Cấu hình khuyến nghị</h3>
+                          <span className="reqBadge">Recommended</span>
+                        </div>
+                        <ul className="reqList">
+                          {game.systemRequirements.recommended.os && (
+                            <li>
+                              <div className="reqIcon">💾</div>
+                              <div className="reqDetails">
+                                <strong>Hệ điều hành:</strong>
+                                <span>{game.systemRequirements.recommended.os}</span>
+                              </div>
+                            </li>
+                          )}
+                          {game.systemRequirements.recommended.cpu && (
+                            <li>
+                              <div className="reqIcon">🔧</div>
+                              <div className="reqDetails">
+                                <strong>Bộ xử lý:</strong>
+                                <span>{game.systemRequirements.recommended.cpu}</span>
+                              </div>
+                            </li>
+                          )}
+                          {game.systemRequirements.recommended.ram && (
+                            <li>
+                              <div className="reqIcon">🧠</div>
+                              <div className="reqDetails">
+                                <strong>Bộ nhớ RAM:</strong>
+                                <span>{game.systemRequirements.recommended.ram}</span>
+                              </div>
+                            </li>
+                          )}
+                          {game.systemRequirements.recommended.gpu && (
+                            <li>
+                              <div className="reqIcon">🎮</div>
+                              <div className="reqDetails">
+                                <strong>Card đồ họa:</strong>
+                                <span>{game.systemRequirements.recommended.gpu}</span>
+                              </div>
+                            </li>
+                          )}
+                          {game.systemRequirements.recommended.storage && (
+                            <li>
+                              <div className="reqIcon">💿</div>
+                              <div className="reqDetails">
+                                <strong>Dung lượng:</strong>
+                                <span>{game.systemRequirements.recommended.storage}</span>
+                              </div>
+                            </li>
+                          )}
+                          {game.systemRequirements.recommended.network && (
+                            <li>
+                              <div className="reqIcon">🌐</div>
+                              <div className="reqDetails">
+                                <strong>Mạng:</strong>
+                                <span>{game.systemRequirements.recommended.network}</span>
+                              </div>
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
                   </div>
-                  <div className="reqColumn">
-                    <h3>Khuyến nghị</h3>
-                    <ul>
-                      <li><strong>OS:</strong> Windows 11 64-bit</li>
-                      <li><strong>CPU:</strong> Intel Core i7-8700K / AMD Ryzen 7 3700X</li>
-                      <li><strong>RAM:</strong> 16 GB</li>
-                      <li><strong>GPU:</strong> NVIDIA RTX 3070 / AMD RX 6800 XT</li>
-                      <li><strong>Storage:</strong> 50 GB SSD</li>
-                    </ul>
+                ) : (
+                  <div className="noSystemReqs">
+                    <div className="noSystemReqsIcon">💻</div>
+                    <h3>Chưa có thông tin cấu hình</h3>
+                    <p>Thông tin cấu hình hệ thống sẽ được cập nhật sớm</p>
+                  </div>
+                )}
+
+                {/* Performance Tips */}
+                <div className="performanceTips">
+                  <div className="tipsHeader">
+                    <span className="tipsIcon">💡</span>
+                    <h3>Lời khuyên tối ưu hiệu suất</h3>
+                  </div>
+                  <div className="tipsGrid">
+                    <div className="tipCard">
+                      <div className="tipIconBox">🚀</div>
+                      <h4>Tối ưu FPS</h4>
+                      <p>Đóng các ứng dụng chạy nền để giải phóng RAM và CPU, tăng hiệu suất game</p>
+                    </div>
+                    <div className="tipCard">
+                      <div className="tipIconBox">🎯</div>
+                      <h4>Cập nhật Driver</h4>
+                      <p>Luôn cập nhật driver card đồ họa mới nhất để tận dụng tối đa hiệu năng</p>
+                    </div>
+                    <div className="tipCard">
+                      <div className="tipIconBox">⚙️</div>
+                      <h4>Cài đặt đồ họa</h4>
+                      <p>Điều chỉnh cài đặt đồ họa phù hợp với cấu hình máy của bạn</p>
+                    </div>
+                    <div className="tipCard">
+                      <div className="tipIconBox">❄️</div>
+                      <h4>Làm mát hệ thống</h4>
+                      <p>Đảm bảo hệ thống tản nhiệt tốt để duy trì hiệu năng ổn định</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -549,43 +717,86 @@ export function GameDetailPage() {
 
             {selectedTab === 'reviews' && (
               <div className="tabPane">
-                <h2>Đánh giá từ người chơi</h2>
-                <div className="reviewsSection">
-                  <div className="reviewsSummary">
-                    <div className="ratingBig">{game.averageRating?.toFixed(1) || 'N/A'}</div>
-                    <div className="ratingStars">
-                      {game.averageRating ? '⭐'.repeat(Math.round(game.averageRating)) : '⭐⭐⭐⭐⭐'}
-                    </div>
-                    <p>Dựa trên {game.ratingCount || 0} đánh giá</p>
-                  </div>
-                  <div className="reviewsList">
-                    {game.ratingCount && game.ratingCount > 0 ? (
-                      <>
-                        <div className="reviewItem">
-                          <div className="reviewHeader">
-                            <strong>GamePlayer123</strong>
-                            <span className="reviewDate">2 ngày trước</span>
-                          </div>
-                          <div className="reviewStars">⭐⭐⭐⭐⭐</div>
-                          <p>Game rất hay! Đồ họa đẹp, gameplay cuốn hút. Đáng tiền!</p>
-                        </div>
-                        <div className="reviewItem">
-                          <div className="reviewHeader">
-                            <strong>ProGamer99</strong>
-                            <span className="reviewDate">5 ngày trước</span>
-                          </div>
-                          <div className="reviewStars">⭐⭐⭐⭐</div>
-                          <p>Khá ổn, có vài bug nhỏ nhưng nhìn chung rất tốt.</p>
-                        </div>
-                      </>
-                    ) : (
-                      <p className="noReviews">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
-                    )}
-                  </div>
-                </div>
+                <GameRating 
+                  gameId={game.id} 
+                  onRatingChange={() => {
+                    // Reload game data to update average rating
+                    apiFetchGame(game.id).then(setGame).catch(console.error);
+                  }}
+                />
               </div>
             )}
           </div>
+
+          {/* Suggested Games Section */}
+          {suggestedGames.length > 0 && (
+            <div className="suggestedGamesSection">
+              <div className="suggestedHeader">
+                <h2>🎮 Game liên quan</h2>
+                <p>Các game tương tự bạn có thể quan tâm</p>
+              </div>
+              <div className="suggestedGamesGrid">
+                {(suggestedGames || []).map((suggestedGame) => {
+                  const suggestedHasDiscount = suggestedGame.salePercent && suggestedGame.salePercent > 0;
+                  const suggestedFinalPrice = getDiscountedPrice(suggestedGame);
+                  const suggestedIsFree = Number(suggestedGame.price) === 0;
+
+                  return (
+                    <div
+                      key={suggestedGame.id}
+                      className="suggestedGameCard"
+                      onClick={() => navigate(`/game/${suggestedGame.id}`)}
+                    >
+                      <div className="suggestedGameImage">
+                        <img
+                          src={getGameImage(suggestedGame)}
+                          alt={suggestedGame.name}
+                        />
+                        {suggestedHasDiscount && (
+                          <div className="suggestedDiscountBadge">
+                            -{suggestedGame.salePercent}%
+                          </div>
+                        )}
+                      </div>
+                      <div className="suggestedGameInfo">
+                        <h4>{suggestedGame.name}</h4>
+                        <div className="suggestedGameMeta">
+                          {suggestedGame.categories && suggestedGame.categories.length > 0 && (
+                            <span className="suggestedCategory">
+                              {suggestedGame.categories[0].name}
+                            </span>
+                          )}
+                          {suggestedGame.averageRating && (
+                            <span className="suggestedRating">
+                              ⭐ {suggestedGame.averageRating.toFixed(1)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="suggestedGamePrice">
+                          {suggestedIsFree ? (
+                            <span className="suggestedFreeTag">Miễn phí</span>
+                          ) : suggestedHasDiscount ? (
+                            <>
+                              <span className="suggestedOriginalPrice">
+                                {formatPrice(Number(suggestedGame.price), currency)}
+                              </span>
+                              <span className="suggestedDiscountPrice">
+                                {formatPrice(suggestedFinalPrice, currency)}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="suggestedRegularPrice">
+                              {formatPrice(Number(suggestedGame.price), currency)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <aside className="gameDetailSidebar">

@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchGamesByPrice, fetchCategories, Game, Category } from '../api/client';
 import { useCurrency } from '../context/CurrencyContext';
+import { getGameImage as getGameImageUtil } from '../utils/imageUtils';
 import './HomePage.css';
 
 // Category icons
@@ -23,16 +24,7 @@ const GAME_PLACEHOLDERS = [
 ];
 
 function getGameImage(game: Game): string {
-  // Prioritize image/cover from API if available
-  if (game.image) {
-    return game.image;
-  }
-  if (game.cover) {
-    return game.cover;
-  }
-  // Fallback to placeholder based on game name hash
-  const hash = game.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return GAME_PLACEHOLDERS[hash % GAME_PLACEHOLDERS.length];
+  return getGameImageUtil(game);
 }
 
 function formatPrice(price: number, currency: string = 'VND'): string {
@@ -40,6 +32,33 @@ function formatPrice(price: number, currency: string = 'VND'): string {
     return `$${(price / 25000).toFixed(2)}`;
   }
   return `${price.toLocaleString('vi-VN')}₫`;
+}
+
+function formatReleaseDate(dateStr?: string): string {
+  if (!dateStr) return '';
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('vi-VN', { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch {
+    return '';
+  }
+}
+
+function renderStars(rating?: number, count?: number): JSX.Element | null {
+  if (!rating || rating === 0) return null;
+  
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+  
+  return (
+    <div className="rating-stars" title={`${rating.toFixed(1)} / 5.0${count ? ` (${count} đánh giá)` : ''}`}>
+      {[...Array(fullStars)].map((_, i) => <span key={`full-${i}`} className="star full">★</span>)}
+      {hasHalfStar && <span className="star half">★</span>}
+      {[...Array(emptyStars)].map((_, i) => <span key={`empty-${i}`} className="star empty">☆</span>)}
+      {count && count > 0 && <span className="rating-count">({count})</span>}
+    </div>
+  );
 }
 
 function getDiscountedPrice(game: Game): number {
@@ -98,34 +117,34 @@ export function HomePage(){
     return () => { cancelled = true; };
   }, []);
 
-  const visibleCats = categories.slice(0, catLimit);
-  const canMoreCat = categories.length > catLimit;
+  const visibleCats = (categories || []).slice(0, catLimit);
+  const canMoreCat = categories && categories.length > catLimit;
 
   // Hero carousel: top 8 games with highest discount
   const heroSlides = useMemo(() => (
-    [...games]
+    [...(games || [])]
       .filter(g => g.salePercent && g.salePercent > 0)
       .sort((a,b) => (b.salePercent || 0) - (a.salePercent || 0))
       .slice(0, 8)
   ), [games]);
   
   const [heroIndex, setHeroIndex] = useState(0);
-  const hero = heroSlides[heroIndex] || games[0]; // Fallback to first game
+  const hero = heroSlides[heroIndex] || (games.length > 0 ? games[0] : null); // Safe fallback
   const heroTimer = useRef<number | null>(null);
   const AUTO_MS = 5200;
 
   function nextHero(){ 
-    setHeroIndex(i => (i+1) % Math.max(1, heroSlides.length)); 
+    setHeroIndex(i => (i+1) % Math.max(1, (heroSlides || []).length)); 
   }
   
   function prevHero(){ 
-    setHeroIndex(i => (i-1 + heroSlides.length) % Math.max(1, heroSlides.length)); 
+    setHeroIndex(i => (i-1 + (heroSlides || []).length) % Math.max(1, (heroSlides || []).length)); 
   }
 
   // Autoplay with pause on hover
   const heroAreaRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    if (heroSlides.length === 0) return;
+    if (!heroSlides || heroSlides.length === 0) return;
     
     function clear(){ 
       if(heroTimer.current) { 
@@ -158,13 +177,13 @@ export function HomePage(){
       area?.removeEventListener('mouseenter', pause);
       area?.removeEventListener('mouseleave', resume);
     };
-  }, [heroIndex, heroSlides.length]);
+  }, [heroIndex, heroSlides?.length]);
 
   // Game sections
-  const featured = useMemo(() => heroSlides.slice(0, 4), [heroSlides]);
+  const featured = useMemo(() => (heroSlides || []).slice(0, 4), [heroSlides]);
   
   const bestSellers = useMemo(() => (
-    [...games]
+    [...(games || [])]
       .sort((a,b) => {
         const scoreA = (a.salePercent || 0) * 2 - (Number(a.price) || 0) / 1000;
         const scoreB = (b.salePercent || 0) * 2 - (Number(b.price) || 0) / 1000;
@@ -174,17 +193,17 @@ export function HomePage(){
   ), [games]);
 
   const deepDiscount = useMemo(() => (
-    games.filter(g => (g.salePercent || 0) >= 30)
+    (games || []).filter(g => (g.salePercent || 0) >= 30)
       .sort((a,b) => (b.salePercent || 0) - (a.salePercent || 0))
       .slice(0, 8)
   ), [games]);
 
   const freeToPlay = useMemo(() => (
-    games.filter(g => Number(g.price) === 0).slice(0, 8)
+    (games || []).filter(g => Number(g.price) === 0).slice(0, 8)
   ), [games]);
 
   const newArrivals = useMemo(() => (
-    [...games].slice(0, 8)
+    [...(games || [])].slice(0, 8)
   ), [games]);
 
   const sections = useMemo(() => {
@@ -198,7 +217,7 @@ export function HomePage(){
     return allSections.filter(s => s.items && s.items.length > 0);
   }, [bestSellers, deepDiscount, featured, freeToPlay, newArrivals]);
 
-  if (loading && games.length === 0) {
+  if (loading && (!games || games.length === 0)) {
     return (
       <div className="home-model">
         <div className="hm-container">
@@ -211,36 +230,47 @@ export function HomePage(){
     );
   }
 
-  if (error && games.length === 0) {
+  if (error && (!games || games.length === 0)) {
     return (
       <div className="home-model">
         <div className="hm-container">
           <div className="error-state-page">
-            <div className="error-icon">⚠️</div>
+            <div className="error-icon-wrapper">
+              <svg className="error-icon-svg" width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+              </svg>
+              <div className="error-glow"></div>
+            </div>
+            
             <h2>Không thể tải dữ liệu</h2>
-            <p className="error-message">{error}</p>
+            <p className="error-description">
+              Rất tiếc, chúng tôi không thể kết nối đến máy chủ lúc này. 
+              Vui lòng thử lại sau hoặc liên hệ hỗ trợ nếu vấn đề vẫn tiếp diễn.
+            </p>
+            
             <div className="error-actions">
               <button 
                 className="btn-retry primary"
                 onClick={() => window.location.reload()}
               >
-                🔄 Thử lại
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
+                </svg>
+                Thử lại
               </button>
               <button 
                 className="btn-retry secondary"
                 onClick={() => navigate('/store')}
               >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/>
+                </svg>
                 Xem cửa hàng
               </button>
             </div>
-            <div className="error-help">
-              <p className="help-title">Gợi ý khắc phục:</p>
-              <ul className="help-list">
-                <li>Kiểm tra backend đang chạy tại <code>http://localhost:8080</code></li>
-                <li>Chạy lệnh: <code>cd Back-End && mvn spring-boot:run</code></li>
-                <li>Đảm bảo MySQL database đang hoạt động</li>
-                <li>Xóa cache trình duyệt và thử lại</li>
-              </ul>
+            
+            <div className="error-footer">
+              <p>Nếu bạn cần hỗ trợ, vui lòng liên hệ với chúng tôi</p>
             </div>
           </div>
         </div>
@@ -256,7 +286,7 @@ export function HomePage(){
           <aside className="hm-side-left">
             <div className="cat-head">Danh mục sản phẩm</div>
             <ul className="cat-nav">
-              {visibleCats.map(c => (
+              {(visibleCats || []).map(c => (
                 <li key={c.id || c.name}>
                   <button 
                     type="button" 
@@ -268,7 +298,7 @@ export function HomePage(){
                 </li>
               ))}
             </ul>
-            {(canMoreCat || categories.length > 10) && (
+            {(canMoreCat || (categories && categories.length > 10)) && (
               <div className="cat-more">
                 {canMoreCat ? (
                   <button className="link-more" onClick={() => setCatLimit(l => l + 8)}>
@@ -313,7 +343,7 @@ export function HomePage(){
                     </div>
                   </div>
                 </Link>
-                {heroSlides.length > 1 && (
+                {heroSlides && heroSlides.length > 1 && (
                   <>
                     <button className="hero-nav prev" onClick={prevHero} aria-label="Trước">
                       ‹
@@ -322,7 +352,7 @@ export function HomePage(){
                       ›
                     </button>
                     <div className="hero-dots">
-                      {heroSlides.map((slide, i) => (
+                      {(heroSlides || []).map((slide, i) => (
                         <button 
                           key={slide.id} 
                           className={i === heroIndex ? 'dot active' : 'dot'} 
@@ -375,7 +405,7 @@ export function HomePage(){
         {sections.length > 0 && (
           <div className="section-nav">
             <ul>
-              {sections.map(s => (
+              {(sections || []).map(s => (
                 <li key={s.id}>
                   <a href={`#sec-${s.id}`}>{s.title}</a>
                 </li>
@@ -387,7 +417,7 @@ export function HomePage(){
         {/* Game Sections */}
         <div className="hm-sections">
           {error && <div className="error-state">{error}</div>}
-          {sections.map(s => (
+          {(sections || []).map(s => (
             <SectionShelf 
               key={s.id} 
               id={`sec-${s.id}`} 
@@ -418,7 +448,7 @@ function SectionShelf({ title, items, id, currency }: SectionShelfProps){
         <Link to="/store" className="link-more">Xem tất cả →</Link>
       </header>
       <div className="shelf-grid">
-        {items.map((g) => {
+        {(items || []).map((g) => {
           const hasDiscount = g.salePercent && g.salePercent > 0;
           const finalPrice = getDiscountedPrice(g);
           const percent = g.salePercent || 0;
@@ -441,13 +471,28 @@ function SectionShelf({ title, items, id, currency }: SectionShelfProps){
               </div>
               <div className="si-body">
                 <span className="si-title">{g.name}</span>
+                
+                {/* Rating */}
+                {g.averageRating && g.averageRating > 0 && (
+                  <div className="si-rating">
+                    {renderStars(g.averageRating, g.ratingCount)}
+                  </div>
+                )}
+                
                 <div className="si-meta">
                   <span className="genres">
                     {g.categories && g.categories.length > 0 
-                      ? g.categories.slice(0, 2).map(c => c.name).join(', ')
+                      ? (g.categories || []).slice(0, 2).map(c => c.name).join(', ')
                       : 'Game'}
                   </span>
+                  {g.releaseDate && (
+                    <>
+                      <span className="meta-sep">•</span>
+                      <span className="release-date">{formatReleaseDate(g.releaseDate)}</span>
+                    </>
+                  )}
                 </div>
+                
                 <div className="si-price-row">
                   {free ? (
                     <span className="free-tag">Miễn phí</span>

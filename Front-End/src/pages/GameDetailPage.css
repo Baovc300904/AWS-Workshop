@@ -5,7 +5,7 @@
 /* Container */
 .gameDetailContainer {
   min-height: calc(100vh - 80px);
-  background: #1B2838;
+  background: linear-gradient(to bottom, #0f172a 0%, #1e293b 50%, #0f172a 100%);
   animation: fadeIn 0.5s ease-out;
 }
 
@@ -21,7 +21,7 @@
   position: relative;
   height: 550px;
   overflow: hidden;
-  background: #0f1419;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
 
 .heroImage {
@@ -48,7 +48,7 @@
   left: 0;
   right: 0;
   height: 60%;
-  background: linear-gradient(to top, #1B2838 0%, rgba(27, 40, 56, 0.8) 50%, transparent 100%);
+  background: linear-gradient(to top, #0f172a 0%, rgba(15, 23, 42, 0.8) 50%, transparent 100%);
   pointer-events: none;
 }
 
@@ -57,10 +57,10 @@
   position: absolute;
   top: 32px;
   right: 32px;
-  background: linear-gradient(135deg, #ff4757 0%, #e84118 100%);
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
   padding: 16px 24px;
   border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(232, 65, 24, 0.5);
+  box-shadow: 0 12px 40px rgba(225, 29, 72, 0.6);
   z-index: 10;
   animation: pulse 2s ease-in-out infinite;
 }
@@ -127,21 +127,23 @@
 
 .heroTag {
   padding: 8px 20px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  background: rgba(6, 182, 212, 0.2);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(6, 182, 212, 0.4);
   border-radius: 24px;
-  color: #fff;
+  color: #67e8f9;
   font-size: 14px;
   font-weight: 700;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
 }
 
 .heroTag:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(6, 182, 212, 0.4);
+  border-color: #06b6d4;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
 }
 
 /* ===================================
@@ -168,23 +170,23 @@
    GAME HEADER SECTION
    =================================== */
 .gameHeader {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(6, 182, 212, 0.2);
   border-radius: 24px;
   padding: 32px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 40px rgba(6, 182, 212, 0.1);
   display: flex;
   flex-direction: column;
   gap: 24px;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .gameHeader:hover {
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 60px rgba(6, 182, 212, 0.15);
   transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(6, 182, 212, 0.4);
 }
 
 .gameTitle h1 {
@@ -204,22 +206,22 @@
 }
 
 .gameTags .tag {
-  background: rgba(30, 41, 59, 0.8);
-  color: #93c5fd;
+  background: rgba(15, 23, 42, 0.9);
+  color: #67e8f9;
   padding: 8px 16px;
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  border: 1px solid rgba(6, 182, 212, 0.3);
   transition: all 0.2s ease;
 }
 
 .gameTags .tag:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.5);
+  border-color: #06b6d4;
 }
 
 .gamePriceSection {
@@ -258,17 +260,17 @@
 .discountPrice {
   font-size: 2.5rem;
   font-weight: 900;
-  color: #ff4757;
+  color: #f43f5e;
   line-height: 1;
-  text-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+  text-shadow: 0 2px 8px rgba(244, 63, 94, 0.4);
 }
 
 .regularPrice {
   font-size: 2.5rem;
   font-weight: 900;
-  color: #60a5fa;
+  color: #06b6d4;
   line-height: 1;
-  text-shadow: 0 2px 8px rgba(96, 165, 250, 0.4);
+  text-shadow: 0 2px 8px rgba(6, 182, 212, 0.4);
 }
 
 .actionButtons {
@@ -312,13 +314,13 @@
 }
 
 .btnBuyNow {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
   color: #fff;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.5);
 }
 
 .btnBuyNow:hover {
-  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.5);
+  box-shadow: 0 12px 32px rgba(6, 182, 212, 0.6);
   transform: translateY(-3px);
 }
 
@@ -328,14 +330,14 @@
 
 .btnAddCart {
   background: rgba(15, 23, 42, 0.8);
-  color: #93c5fd;
-  border: 2px solid #3b82f6;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+  color: #67e8f9;
+  border: 2px solid #06b6d4;
+  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
 }
 
 .btnAddCart:hover {
   background: rgba(30, 41, 59, 0.9);
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
   transform: translateY(-3px);
   color: #ffffff;
 }
@@ -355,23 +357,23 @@
 }
 
 .btnWishlist.active {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: #ef4444;
+  background: rgba(244, 63, 94, 0.2);
+  border-color: #f43f5e;
 }
 
 /* ===================================
    GAME TABS
    =================================== */
 .gameTabs {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(6, 182, 212, 0.2);
   border-radius: 20px;
   padding: 8px;
   display: flex;
   gap: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 30px rgba(6, 182, 212, 0.1);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .gameTabs .tab {
@@ -393,28 +395,28 @@
 }
 
 .gameTabs .tab:hover {
-  background: rgba(37, 99, 235, 0.2);
-  color: #93c5fd;
+  background: rgba(6, 182, 212, 0.2);
+  color: #67e8f9;
 }
 
 .gameTabs .tab.active {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
   color: #fff;
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
 }
 
 /* ===================================
    TAB CONTENT
    =================================== */
 .gameTabContent {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(6, 182, 212, 0.15);
   border-radius: 24px;
   padding: 40px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   animation: fadeInUp 0.5s ease-out;
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 @keyframes fadeInUp {
@@ -551,13 +553,13 @@
 }
 
 .btnBuyNowModern {
-  background: linear-gradient(135deg, #4eb8dd 0%, #2a90b3 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
   color: #fff;
-  box-shadow: 0 8px 24px rgba(42, 144, 179, 0.4);
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.5);
 }
 
 .btnBuyNowModern:hover {
-  box-shadow: 0 12px 32px rgba(42, 144, 179, 0.5);
+  box-shadow: 0 12px 32px rgba(6, 182, 212, 0.6);
   transform: translateY(-3px);
 }
 
@@ -566,16 +568,17 @@
 }
 
 .btnAddCartModern {
-  background: #fff;
-  color: #2a90b3;
-  border: 2px solid #4eb8dd;
-  box-shadow: 0 4px 16px rgba(78, 184, 221, 0.2);
+  background: rgba(15, 23, 42, 0.95);
+  color: #67e8f9;
+  border: 2px solid #06b6d4;
+  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
 }
 
 .btnAddCartModern:hover {
-  background: linear-gradient(135deg, #f0f9fb, #e6f5fa);
-  box-shadow: 0 8px 24px rgba(78, 184, 221, 0.3);
+  background: rgba(30, 41, 59, 0.95);
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
   transform: translateY(-3px);
+  color: #ffffff;
 }
 
 .btnWishlistModern {
@@ -586,14 +589,14 @@
 }
 
 .btnWishlistModern:hover {
-  background: #fff5f5;
-  border-color: #ffcccb;
+  background: rgba(30, 41, 59, 0.5);
+  border-color: #ef4444;
   transform: scale(1.1);
 }
 
 .btnWishlistModern.active {
-  background: linear-gradient(135deg, #ffe6e6, #ffd4d4);
-  border-color: #ff9999;
+  background: rgba(244, 63, 94, 0.2);
+  border-color: #f43f5e;
 }
 
 .btnIcon {
@@ -765,7 +768,7 @@
   gap: 12px;
   font-size: 32px;
   font-weight: 900;
-  color: #1d4e63;
+  color: #06b6d4;
   margin: 0 0 8px;
 }
 
@@ -775,7 +778,7 @@
   gap: 10px;
   font-size: 24px;
   font-weight: 800;
-  color: #2a90b3;
+  color: #67e8f9;
   margin: 0 0 8px;
 }
 
@@ -825,8 +828,8 @@
 }
 
 .featureCard {
-  background: linear-gradient(135deg, #f8fcfe, #f0f9fb);
-  border: 1px solid rgba(78, 184, 221, 0.2);
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(6, 182, 212, 0.2);
   border-radius: 16px;
   padding: 24px;
   display: flex;
@@ -836,9 +839,9 @@
 }
 
 .featureCard:hover {
-  background: #fff;
-  border-color: #4eb8dd;
-  box-shadow: 0 12px 32px rgba(78, 184, 221, 0.2);
+  background: rgba(30, 41, 59, 0.7);
+  border-color: #06b6d4;
+  box-shadow: 0 12px 32px rgba(6, 182, 212, 0.3);
   transform: translateY(-4px);
 }
 
@@ -856,13 +859,13 @@
   margin: 0 0 8px;
   font-size: 16px;
   font-weight: 800;
-  color: #1d4e63;
+  color: #06b6d4;
 }
 
 .featureCardContent p {
   margin: 0;
   font-size: 15px;
-  color: #6e93a3;
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
 }
 
@@ -890,7 +893,7 @@
 .gameInfoHeader {
   text-align: center;
   padding-bottom: 24px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid rgba(6, 182, 212, 0.3);
 }
 
 .gameInfoHeader h2 {
@@ -910,20 +913,20 @@
 
 .metaTag {
   padding: 8px 20px;
-  background: rgba(30, 41, 59, 0.8);
-  color: #93c5fd;
+  background: rgba(15, 23, 42, 0.9);
+  color: #67e8f9;
   font-size: 14px;
   font-weight: 700;
   border-radius: 20px;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  border: 1px solid rgba(6, 182, 212, 0.3);
   transition: all 0.2s ease;
 }
 
 .metaTag:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
   color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.5);
 }
 
 /* Description Card */
@@ -937,8 +940,8 @@
 }
 
 .gameDescriptionCard:hover {
-  border-color: rgba(59, 130, 246, 0.5);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 30px rgba(6, 182, 212, 0.2);
   transform: translateY(-2px);
 }
 
@@ -948,7 +951,7 @@
   gap: 12px;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid rgba(6, 182, 212, 0.3);
 }
 
 .descIcon {
@@ -980,9 +983,9 @@
   font-size: 17px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
-  background: rgba(37, 99, 235, 0.15);
+  background: rgba(6, 182, 212, 0.15);
   padding: 20px;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid #06b6d4;
   border-radius: 12px;
 }
 
@@ -1026,16 +1029,16 @@
 }
 
 .videoCaption {
-  background: rgba(37, 99, 235, 0.15);
+  background: rgba(6, 182, 212, 0.15);
   padding: 16px 20px;
   border-radius: 12px;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid #06b6d4;
 }
 
 .videoCaption p {
   margin: 0;
   font-size: 15px;
-  color: #93c5fd;
+  color: #67e8f9;
   font-weight: 600;
 }
 
@@ -1054,7 +1057,7 @@
   gap: 12px;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid rgba(6, 182, 212, 0.3);
 }
 
 .featIcon {
@@ -1095,7 +1098,7 @@
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(180deg, #2563eb, #1d4ed8);
+  background: linear-gradient(180deg, #06b6d4, #0891b2);
   transition: width 0.3s ease;
 }
 
@@ -1105,14 +1108,14 @@
 }
 
 .detailedFeatureCard:hover {
-  border-color: rgba(59, 130, 246, 0.6);
-  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.3);
+  border-color: rgba(6, 182, 212, 0.6);
+  box-shadow: 0 12px 32px rgba(6, 182, 212, 0.4);
   transform: translateY(-4px);
 }
 
 .detailedFeatureCard.primary {
-  border-color: rgba(59, 130, 246, 0.4);
-  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(6, 182, 212, 0.4);
+  background: rgba(6, 182, 212, 0.1);
 }
 
 .detailedFeatureCard.success {
@@ -1140,11 +1143,11 @@
 }
 
 .detailedFeatureCard.info {
-  border-color: rgba(59, 130, 246, 0.4);
+  border-color: rgba(6, 182, 212, 0.4);
 }
 
 .detailedFeatureCard.info::before {
-  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  background: linear-gradient(180deg, #06b6d4, #0891b2);
 }
 
 .detailedFeatureCard.accent {
@@ -1161,7 +1164,7 @@
 }
 
 .detailedFeatureCard.sale::before {
-  background: linear-gradient(180deg, #ff4757, #e84118);
+  background: linear-gradient(180deg, #f43f5e, #e11d48);
 }
 
 .detailedFeatureCard .featureCardIcon {
@@ -1191,7 +1194,7 @@
   margin: 0 0 8px;
   font-size: 22px;
   font-weight: 900;
-  color: #93c5fd;
+  color: #67e8f9;
   line-height: 1.2;
 }
 
@@ -1304,33 +1307,33 @@
 }
 
 .purchaseInfoCard {
-  background: linear-gradient(135deg, #f0f9fb, #e6f5fa);
-  border: 2px solid #4eb8dd;
+  background: rgba(15, 23, 42, 0.7);
+  border: 2px solid rgba(6, 182, 212, 0.4);
   border-radius: 20px;
   padding: 32px;
   display: flex;
   gap: 24px;
   align-items: flex-start;
-  box-shadow: 0 12px 36px rgba(78, 184, 221, 0.2);
+  box-shadow: 0 12px 36px rgba(6, 182, 212, 0.3);
   transition: all 0.3s ease;
 }
 
 .purchaseInfoCard:hover {
-  box-shadow: 0 16px 48px rgba(78, 184, 221, 0.3);
+  box-shadow: 0 16px 48px rgba(6, 182, 212, 0.4);
   transform: translateY(-4px);
 }
 
 .purchaseIcon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #4eb8dd, #2a90b3);
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
   flex-shrink: 0;
-  box-shadow: 0 8px 24px rgba(42, 144, 179, 0.4);
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.5);
 }
 
 .purchaseContent {
@@ -1341,7 +1344,7 @@
   margin: 0 0 16px;
   font-size: 26px;
   font-weight: 900;
-  color: #1d4e63;
+  color: #06b6d4;
 }
 
 .purchaseList {
@@ -1355,13 +1358,13 @@
 
 .purchaseList li {
   padding: 12px 16px;
-  background: #ffffff;
+  background: rgba(30, 41, 59, 0.6);
   border-left: 4px solid #10b981;
   border-radius: 10px;
   font-size: 15px;
-  color: #2a5570;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
 }
 
@@ -1382,16 +1385,16 @@
 }
 
 .reqCard {
-  background: linear-gradient(135deg, #f8fcfe, #ffffff);
-  border: 2px solid rgba(78, 184, 221, 0.2);
+  background: rgba(15, 23, 42, 0.7);
+  border: 2px solid rgba(6, 182, 212, 0.2);
   border-radius: 20px;
   padding: 28px;
   transition: all 0.3s ease;
 }
 
 .reqCard:hover {
-  border-color: #4eb8dd;
-  box-shadow: 0 12px 36px rgba(78, 184, 221, 0.2);
+  border-color: #06b6d4;
+  box-shadow: 0 12px 36px rgba(6, 182, 212, 0.3);
   transform: translateY(-4px);
 }
 
@@ -1409,19 +1412,19 @@
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 2px solid rgba(78, 184, 221, 0.1);
+  border-bottom: 2px solid rgba(6, 182, 212, 0.2);
 }
 
 .reqCardHeader h3 {
   margin: 0;
   font-size: 22px;
   font-weight: 900;
-  color: #1d4e63;
+  color: #06b6d4;
 }
 
 .reqBadge {
   padding: 6px 14px;
-  background: linear-gradient(135deg, #4eb8dd, #2a90b3);
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
   color: #fff;
   font-size: 12px;
   font-weight: 700;
@@ -1443,8 +1446,8 @@
   display: flex;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(78, 184, 221, 0.05);
-  border-left: 3px solid #4eb8dd;
+  background: rgba(6, 182, 212, 0.1);
+  border-left: 3px solid #06b6d4;
   border-radius: 10px;
   font-size: 14px;
   color: #4a7385;
@@ -1461,10 +1464,33 @@
   font-size: 20px;
   line-height: 1.4;
   flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.reqDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reqDetails strong {
+  color: #06b6d4;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reqDetails span {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
 }
 
 .reqList li strong {
-  color: #1d4e63;
+  color: #06b6d4;
   font-weight: 800;
   margin-right: 6px;
 }
@@ -1546,14 +1572,14 @@
 .ratingProgress {
   flex: 1;
   height: 12px;
-  background: rgba(78, 184, 221, 0.1);
+  background: rgba(6, 182, 212, 0.15);
   border-radius: 6px;
   overflow: hidden;
 }
 
 .ratingProgressFill {
   height: 100%;
-  background: linear-gradient(90deg, #4eb8dd, #2a90b3);
+  background: linear-gradient(90deg, #06b6d4, #0891b2);
   border-radius: 6px;
   transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1561,7 +1587,7 @@
 .ratingPercent {
   font-size: 14px;
   font-weight: 700;
-  color: #2a90b3;
+  color: #06b6d4;
   min-width: 45px;
   text-align: right;
 }
@@ -1574,16 +1600,16 @@
 }
 
 .reviewCard {
-  background: #fff;
-  border: 1px solid rgba(78, 184, 221, 0.2);
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(6, 182, 212, 0.2);
   border-radius: 18px;
   padding: 28px;
   transition: all 0.3s ease;
 }
 
 .reviewCard:hover {
-  border-color: #4eb8dd;
-  box-shadow: 0 8px 24px rgba(78, 184, 221, 0.15);
+  border-color: #06b6d4;
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.2);
   transform: translateY(-2px);
 }
 
@@ -1603,7 +1629,7 @@
 .reviewerAvatar {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #4eb8dd, #2a90b3);
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1615,7 +1641,7 @@
 .reviewerName {
   font-size: 16px;
   font-weight: 800;
-  color: #1d4e63;
+  color: #06b6d4;
 }
 
 .reviewDate {
@@ -1636,14 +1662,14 @@
 .reviewTitle {
   font-size: 18px;
   font-weight: 800;
-  color: #1d4e63;
+  color: #67e8f9;
   margin: 0 0 8px;
 }
 
 .reviewContent p {
   font-size: 15px;
   line-height: 1.7;
-  color: #4a7385;
+  color: rgba(255, 255, 255, 0.8);
   margin: 0;
 }
 
@@ -1651,33 +1677,33 @@
   display: flex;
   gap: 12px;
   padding-top: 16px;
-  border-top: 1px solid rgba(78, 184, 221, 0.1);
+  border-top: 1px solid rgba(6, 182, 212, 0.2);
 }
 
 .reviewAction {
   padding: 8px 16px;
-  background: rgba(78, 184, 221, 0.05);
-  border: 1px solid rgba(78, 184, 221, 0.2);
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
-  color: #2a90b3;
+  color: #67e8f9;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .reviewAction:hover {
-  background: rgba(78, 184, 221, 0.1);
-  border-color: #4eb8dd;
+  background: rgba(6, 182, 212, 0.2);
+  border-color: #06b6d4;
   transform: translateY(-2px);
 }
 
 .noReviewsModern {
   text-align: center;
   padding: 60px 20px;
-  background: linear-gradient(135deg, #f8fcfe, #f0f9fb);
+  background: rgba(15, 23, 42, 0.6);
   border-radius: 20px;
-  border: 2px dashed rgba(78, 184, 221, 0.3);
+  border: 2px dashed rgba(6, 182, 212, 0.3);
 }
 
 .noReviewsIcon {
@@ -1689,7 +1715,7 @@
 .noReviewsModern p {
   font-size: 18px;
   font-weight: 700;
-  color: #6e93a3;
+  color: rgba(255, 255, 255, 0.7);
   margin: 8px 0;
 }
 
@@ -2106,5 +2132,351 @@
   .subsectionTitle {
     font-size: 18px;
   }
+}
+
+/* ===================================
+   PERFORMANCE TIPS
+   =================================== */
+.performanceTips {
+  margin-top: 32px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.tipsHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid rgba(6, 182, 212, 0.3);
+}
+
+.tipsIcon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.tipsHeader h3 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #06b6d4;
+  margin: 0;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.tipCard {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tipCard:hover {
+  border-color: rgba(6, 182, 212, 0.5);
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.2);
+  transform: translateY(-4px);
+}
+
+.tipIconBox {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 4px;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+}
+
+.tipCard h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #67e8f9;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ===================================
+   SUGGESTED GAMES SECTION
+   =================================== */
+.suggestedGamesSection {
+  margin-top: 48px;
+  padding-top: 48px;
+  border-top: 2px solid rgba(6, 182, 212, 0.2);
+}
+
+.suggestedHeader {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.suggestedHeader h2 {
+  font-size: 36px;
+  font-weight: 900;
+  color: #06b6d4;
+  margin: 0 0 8px;
+  text-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+}
+
+.suggestedHeader p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.suggestedGamesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.suggestedGameCard {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.suggestedGameCard:hover {
+  transform: translateY(-8px);
+  border-color: rgba(6, 182, 212, 0.6);
+  box-shadow: 0 12px 32px rgba(6, 182, 212, 0.3);
+}
+
+.suggestedGameImage {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.suggestedGameImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.suggestedGameCard:hover .suggestedGameImage img {
+  transform: scale(1.1);
+}
+
+.suggestedDiscountBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.4);
+  z-index: 2;
+}
+
+.suggestedGameInfo {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.suggestedGameInfo h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffffff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  min-height: 50px;
+}
+
+.suggestedGameMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.suggestedCategory {
+  padding: 4px 12px;
+  background: rgba(6, 182, 212, 0.15);
+  color: #67e8f9;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.suggestedRating {
+  padding: 4px 12px;
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.suggestedGamePrice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.suggestedFreeTag {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.suggestedOriginalPrice {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: line-through;
+  font-weight: 600;
+}
+
+.suggestedDiscountPrice {
+  font-size: 20px;
+  font-weight: 900;
+  color: #f43f5e;
+  text-shadow: 0 2px 8px rgba(244, 63, 94, 0.3);
+}
+
+.suggestedRegularPrice {
+  font-size: 20px;
+  font-weight: 900;
+  color: #06b6d4;
+  text-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+}
+
+/* Responsive for Performance Tips and Suggested Games */
+@media (max-width: 1200px) {
+  .suggestedGamesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .suggestedGamesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .suggestedGameImage {
+    height: 150px;
+  }
+
+  .suggestedHeader h2 {
+    font-size: 28px;
+  }
+
+  .performanceTips {
+    padding: 24px;
+  }
+
+  .tipsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .suggestedGamesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .suggestedGameImage {
+    height: 200px;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .performanceTips {
+    padding: 20px;
+  }
+
+  .suggestedHeader h2 {
+    font-size: 24px;
+  }
+}
+
+/* ===================================
+   NO SYSTEM REQUIREMENTS STATE
+   =================================== */
+.noSystemReqs {
+  text-align: center;
+  padding: 80px 40px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 2px dashed rgba(6, 182, 212, 0.3);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.noSystemReqsIcon {
+  font-size: 64px;
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+
+.noSystemReqs h3 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #06b6d4;
+  margin: 0;
+}
+
+.noSystemReqs p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  max-width: 500px;
 }
 

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMyInfo, introspect, updateMyInfo, UpdateProfilePayload } from '../api/client';
+import { getMyInfo, introspect, updateMyInfo, UpdateProfilePayload, uploadAvatar, getBalance, createMoMoTopup, getTransactionHistory } from '../api/client';
 import './ProfilePage.css';
 
 interface UserProfile {
@@ -11,6 +11,8 @@ interface UserProfile {
   email?: string;
   phone?: string;
   dob?: string;
+  avatarUrl?: string;
+  balance?: number;
 }
 
 export function ProfilePage() {
@@ -28,6 +30,13 @@ export function ProfilePage() {
     phone: '',
     dob: '',
   });
+  const [passwordConfirm, setPasswordConfirm] = useState(''); // Password for confirmation
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [balance, setBalance] = useState<number>(0);
+  const [topupAmount, setTopupAmount] = useState<string>('');
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('wgs_token') || localStorage.getItem('token');
@@ -38,32 +47,7 @@ export function ProfilePage() {
 
     const checkAuth = async () => {
       try {
-        // TEMPORARY: Mock data if backend not available
-        const USE_MOCK = true; // Set to false when backend is ready
-        
-        if (USE_MOCK) {
-          console.warn('[ProfilePage] Using MOCK data - Backend not available');
-          const mockData = {
-            id: 'mock-user-123',
-            username: localStorage.getItem('username') || 'baovc',
-            firstName: 'Bảo',
-            lastName: 'Võ Cao',
-            email: 'baovc@devteria.com',
-            phone: '0987654321',
-            dob: '2000-01-15'
-          };
-          setProfile(mockData);
-          setFormData({
-            firstName: mockData.firstName || '',
-            lastName: mockData.lastName || '',
-            email: mockData.email || '',
-            phone: mockData.phone || '',
-            dob: mockData.dob || '',
-          });
-          setLoading(false);
-          return;
-        }
-
+        // Verify token first
         const valid = await introspect(token);
         if (!valid) {
           localStorage.removeItem('token');
@@ -72,8 +56,8 @@ export function ProfilePage() {
           return;
         }
 
+        // Load user profile from API
         const data = await getMyInfo();
-        console.log('[ProfilePage] User data loaded:', data);
         setProfile(data);
         setFormData({
           firstName: data.firstName || '',
@@ -82,9 +66,24 @@ export function ProfilePage() {
           phone: data.phone || '',
           dob: data.dob || '',
         });
+
+        // Load balance
+        try {
+          const balanceData = await getBalance();
+          setBalance(balanceData.balance || 0);
+        } catch (balanceErr) {
+          console.error('Failed to load balance:', balanceErr);
+        }
       } catch (err: any) {
-        console.error('[ProfilePage] Error loading user info:', err);
-        setError(err?.response?.data?.message || 'Không thể tải thông tin người dùng');
+        const errorMsg = err?.response?.data?.message || err?.message || 'Không thể tải thông tin người dùng';
+        setError(errorMsg);
+        
+        // If 401, redirect to login
+        if (err?.response?.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('wgs_token');
+          navigate('/login');
+        }
       } finally {
         setLoading(false);
       }
@@ -103,7 +102,7 @@ export function ProfilePage() {
 
   const handleEdit = () => {
     if (editing) {
-      // Cancel edit - reset form data
+      // Cancel edit - reset form data and password
       setFormData({
         firstName: profile?.firstName || '',
         lastName: profile?.lastName || '',
@@ -111,6 +110,7 @@ export function ProfilePage() {
         phone: profile?.phone || '',
         dob: profile?.dob || '',
       });
+      setPasswordConfirm('');
     }
     setEditing(!editing);
   };
@@ -119,15 +119,56 @@ export function ProfilePage() {
     if (!profile) return;
     
     setSaving(true);
+    setError(null);
     try {
-      const updated = await updateMyInfo(formData);
-      console.log('[ProfilePage] Profile updated:', updated);
+      // Update profile info WITHOUT sending password
+      // Password should only be sent when explicitly changing password
+      const updatePayload = {
+        ...formData
+      };
+      
+      console.log('🔄 Step 1: Preparing update with:', updatePayload);
+      console.log('🔄 Step 2: Calling updateMyInfo...');
+      
+      const updated = await updateMyInfo(updatePayload as any);
+      
+      console.log('✅ Step 3: Got response:', updated);
+      
       setProfile(updated);
+      // IMPORTANT: Update formData with new values too!
+      setFormData({
+        firstName: updated.firstName || '',
+        lastName: updated.lastName || '',
+        email: updated.email || '',
+        phone: updated.phone || '',
+        dob: updated.dob || '',
+      });
       setEditing(false);
-      alert('✅ Cập nhật thông tin thành công!');
+      setPasswordConfirm(''); // Clear password field
+      
+      // Show success message
+      const successMsg = document.createElement('div');
+      successMsg.className = 'toast-success';
+      successMsg.textContent = '✅ Cập nhật thông tin thành công!';
+      document.body.appendChild(successMsg);
+      setTimeout(() => successMsg.remove(), 3000);
+      
     } catch (err: any) {
-      console.error('[ProfilePage] Update failed:', err);
-      alert('❌ Cập nhật thất bại: ' + (err?.response?.data?.message || err.message));
+      let errorMsg = err?.response?.data?.message || err?.message || 'Cập nhật thất bại';
+      
+      // Check if error is due to wrong password
+      if (err?.response?.status === 401 || errorMsg.toLowerCase().includes('password')) {
+        errorMsg = 'Mật khẩu không đúng! Vui lòng thử lại.';
+      }
+      
+      setError(errorMsg);
+      
+      // Show error message
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'toast-error';
+      errorDiv.textContent = `❌ ${errorMsg}`;
+      document.body.appendChild(errorDiv);
+      setTimeout(() => errorDiv.remove(), 3000);
     } finally {
       setSaving(false);
     }
@@ -136,6 +177,95 @@ export function ProfilePage() {
   const handleChange = (field: keyof UpdateProfilePayload, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('⚠️ Vui lòng chọn file ảnh!');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('⚠️ Kích thước ảnh không được vượt quá 5MB!');
+      return;
+    }
+
+    setAvatarUploading(true);
+    try {
+      const updatedUser = await uploadAvatar(file);
+      
+      // Update local state with new avatar URL (includes timestamp from backend)
+      setProfile(prev => prev ? { ...prev, avatarUrl: updatedUser.avatarUrl } : null);
+      
+      // Update navbar avatar - trigger event
+      window.dispatchEvent(new CustomEvent('avatar-updated', { detail: updatedUser.avatarUrl }));
+      
+      const successMsg = document.createElement('div');
+      successMsg.className = 'toast-success';
+      successMsg.textContent = '✅ Upload avatar thành công!';
+      document.body.appendChild(successMsg);
+      setTimeout(() => successMsg.remove(), 3000);
+    } catch (err: any) {
+      console.error('Failed to upload avatar:', err);
+      alert('❌ Upload avatar thất bại: ' + (err.message || 'Unknown error'));
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  const handleTopup = async () => {
+    const amount = parseFloat(topupAmount);
+    if (!amount || amount <= 0) {
+      alert('⚠️ Vui lòng nhập số tiền hợp lệ!');
+      return;
+    }
+
+    if (amount < 10000) {
+      alert('⚠️ Số tiền nạp tối thiểu là 10,000 VNĐ!');
+      return;
+    }
+
+    try {
+      const result = await createMoMoTopup({ amount });
+      
+      if (result.payUrl) {
+        // Redirect to MoMo payment page
+        window.location.href = result.payUrl;
+      } else {
+        alert('❌ Không thể tạo link thanh toán');
+      }
+    } catch (err: any) {
+      console.error('Failed to create topup:', err);
+      alert('❌ Tạo yêu cầu nạp tiền thất bại');
+    }
+  };
+
+  const loadTransactions = async () => {
+    setLoadingTransactions(true);
+    try {
+      const data = await getTransactionHistory();
+      setTransactions(data);
+    } catch (err) {
+      console.error('Failed to load transactions:', err);
+    } finally {
+      setLoadingTransactions(false);
+    }
+  };
+
+  // Load transactions when switching to history section
+  useEffect(() => {
+    if (activeSection === 'history') {
+      loadTransactions();
+    }
+  }, [activeSection]);
 
   if (loading) {
     return (
@@ -167,9 +297,22 @@ export function ProfilePage() {
       {/* Left Sidebar */}
       <div className="profileSidebar">
         <div className="sidebarHeader">
-          <div className="sidebarAvatar">
-            <span className="sidebarAvatarText">{profile.username.charAt(0).toUpperCase()}</span>
+          <div className="sidebarAvatar sidebarAvatarClickable" onClick={handleAvatarClick}>
+            {profile.avatarUrl ? (
+              <img src={profile.avatarUrl} alt="Avatar" className="sidebarAvatarImage" />
+            ) : (
+              <span className="sidebarAvatarText">{profile.username.charAt(0).toUpperCase()}</span>
+            )}
+            {avatarUploading && <div className="avatarUploading">...</div>}
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="avatarFileInput"
+            onChange={handleAvatarChange}
+            aria-label="Upload avatar"
+          />
           <div className="sidebarUserInfo">
             <h3 className="sidebarUserName">
               {profile.firstName || profile.lastName
@@ -177,6 +320,12 @@ export function ProfilePage() {
                 : profile.username}
             </h3>
             <p className="sidebarUsername">@{profile.username}</p>
+          <div className="sidebarBalance">
+              <svg className="balanceIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="balanceAmount">{balance.toLocaleString('vi-VN')}đ</span>
+          </div>
           </div>
         </div>
 
@@ -185,7 +334,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'account' ? 'active' : ''}`}
             onClick={() => setActiveSection('account')}
           >
-            <span className="navItemIcon">👤</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Tài khoản của tôi</span>
           </button>
           
@@ -193,7 +344,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'topup' ? 'active' : ''}`}
             onClick={() => setActiveSection('topup')}
           >
-            <span className="navItemIcon">💰</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Nạp tiền</span>
           </button>
           
@@ -201,7 +354,10 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'inventory' ? 'active' : ''}`}
             onClick={() => setActiveSection('inventory')}
           >
-            <span className="navItemIcon">📦</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Kho hàng</span>
           </button>
           
@@ -209,7 +365,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'points' ? 'active' : ''}`}
             onClick={() => setActiveSection('points')}
           >
-            <span className="navItemIcon">💎</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Đổi điểm</span>
           </button>
           
@@ -217,7 +375,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'history' ? 'active' : ''}`}
             onClick={() => setActiveSection('history')}
           >
-            <span className="navItemIcon">📜</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Lịch sử</span>
           </button>
           
@@ -225,7 +385,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'voucher' ? 'active' : ''}`}
             onClick={() => setActiveSection('voucher')}
           >
-            <span className="navItemIcon">🎟️</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Kho Voucher</span>
           </button>
           
@@ -233,7 +395,9 @@ export function ProfilePage() {
             className={`sidebarNavItem ${activeSection === 'wishlist' ? 'active' : ''}`}
             onClick={() => navigate('/wishlist')}
           >
-            <span className="navItemIcon">❤️</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Yêu thích</span>
           </button>
           
@@ -241,7 +405,9 @@ export function ProfilePage() {
             className="sidebarNavItem danger"
             onClick={handleLogout}
           >
-            <span className="navItemIcon">🚪</span>
+            <svg className="navItemIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="navItemText">Đăng xuất</span>
           </button>
         </nav>
@@ -254,11 +420,21 @@ export function ProfilePage() {
           <div className="contentSection">
             <div className="sectionHeader">
               <h1 className="sectionTitle">
-                <span className="sectionIcon">👤</span>
+                <svg className="sectionIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
                 Tài khoản của tôi
               </h1>
               <button className="editToggleBtn" onClick={handleEdit}>
-                <span className="editIcon">{editing ? '❌' : '✏️'}</span>
+                {editing ? (
+                  <svg className="editIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg className="editIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
                 {editing ? 'Hủy' : 'Chỉnh sửa'}
               </button>
             </div>
@@ -374,6 +550,8 @@ export function ProfilePage() {
                             className="editInput"
                             value={formData.dob}
                             onChange={(e) => handleChange('dob', e.target.value)}
+                            placeholder="YYYY-MM-DD"
+                            aria-label="Ngày sinh"
                           />
                         ) : (
                           profile.dob 
@@ -397,24 +575,46 @@ export function ProfilePage() {
                   </div>
 
                   {editing && (
-                    <div className="editActions">
-                      <button 
-                        className="saveButton" 
-                        onClick={handleSave}
-                        disabled={saving}
-                      >
-                        <span className="saveIcon">💾</span>
-                        {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
-                      </button>
-                      <button 
-                        className="cancelButton" 
-                        onClick={handleEdit}
-                        disabled={saving}
-                      >
-                        <span className="cancelIcon">🚫</span>
-                        Hủy bỏ
-                      </button>
-                    </div>
+                    <>
+                      <div className="passwordConfirmSection">
+                        <div className="passwordConfirmHeader">
+                          <span className="warningIcon">🔐</span>
+                          <h3>Xác nhận mật khẩu</h3>
+                        </div>
+                        <p className="passwordConfirmNote">
+                          Để bảo mật tài khoản, vui lòng nhập mật khẩu hiện tại của bạn để xác nhận thay đổi.
+                        </p>
+                        <div className="passwordConfirmInput">
+                          <input
+                            type="password"
+                            className="editInput"
+                            placeholder="Nhập mật khẩu hiện tại..."
+                            value={passwordConfirm}
+                            onChange={(e) => setPasswordConfirm(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="editActions">
+                        <button 
+                          className="saveButton" 
+                          onClick={handleSave}
+                          disabled={saving}
+                        >
+                          <span className="saveIcon">💾</span>
+                          {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                        </button>
+                        <button 
+                          className="cancelButton" 
+                          onClick={handleEdit}
+                          disabled={saving}
+                        >
+                          <span className="cancelIcon">🚫</span>
+                          Hủy bỏ
+                        </button>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -520,12 +720,68 @@ export function ProfilePage() {
                 Nạp tiền
               </h1>
             </div>
+            
             <div className="contentCard">
+              <div className="cardHeader">
+                <h2 className="cardTitle">
+                  <span className="titleIcon">💳</span>
+                  Số dư hiện tại
+                </h2>
+              </div>
               <div className="cardBody">
-                <div className="emptyState">
-                  <div className="emptyStateIcon">💳</div>
-                  <h3>Chức năng nạp tiền</h3>
-                  <p>Tính năng này đang được phát triển</p>
+                <div className="balanceDisplay">
+                  <div className="balanceAmount">{balance.toLocaleString('vi-VN')} VNĐ</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="contentCard">
+              <div className="cardHeader">
+                <h2 className="cardTitle">
+                  <span className="titleIcon">💸</span>
+                  Nạp tiền qua MoMo
+                </h2>
+              </div>
+              <div className="cardBody">
+                <div className="topupForm">
+                  <div className="formGroup">
+                    <label htmlFor="topupAmount">Số tiền nạp (VNĐ)</label>
+                    <input
+                      id="topupAmount"
+                      type="number"
+                      className="editInput"
+                      value={topupAmount}
+                      onChange={(e) => setTopupAmount(e.target.value)}
+                      placeholder="Nhập số tiền (tối thiểu 10,000đ)"
+                      min="10000"
+                      step="10000"
+                    />
+                  </div>
+                  
+                  <div className="quickAmounts">
+                    <button className="quickAmountBtn" onClick={() => setTopupAmount('50000')}>
+                      50,000đ
+                    </button>
+                    <button className="quickAmountBtn" onClick={() => setTopupAmount('100000')}>
+                      100,000đ
+                    </button>
+                    <button className="quickAmountBtn" onClick={() => setTopupAmount('200000')}>
+                      200,000đ
+                    </button>
+                    <button className="quickAmountBtn" onClick={() => setTopupAmount('500000')}>
+                      500,000đ
+                    </button>
+                  </div>
+
+                  <button className="topupButton" onClick={handleTopup}>
+                    <span className="topupIcon">💳</span>
+                    Nạp tiền qua MoMo
+                  </button>
+
+                  <div className="topupNote">
+                    <p>💡 Bạn sẽ được chuyển đến trang thanh toán MoMo</p>
+                    <p>💡 Số tiền nạp tối thiểu: 10,000 VNĐ</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -585,14 +841,55 @@ export function ProfilePage() {
                 <span className="sectionIcon">📜</span>
                 Lịch sử giao dịch
               </h1>
+              <button className="refreshButton" onClick={loadTransactions}>
+                🔄 Làm mới
+              </button>
             </div>
+            
             <div className="contentCard">
               <div className="cardBody">
-                <div className="emptyState">
-                  <div className="emptyStateIcon">📋</div>
-                  <h3>Chưa có giao dịch</h3>
-                  <p>Lịch sử giao dịch của bạn sẽ hiển thị ở đây</p>
-                </div>
+                {loadingTransactions ? (
+                  <div className="loadingState">
+                    <div className="spinner"></div>
+                    <p>Đang tải...</p>
+                  </div>
+                ) : transactions.length === 0 ? (
+                  <div className="emptyState">
+                    <div className="emptyStateIcon">📋</div>
+                    <h3>Chưa có giao dịch</h3>
+                    <p>Lịch sử giao dịch của bạn sẽ hiển thị ở đây</p>
+                  </div>
+                ) : (
+                  <div className="transactionList">
+                    {transactions.map((tx) => (
+                      <div key={tx.id} className={`transactionItem ${tx.status.toLowerCase()}`}>
+                        <div className="transactionIcon">
+                          {tx.type === 'TOPUP' ? '💰' : tx.type === 'PURCHASE' ? '🎮' : '🔄'}
+                        </div>
+                        <div className="transactionDetails">
+                          <div className="transactionTitle">{tx.description}</div>
+                          <div className="transactionMeta">
+                            <span className="transactionDate">
+                              {new Date(tx.createdAt).toLocaleString('vi-VN')}
+                            </span>
+                            <span className="transactionMethod">{tx.paymentMethod}</span>
+                          </div>
+                        </div>
+                        <div className="transactionAmount">
+                          <span className={tx.type === 'TOPUP' ? 'positive' : 'negative'}>
+                            {tx.type === 'TOPUP' ? '+' : '-'}
+                            {tx.amount.toLocaleString('vi-VN')}đ
+                          </span>
+                          <span className={`transactionStatus ${tx.status.toLowerCase()}`}>
+                            {tx.status === 'SUCCESS' ? '✅ Thành công' : 
+                             tx.status === 'PENDING' ? '⏳ Đang xử lý' : 
+                             tx.status === 'FAILED' ? '❌ Thất bại' : '🚫 Đã hủy'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
