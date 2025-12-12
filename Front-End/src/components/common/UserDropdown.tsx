@@ -153,15 +153,11 @@ export function UserDropdown() {
         aria-haspopup="true"
       >
         <div className="user-avatar">
-<<<<<<< HEAD
           {user.avatarUrl ? (
             <img src={user.avatarUrl} alt={getDisplayName()} className="avatar-image" />
           ) : (
             getInitials()
           )}
-=======
-          {getInitials()}
->>>>>>> origin/main
         </div>
         <div className="user-info">
           <span className="user-name">{getDisplayName()}</span>
@@ -182,7 +178,6 @@ export function UserDropdown() {
       {isOpen && (
         <div className="user-dropdown-menu">
           <div className="dropdown-header">
-<<<<<<< HEAD
             <div className="dropdown-avatar">
               {user.avatarUrl ? (
                 <img src={user.avatarUrl} alt={getDisplayName()} className="avatar-image" />
@@ -190,9 +185,6 @@ export function UserDropdown() {
                 getInitials()
               )}
             </div>
-=======
-            <div className="dropdown-avatar">{getInitials()}</div>
->>>>>>> origin/main
             <div className="dropdown-user-info">
               <strong>{getDisplayName()}</strong>
               <span>{user.email || user.username}</span>

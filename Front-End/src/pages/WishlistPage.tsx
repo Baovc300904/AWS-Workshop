@@ -4,10 +4,8 @@ import { useCart } from '../context/CartContext';
 import { useCurrency, formatPrice } from '../context/CurrencyContext';
 import { useEffect, useState } from 'react';
 import { Game as GameResponse, fetchGame } from '../api/client';
-<<<<<<< HEAD
 import { getGameImage } from '../utils/imageUtils';
-=======
->>>>>>> origin/main
+import { getGameImage } from '../utils/imageUtils';
 import './WishlistPage.css';
 
 const WishlistPage = () => {
@@ -17,11 +15,10 @@ const WishlistPage = () => {
     const { currency } = useCurrency();
     const [games, setGames] = useState<GameResponse[]>([]);
     const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
     const [sortBy, setSortBy] = useState<'name' | 'price' | 'discount' | 'date'>('date');
     const [showOnSaleOnly, setShowOnSaleOnly] = useState(false);
-=======
->>>>>>> origin/main
+    const [sortBy, setSortBy] = useState<'name' | 'price' | 'discount' | 'date'>('date');
+    const [showOnSaleOnly, setShowOnSaleOnly] = useState(false);
 
     useEffect(() => {
         const fetchWishlistGames = async () => {
@@ -54,7 +51,6 @@ const WishlistPage = () => {
         add(game as any);
     };
 
-<<<<<<< HEAD
 
 
     // Filter and sort games
@@ -91,12 +87,6 @@ const WishlistPage = () => {
 
     const displayGames = getFilteredAndSortedGames();
 
-=======
-    const getGameImage = (game: GameResponse) => {
-        return game.image || game.cover || 'https://placehold.co/300x400/1a2332/4facfe?text=No+Image';
-    };
-
->>>>>>> origin/main
     if (loading) {
         return (
             <div className="wishlist-page">
@@ -140,7 +130,6 @@ const WishlistPage = () => {
         <div className="wishlist-page">
             <div className="wishlist-container">
                 <div className="wishlist-header">
-<<<<<<< HEAD
                     <div className="header-top">
                         <div>
                             <h1>❤️ Danh sách yêu thích</h1>
@@ -200,14 +189,6 @@ const WishlistPage = () => {
                 ) : (
                     <div className="wishlist-list">
                         {displayGames.map((game) => {
-=======
-                    <h1>❤️ Danh sách yêu thích</h1>
-                    <p className="wishlist-subtitle">{games.length} game trong danh sách của bạn</p>
-                </div>
-
-                <div className="wishlist-list">
-                    {games.map((game) => {
->>>>>>> origin/main
                         const salePercent = game.salePercent ?? 0;
                         const finalPrice = salePercent > 0 
                             ? game.price * (1 - salePercent / 100) 
@@ -311,7 +292,6 @@ const WishlistPage = () => {
                             </div>
                         );
                     })}
-<<<<<<< HEAD
                     </div>
                 )}
 
@@ -345,27 +325,6 @@ const WishlistPage = () => {
                         </div>
                     </div>
                 )}
-=======
-                </div>
-
-                <div className="wishlist-actions">
-                    <button 
-                        className="btn-secondary"
-                        onClick={() => navigate('/store')}
-                    >
-                        ← Tiếp tục mua sắm
-                    </button>
-                    <button 
-                        className="btn-primary"
-                        onClick={() => {
-                            games.forEach((game) => add(game as any));
-                            navigate('/checkout');
-                        }}
-                    >
-                        🛒 Thêm tất cả vào giỏ hàng ({games.length})
-                    </button>
-                </div>
->>>>>>> origin/main
             </div>
         </div>
     );

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchGamesByPrice, fetchCategories, Game, Category } from '../api/client';
@@ -83,79 +82,15 @@ export function HomePage(){
   const [catLimit, setCatLimit] = useState(10);
 
   // Load games
-=======
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { fetchGamesByPrice, searchGames, Game, getMyInfo, Me, setAuthToken, fetchCategories, Category } from '../api/client';
-import './HomePage.css';
-
-export function HomePage() {
-  const [games, setGames] = useState<Game[]>([]);
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
-  const [keyword, setKeyword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [me, setMe] = useState<Me | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement | null>(null);
-  const userRef = useRef<HTMLDivElement | null>(null);
-  const [page, setPage] = useState(0);
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [catOpen, setCatOpen] = useState(false);
-  const catRef = useRef<HTMLDivElement | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [catShowAll, setCatShowAll] = useState(false);
-  const phasmoBase = 'https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:format(webp):quality(75)/2023_12_22_638388544972449475_phasmophobia-thum.jpg';
-  const repoBase = 'https://cdn.dlcompare.com/game_tetiere/upload/gameimage/file/r-e-p-o-file-207303896c.jpg.webp';
-  const peakBase = 'https://tamhongame.net/storage/games/peak-online-multiplayer/peak-online-multiplayer-vertical_photo-6QMXdTk37H4F0uqXhKQ2.jpeg';
-  const palworldBase = 'https://tamhongame.net/storage/games/palworld/palworld-horizontal_photo-HdHSYiLAMsEe6LAWrRyV.jpeg';
-  const codBase = 'https://tamhongame.net/storage/games/call-of-duty-black-ops-6/call-of-duty-black-ops-6-horizontal_photo-vw2Mptr6ftK6otZbrzka.jpeg';
-  const rematchBase = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfH7I1Um-tl2dzd370WKP2dlP4Fgl6sDNQnQ&s';
-  const cupheadBase = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyVQ8pbT1GsxKiONB0nw0zpbHlTuDuiLi7tQ&s';
-  const cupheadLocal = `${import.meta.env.BASE_URL}assets/cuphead.jpg`;
-  const vRisingBase = 'https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/06/game-v-rising-thumb.jpg';
-
-  const getTags = (name?: string): string[] => {
-    const n = (name || '').toLowerCase();
-    if (n.includes('phasmophobia')) return ['Horror', 'Co-op', 'Multiplayer'];
-    if (n.includes('palworld') || n.includes('palword')) return ['Survival', 'Open World', 'Creature'];
-    if (n.includes('repo')) return ['Action', 'Adventure'];
-    if (n.includes('peak')) return ['Multiplayer', 'Casual'];
-    if (n.includes('call of duty') || n.includes('cod')) return ['Shooter', 'Action'];
-    return [];
-  };
-  const [playPhasmo, setPlayPhasmo] = useState(false);
-  const [playRepo, setPlayRepo] = useState(false);
-  const [playPeak, setPlayPeak] = useState(false);
-  const [playPal, setPlayPal] = useState(false);
-  const [playCod, setPlayCod] = useState(false);
-  const [playRematch, setPlayRematch] = useState(false);
-  const [playCup, setPlayCup] = useState(false);
-  const [playVRising, setPlayVRising] = useState(false);
-  const phasmoEmbed = 'https://www.youtube-nocookie.com/embed/sRa9oeo5KiY?autoplay=1&mute=1&loop=1&playlist=sRa9oeo5KiY&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0&title=0';
-  const repoEmbed = 'https://www.youtube-nocookie.com/embed/oSfoK8eSeD8?autoplay=1&mute=1&loop=1&playlist=oSfoK8eSeD8&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0&title=0';
-  const peakEmbed = 'https://www.youtube-nocookie.com/embed/jrlUVhLBjG0?autoplay=1&mute=1&loop=1&playlist=jrlUVhLBjG0&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0&title=0';
-  const palworldEmbed = 'https://www.youtube-nocookie.com/embed/D9w97KSEAOo?autoplay=1&mute=1&loop=1&playlist=D9w97KSEAOo&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0&title=0';
-  const codEmbed = 'https://www.youtube-nocookie.com/embed/9txkGBj_trg?autoplay=1&mute=1&loop=1&playlist=9txkGBj_trg&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0&title=0';
-  const rematchEmbed = 'https://www.youtube-nocookie.com/embed/mo_RL_K891U?autoplay=1&mute=1&loop=1&playlist=mo_RL_K891U&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0&title=0';
-  const cupheadEmbed = 'https://www.youtube-nocookie.com/embed/NN-9SQXoi50?autoplay=1&mute=1&loop=1&playlist=NN-9SQXoi50&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0&title=0';
-  const vRisingEmbed = 'https://www.youtube-nocookie.com/embed/iCEpBpJ3paQ?autoplay=1&mute=1&loop=1&playlist=iCEpBpJ3paQ&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0&title=0';
-
->>>>>>> origin/main
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
-<<<<<<< HEAD
     fetchGamesByPrice('asc')
-=======
-    fetchGamesByPrice(order)
->>>>>>> origin/main
       .then((data) => {
         if (!cancelled) setGames(data);
       })
       .catch((err) => {
-<<<<<<< HEAD
         if (!cancelled) {
           // Check if it's a network/connection error
           if (!err.response) {
@@ -182,51 +117,6 @@ export function HomePage() {
     return () => { cancelled = true; };
   }, []);
 
-=======
-        if (!cancelled) setError(err?.response?.data?.message ?? 'Failed to load');
-      })
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [order]);
-
-  // load categories once
-  useEffect(() => {
-    let cancelled = false;
-    fetchCategories().then((arr)=>{ if(!cancelled) setCategories(arr||[]); }).catch(()=>{});
-    return ()=>{ cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    // Try to get raw token from 'token' or from JSON stored in 'user'
-    let token: string | null = localStorage.getItem('token');
-    if (!token) {
-      try {
-        const raw = localStorage.getItem('user');
-        if (raw) token = JSON.parse(raw)?.token ?? null;
-      } catch {}
-    }
-    if (!token) {
-      // no token: try to show cached username so user still sees the header
-      const u = localStorage.getItem('username') || (() => { try { return JSON.parse(localStorage.getItem('user')||'{}')?.username; } catch { return null; } })();
-      if (u && !cancelled) setMe({ id: 'me', username: u });
-      return () => { cancelled = true; };
-    }
-    // Ensure Authorization header is present before calling API
-    try { setAuthToken(token); } catch {}
-    getMyInfo()
-      .then((data) => { if (!cancelled) setMe(data); })
-      .catch(() => {
-        // fallback: use username from localStorage if API fails (e.g., CORS or token desync)
-        const u = localStorage.getItem('username') || (() => { try { return JSON.parse(localStorage.getItem('user')||'{}')?.username; } catch { return null; } })();
-        if (u && !cancelled) setMe({ id: 'me', username: u });
-      });
-    return () => { cancelled = true; };
-  }, []);
-
-<<<<<<< HEAD
   const onSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -329,8 +219,6 @@ export function HomePage() {
       </div>
     </div>
   ), [keyword, order, menuOpen, me, showWishlist, catOpen, categories, selectedCategory]);
-=======
->>>>>>> origin/main
   const visibleCats = (categories || []).slice(0, catLimit);
   const canMoreCat = categories && categories.length > catLimit;
 
@@ -343,11 +231,8 @@ export function HomePage() {
   ), [games]);
   
   const [heroIndex, setHeroIndex] = useState(0);
-<<<<<<< HEAD
   const hero = heroSlides[heroIndex] || (games.length > 0 ? games[0] : null); // Safe fallback
-=======
-  const hero = heroSlides[heroIndex] || games[0]; // Fallback to first game
->>>>>>> origin/main
+  const hero = heroSlides[heroIndex] || (games.length > 0 ? games[0] : null); // Safe fallback
   const heroTimer = useRef<number | null>(null);
   const AUTO_MS = 5200;
 
@@ -358,17 +243,13 @@ export function HomePage() {
   function prevHero(){ 
     setHeroIndex(i => (i-1 + (heroSlides || []).length) % Math.max(1, (heroSlides || []).length)); 
   }
-<<<<<<< HEAD
 
   // Autoplay with pause on hover
   const heroAreaRef = useRef<HTMLElement>(null);
   useEffect(() => {
-=======
->>>>>>> origin/main
 
   // close user menu and category menu on outside click or on scroll
   useEffect(() => {
-<<<<<<< HEAD
     const onDocClick = (e: MouseEvent) => {
       const target = e.target as Node;
       const clickedInsideMenu = menuRef.current?.contains(target);
@@ -376,8 +257,6 @@ export function HomePage() {
       const clickedOnCat = catRef.current?.contains(target);
       if (!clickedInsideMenu && !clickedOnUser) setMenuOpen(false);
       if (!clickedOnCat) setCatOpen(false);
-=======
->>>>>>> origin/main
     if (!heroSlides || heroSlides.length === 0) return;
     
     function clear(){ 
@@ -396,7 +275,6 @@ export function HomePage() {
     const vis = () => { 
       if(document.visibilityState === 'visible') schedule(); 
       else clear(); 
-<<<<<<< HEAD
     };
     document.addEventListener('visibilitychange', vis);
     
@@ -412,8 +290,6 @@ export function HomePage() {
       area?.removeEventListener('mouseenter', pause);
       area?.removeEventListener('mouseleave', resume);
     };
-=======
->>>>>>> origin/main
     };
     const onScroll = () => setMenuOpen(false);
     document.addEventListener('click', onDocClick);
@@ -422,7 +298,6 @@ export function HomePage() {
       document.removeEventListener('click', onDocClick);
       window.removeEventListener('scroll', onScroll);
     };
-<<<<<<< HEAD
   }, []);
 
   const withMute = (url: string, muted: boolean) => url.replace(/mute=\d/, `mute=${muted ? 1 : 0}`);
@@ -490,8 +365,6 @@ export function HomePage() {
       }
     } catch {}
   };
-=======
->>>>>>> origin/main
   }, [heroIndex, heroSlides?.length]);
 
   // Game sections
@@ -520,7 +393,6 @@ export function HomePage() {
   const newArrivals = useMemo(() => (
     [...(games || [])].slice(0, 8)
   ), [games]);
-<<<<<<< HEAD
 
   const sections = useMemo(() => {
     const allSections = [
@@ -533,8 +405,6 @@ export function HomePage() {
     return allSections.filter(s => s.items && s.items.length > 0);
   }, [bestSellers, deepDiscount, featured, freeToPlay, newArrivals]);
 
-=======
->>>>>>> origin/main
 
   const buyNow = (g: Game) => {
     const items = [{ id: g.id, name: g.name, price: g.price as any, qty: 1 }];
@@ -542,7 +412,6 @@ export function HomePage() {
     window.location.href = '/checkout';
   };
 
-<<<<<<< HEAD
   // Featured (carousel) shows only the first 6 games; the rest go to Famous Game
   const filteredByCategory = selectedCategory ? games.filter(g => (g as any).categories?.some((c:any)=> c.name?.toLowerCase() === selectedCategory?.toLowerCase())) : games;
   const featuredGames = filteredByCategory.slice(0, 6);
@@ -569,8 +438,6 @@ export function HomePage() {
               src="https://www.youtube-nocookie.com/embed/LembwKDo1Dk?autoplay=1&mute=1&loop=1&playlist=LembwKDo1Dk&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&showinfo=0&fs=0"
               title="Video"
               allow="autoplay; encrypted-media"
-=======
->>>>>>> origin/main
   if (loading && (!games || games.length === 0)) {
     return (
       <div className="home-model">
@@ -778,12 +645,9 @@ export function HomePage() {
               title={s.title} 
               items={s.items} 
               currency={currency} 
-<<<<<<< HEAD
             />
           ))}
         </div>
-=======
->>>>>>> origin/main
             />
             <div className="heroOverlay">
               <div>
@@ -1173,7 +1037,6 @@ export function HomePage() {
             </article>
           ))}
         </div>
-<<<<<<< HEAD
         <div className="gridRow">
           {((showWishlist ? games.filter(g=>isWished(g.id)) : games).slice(4,8)).map((g) => (
             <article key={g.id} className="card">
@@ -1333,8 +1196,6 @@ export function HomePage() {
                     <button className="btn add" onClick={() => addToCart(g)}>Add to Cart</button>
                     <button className="btn buy" onClick={() => buyNow(g)}>Buy Now</button>
                   </div>
-=======
->>>>>>> origin/main
       </div>
     </main>
   );
@@ -1412,7 +1273,6 @@ function SectionShelf({ title, items, id, currency }: SectionShelfProps){
                   ) : (
                     <span className="final solo">{formatPrice(Number(g.price), currency)}</span>
                   )}
-<<<<<<< HEAD
                 </div>
               </div>
             </Link>
@@ -1422,8 +1282,6 @@ function SectionShelf({ title, items, id, currency }: SectionShelfProps){
     </section>
   );
 }
-=======
->>>>>>> origin/main
                 </div>
               </div>
             </article>
@@ -1690,4 +1548,3 @@ function SectionShelf({ title, items, id, currency }: SectionShelfProps){
 }
 
 
->>>>>>> origin/main

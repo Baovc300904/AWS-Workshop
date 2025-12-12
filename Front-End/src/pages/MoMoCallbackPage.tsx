@@ -54,12 +54,12 @@ export default function MoMoCallbackPage() {
               setStatus('success');
               setMessage(successMsg);
               showSuccess(successMsg);
-<<<<<<< HEAD
               
               // Trigger balance update in navbar
               window.dispatchEvent(new Event('balance-updated'));
-=======
->>>>>>> origin/main
+              
+              // Trigger balance update in navbar
+              window.dispatchEvent(new Event('balance-updated'));
             } else {
               // Confirm game purchase
               await confirmMoMoPayment(orderId, { 
@@ -98,12 +98,12 @@ export default function MoMoCallbackPage() {
               const successMsg = `Nạp tiền thành công! Số tiền ${amount ? parseInt(amount).toLocaleString('vi-VN') : ''} VNĐ đã được cộng vào ví của bạn.`;
               setMessage(successMsg);
               showSuccess(successMsg);
-<<<<<<< HEAD
               
               // Trigger balance update in navbar
               window.dispatchEvent(new Event('balance-updated'));
-=======
->>>>>>> origin/main
+              
+              // Trigger balance update in navbar
+              window.dispatchEvent(new Event('balance-updated'));
             } else {
               // Game purchase
               await confirmMoMoPayment(orderId, { 
@@ -116,12 +116,12 @@ export default function MoMoCallbackPage() {
               setMessage(successMsg);
               showSuccess(successMsg);
               
-<<<<<<< HEAD
               // Trigger balance update in navbar
               window.dispatchEvent(new Event('balance-updated'));
               
-=======
->>>>>>> origin/main
+              // Trigger balance update in navbar
+              window.dispatchEvent(new Event('balance-updated'));
+              
               // Clear cart for purchases
               clear();
               localStorage.removeItem('pending_order');
