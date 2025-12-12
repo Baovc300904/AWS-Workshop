@@ -1,14 +1,19 @@
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { fetchCategories, Category, setAuthToken, logout as apiLogout, getMyInfo, getBalance } from '../../api/client';
 import { fetchCategories, Category, setAuthToken, logout as apiLogout, getMyInfo, getBalance } from '../../api/client';
 
 export default function Navbar() {
     const { cart } = useCart();
     const { wishlist } = useWishlist();
     const navigate = useNavigate();
+    const location = useLocation();
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [balance, setBalance] = useState<number>(0);
     const location = useLocation();
     const [categories, setCategories] = useState<Category[]>([]);
     const [balance, setBalance] = useState<number>(0);

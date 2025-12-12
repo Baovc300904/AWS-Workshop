@@ -57,6 +57,9 @@ export default function MoMoCallbackPage() {
               
               // Trigger balance update in navbar
               window.dispatchEvent(new Event('balance-updated'));
+              
+              // Trigger balance update in navbar
+              window.dispatchEvent(new Event('balance-updated'));
             } else {
               // Confirm game purchase
               await confirmMoMoPayment(orderId, { 
@@ -98,6 +101,9 @@ export default function MoMoCallbackPage() {
               
               // Trigger balance update in navbar
               window.dispatchEvent(new Event('balance-updated'));
+              
+              // Trigger balance update in navbar
+              window.dispatchEvent(new Event('balance-updated'));
             } else {
               // Game purchase
               await confirmMoMoPayment(orderId, { 
@@ -109,6 +115,9 @@ export default function MoMoCallbackPage() {
               const successMsg = 'Thanh toán thành công! Mã kích hoạt game đã được gửi đến email của bạn.';
               setMessage(successMsg);
               showSuccess(successMsg);
+              
+              // Trigger balance update in navbar
+              window.dispatchEvent(new Event('balance-updated'));
               
               // Trigger balance update in navbar
               window.dispatchEvent(new Event('balance-updated'));

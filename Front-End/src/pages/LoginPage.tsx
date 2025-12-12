@@ -49,6 +49,9 @@ const [showErrorModal, setShowErrorModal] = useState(false);
 const [isBlinking, setIsBlinking] = useState(false);
 const [loginSuccess, setLoginSuccess] = useState(false);
 const [loginError, setLoginError] = useState(false);
+const [isBlinking, setIsBlinking] = useState(false);
+const [loginSuccess, setLoginSuccess] = useState(false);
+const [loginError, setLoginError] = useState(false);
   const navigate = useNavigate();
 
 	const getPosition = (el: Element | null) => {
@@ -268,6 +271,7 @@ const [loginError, setLoginError] = useState(false);
 		<div className="yetiLoginContainer">
 			<div className="yetiCard">
 				<div className={`yetiHead ${loginSuccess ? 'celebrate' : ''} ${loginError ? 'shake' : ''} ${submitting ? 'loading' : ''}`}>
+				<div className={`yetiHead ${loginSuccess ? 'celebrate' : ''} ${loginError ? 'shake' : ''} ${submitting ? 'loading' : ''}`}>
 					<div className="svgContainer noBorder">
 						<svg ref={svgRef} className="mySVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
               <defs>
@@ -310,6 +314,11 @@ const [loginError, setLoginError] = useState(false);
                 <path fill="#FFFFFF" d="M138.142,55.064c-4.93,1.259-9.874,2.118-14.787,2.599c-0.336,3.341-0.776,6.689-1.322,10.037 c-4.569-1.465-8.909-3.222-12.996-5.226c-0.98,3.075-2.07,6.137-3.267,9.179c-5.514-3.067-10.559-6.545-15.097-10.329 c-1.806,2.889-3.745,5.73-5.816,8.515c-7.916-4.124-15.053-9.114-21.296-14.738l1.107-11.768h73.475V55.064z" />
 								<path fill="#FFFFFF" stroke="#3A5E77" strokeWidth={2.5} strokeLinecap="round" d="M63.56,55.102 c6.243,5.624,13.38,10.614,21.296,14.738c2.071-2.785,4.01-5.626,5.816-8.515c4.537,3.785,9.583,7.263,15.097,10.329 c1.197-3.043,2.287-6.104,3.267-9.179c4.087,2.004,8.427,3.761,12.996,5.226c0.545-3.348,0.986-6.696,1.322-10.037 c4.913-0.481,9.857-1.34,14.787-2.599" />
 							</g>
+							<g ref={eyeLRef} className={`eyeL ${isBlinking ? 'blink' : ''}`}>
+								<circle cx="85.5" cy="78.5" r="3.5" fill="#3a5e77" />
+								<circle cx="84" cy="76" r="1" fill="#fff" />
+							</g>
+							<g ref={eyeRRef} className={`eyeR ${isBlinking ? 'blink' : ''}`}>
 							<g ref={eyeLRef} className={`eyeL ${isBlinking ? 'blink' : ''}`}>
 								<circle cx="85.5" cy="78.5" r="3.5" fill="#3a5e77" />
 								<circle cx="84" cy="76" r="1" fill="#fff" />
@@ -372,7 +381,7 @@ const [loginError, setLoginError] = useState(false);
                     const token = await login(username, password);
                     
                     if (!token) throw new Error('Đăng nhập thất bại - không nhận được token');
-                    
+                 
                     localStorage.setItem('wgs_token', token);
                     localStorage.setItem('token', token); // Also save as 'token' for compatibility
                     localStorage.setItem('username', username);

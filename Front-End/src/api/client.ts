@@ -3,6 +3,11 @@ import axios from 'axios';
 // Use environment variable for API base URL
 // Default to /api which nginx will proxy to backend at /identity
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+// Use environment variable for API base URL
+// Default to /api which nginx will proxy to backend at /identity
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+// Use /api prefix in production, empty in dev (Vite proxy handles it)
+const API_BASE = import.meta.env.PROD ? '/api' : '';
 
 export const api = axios.create({
   baseURL: API_BASE,
@@ -14,6 +19,9 @@ export const api = axios.create({
 
 // Public endpoints that don't need authentication
 const PUBLIC_ENDPOINTS = [
+  '/auth/login',
+  '/auth/introspect',
+  // NOTE: /users is handled specially in interceptor (only POST /users for registration is public)
   '/auth/login',
   '/auth/introspect',
   // NOTE: /users is handled specially in interceptor (only POST /users for registration is public)
@@ -305,6 +313,17 @@ export async function login(username: string, password: string) {
   if (!token) {
     throw new Error('No token received from server');
   }
+export async function login(username: string, password: string) {
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/auth/login', { username, password });
+  const token = res.data?.result?.token as string;
+  if (!token) {
+    throw new Error('No token received from server');
+  }
+export async function login(username: string, password: string) {
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/auth/log-in', { username, password });
+  const token = res.data?.result?.token as string;
   return token;
 }
 
@@ -345,6 +364,9 @@ export async function requestPhoneOtp(phone: string) {
 
 // Request email OTP for registration
 export async function requestEmailOtp(email: string): Promise<string> {
+  // Public endpoint - interceptor will not add token
+  const res = await api.post('/email/request-otp', { email });
+  return res.data?.result as string; // Backend returns "OTP sent successfully" or the OTP code
   // Public endpoint - interceptor will not add token
   const res = await api.post('/email/request-otp', { email });
   return res.data?.result as string; // Backend returns "OTP sent successfully" or the OTP code
@@ -454,7 +476,6 @@ export async function fetchMonthlySales() {
   const res = await api.get('/orders/monthly-sales');
   return res.data?.result as Array<{ month: string; amount: number }>;
 }
-
 // Order Management APIs
 export async function fetchAllOrders() {
   const res = await api.get('/orders');

@@ -25,10 +25,18 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
 const GoogleCallbackPage = lazy(() => import('./pages/GoogleCallbackPage'));
+const MoMoCallbackPage = lazy(() => import('./pages/MoMoCallbackPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const GameDetailPage = lazy(() => import('./pages/GameDetailPage').then(m => ({ default: m.GameDetailPage })));
 const WishlistPage = lazy(() => import('./pages/WishlistPage'));
 const AdminPage = lazy(() => import('./pages/admin/AdminPage'));
+const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
+const AdminUsersManagement = lazy(() => import('./pages/admin/AdminUsersManagement'));
+const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
+const AdminUsersManagement = lazy(() => import('./pages/admin/AdminUsersManagement'));
 const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
 const AdminUsersManagement = lazy(() => import('./pages/admin/AdminUsersManagement'));
 const ModeratorPage = lazy(() => import('./pages/ModeratorPage'));
@@ -72,11 +80,17 @@ function AdminRoute({ children }: { children: React.ReactElement }) {
         }
         const raw = localStorage.getItem('user');
         let hasAccess = false;
+        let hasAccess = false;
         try {
           const u = raw ? JSON.parse(raw) : {};
           const roles = (u?.roles || u?.authorities || []).map((r: any) =>
             (r?.authority || r).toString().toUpperCase()
           );
+          // Allow both ADMIN and MOD to access admin pages
+          hasAccess = roles.includes('ROLE_ADMIN') || roles.includes('ADMIN') || 
+                      roles.includes('ROLE_MOD') || roles.includes('MOD');
+        } catch {}
+        setStatus(hasAccess ? 'allowed' : 'redirect');
           // Allow both ADMIN and MOD to access admin pages
           hasAccess = roles.includes('ROLE_ADMIN') || roles.includes('ADMIN') || 
                       roles.includes('ROLE_MOD') || roles.includes('MOD');

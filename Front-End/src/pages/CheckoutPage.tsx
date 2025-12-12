@@ -196,6 +196,147 @@ export default function CheckoutPage() {
     return formatted.slice(0, 19); // 16 digits + 3 spaces
   };
 
+    if (paymentMethod === 'momo') {
+      if (!momoPhone || !/^(0|\+84)[0-9]{9,10}$/.test(momoPhone.replace(/\s/g, ''))) {
+        newErrors.momoPhone = 'Số điện thoại MoMo không hợp lệ';
+      }
+    }
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = 'Email không hợp lệ';
+    }
+
+    if (phone && !/^[0-9]{9,11}$/.test(phone.replace(/\s/g, ''))) {
+      newErrors.phone = 'Số điện thoại không hợp lệ';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setIsProcessing(true);
+    setErrors({});
+
+    // Handle Balance payment
+    if (paymentMethod === 'balance') {
+      try {
+        // TODO: Call API to purchase with balance
+        alert('💰 Thanh toán bằng số dư tài khoản\n\nChức năng đang được phát triển...');
+        setIsProcessing(false);
+        return;
+      } catch (error: any) {
+        setIsProcessing(false);
+        const errorMsg = error?.response?.data?.message || error?.message || 'Không thể thanh toán bằng số dư';
+        alert(`❌ Lỗi thanh toán:\n\n${errorMsg}`);
+        return;
+      }
+    }
+
+    // Handle MoMo payment
+    if (paymentMethod === 'momo') {
+      try {
+        const gameNames = cart.map(item => item.name).join(', ');
+        const orderInfo = `Mua game: ${gameNames.slice(0, 100)}${gameNames.length > 100 ? '...' : ''}`;
+        const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        try {
+          // Use new API with items
+          const momoResponse = await createMoMoPaymentWithItems({
+            orderId,
+            amount: totalRaw,
+            orderInfo,
+            items: cart.map(item => ({
+              gameId: item.id,
+              gameName: item.name,
+              unitPrice: Number(item.price),
+              quantity: item.quantity,
+              salePercent: item.salePercent || 0,
+            })),
+          });
+
+          // Save order info to localStorage for callback
+          localStorage.setItem('pending_order', JSON.stringify({
+            orderId: momoResponse.orderId,
+            amount: totalRaw,
+            cart,
+            email,
+            phone,
+            timestamp: Date.now(),
+          }));
+
+          // Redirect to MoMo payment page
+          if (momoResponse.payUrl) {
+            // Open MoMo deeplink if on mobile, otherwise use payUrl
+            if (momoResponse.deeplink && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+              window.location.href = momoResponse.deeplink;
+            } else {
+              window.location.href = momoResponse.payUrl;
+            }
+            return;
+          }
+        } catch (apiError: any) {
+          console.error('MoMo API error:', apiError);
+          setIsProcessing(false);
+          
+          const errorDetail = apiError?.response?.data?.message || apiError?.message || 'Không rõ lỗi';
+          alert(
+            `❌ Lỗi kết nối MoMo API\n\n` +
+            `Chi tiết: ${errorDetail}\n\n` +
+            `Vui lòng kiểm tra:\n` +
+            `- Backend đã chạy chưa?\n` +
+            `- MoMo credentials đã đúng chưa?\n` +
+            `- Kết nối mạng ổn định không?`
+          );
+          return;
+        }
+        
+        throw new Error('Không nhận được URL thanh toán từ MoMo');
+      } catch (error: any) {
+        setIsProcessing(false);
+        const errorMsg = error?.response?.data?.message || error?.message || 'Không thể tạo giao dịch MoMo';
+        alert(`❌ Lỗi thanh toán MoMo:\n\n${errorMsg}\n\nVui lòng thử lại hoặc chọn phương thức thanh toán khác.`);
+      }
+      return;
+    }
+  };
+
+  // Calculate totals
+  const subtotal = cart.reduce((sum, item) => {
+    return sum + Number(item.price) * item.quantity;
+  }, 0);
+
+  const totalRaw = cart.reduce((sum, item) => {
+    const finalPrice = getDiscountedPrice(item);
+    return sum + finalPrice * item.quantity;
+  }, 0);
+
+  const discount = subtotal - totalRaw;
+
+  if (cart.length === 0) {
+    return (
+      <div className="checkoutPage">
+        <div className="checkoutContainer">
+          <div className="emptyCart">
+            <div className="emptyIcon">🛒</div>
+            <h2>Giỏ hàng trống</h2>
+            <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+            <button className="emptyBtn" onClick={() => navigate('/store')}>
+              Khám phá game ngay
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Format card number with spaces
+  const formatCardNumber = (value: string) => {
+    const cleaned = value.replace(/\s/g, '');
+    const formatted = cleaned.match(/.{1,4}/g)?.join(' ') || cleaned;
+    return formatted.slice(0, 19); // 16 digits + 3 spaces
+  };
+
   // Format expiry date
   const formatExpiry = (value: string) => {
     const cleaned = value.replace(/\D/g, '');
@@ -396,7 +537,6 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 )}
-
                 <div className="contactForm">
                   <h3>Thông tin liên hệ</h3>
                   

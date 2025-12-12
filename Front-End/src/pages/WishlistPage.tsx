@@ -5,6 +5,7 @@ import { useCurrency, formatPrice } from '../context/CurrencyContext';
 import { useEffect, useState } from 'react';
 import { Game as GameResponse, fetchGame } from '../api/client';
 import { getGameImage } from '../utils/imageUtils';
+import { getGameImage } from '../utils/imageUtils';
 import './WishlistPage.css';
 
 const WishlistPage = () => {
@@ -14,6 +15,8 @@ const WishlistPage = () => {
     const { currency } = useCurrency();
     const [games, setGames] = useState<GameResponse[]>([]);
     const [loading, setLoading] = useState(true);
+    const [sortBy, setSortBy] = useState<'name' | 'price' | 'discount' | 'date'>('date');
+    const [showOnSaleOnly, setShowOnSaleOnly] = useState(false);
     const [sortBy, setSortBy] = useState<'name' | 'price' | 'discount' | 'date'>('date');
     const [showOnSaleOnly, setShowOnSaleOnly] = useState(false);
 

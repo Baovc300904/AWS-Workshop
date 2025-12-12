@@ -207,7 +207,7 @@ export function ProfilePage() {
       
       // Update navbar avatar - trigger event
       window.dispatchEvent(new CustomEvent('avatar-updated', { detail: updatedUser.avatarUrl }));
-      
+
       const successMsg = document.createElement('div');
       successMsg.className = 'toast-success';
       successMsg.textContent = '✅ Upload avatar thành công!';

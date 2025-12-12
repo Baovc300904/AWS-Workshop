@@ -120,6 +120,7 @@ export async function exchangeCodeForToken(code: string): Promise<any> {
   // 5. Return your app's JWT token
   
   const response = await fetch('/api/auth/google/callback', {
+  const response = await fetch('/api/auth/google/callback', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code }),
